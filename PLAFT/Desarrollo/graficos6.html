@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bca Minorista — PLAFT Analytics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --blue:       rgb(31, 69, 146);
+      --green:      rgb(0, 190, 80);
+      --green-dark: rgb(0, 95, 30);
+      --green-soft: rgb(198, 255, 192);
+      --white:      #ffffff;
+      --gray-bg:    #f5f7f5;
+      --gray-line:  #e2e8e2;
+      --text:       #1a1a1a;
+      --muted:      #5a6472;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      font-weight: 400;
+      background: #eef2ee;
+      color: var(--text);
+    }
+
+    .slide {
+      width: 1280px;
+      height: 720px;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+      margin: 28px auto;
+      page-break-after: always;
+      box-shadow: 0 4px 24px rgba(0,95,30,.12);
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 6px; height: 100%;
+      background: var(--green);
+    }
+
+    .inner {
+      height: 100%;
+      padding: 28px 36px 22px 44px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid var(--gray-line);
+    }
+
+    .title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1.15;
+      letter-spacing: -.01em;
+    }
+
+    .subtitle {
+      font-size: .74rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 4px;
+      max-width: 880px;
+      line-height: 1.45;
+    }
+
+    .badge {
+      background: var(--green-soft);
+      color: var(--green-dark);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .65rem;
+      font-weight: 600;
+      white-space: nowrap;
+      margin-top: 2px;
+      display: inline-block;
+    }
+
+    .badge-sub {
+      font-size: .60rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .bottom-bar {
+      position:absolute;
+      bottom:0; left:0;
+      width:100%; height:5px;
+      background:var(--green);
+    }
+
+    .footer {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.60rem;
+      font-weight:300;
+      color:var(--muted);
+      padding-top:6px;
+      border-top:1px solid var(--gray-line);
+    }
+
+    .kpi-row { display:grid; gap:10px; }
+    .kpi-row-3 { grid-template-columns:repeat(3, 1fr); }
+    .kpi-row-4 { grid-template-columns:repeat(4, 1fr); }
+
+    .kpi {
+      border-radius:10px;
+      padding:10px 13px;
+      background:var(--white);
+      border:1.5px solid var(--gray-line);
+      border-top:4px solid var(--blue);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:105px;
+    }
+
+    .kpi.k-green  { border-top-color:var(--green); background:var(--green-soft); }
+    .kpi.k-blue   { border-top-color:var(--blue); background:rgba(31,69,146,.05); }
+    .kpi.k-subtle { border-top-color:var(--green-dark); background:var(--gray-bg); }
+
+    .kpi-label {
+      font-size:.56rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--blue);
+      margin-bottom:6px;
+    }
+
+    .kpi.k-green .kpi-label,
+    .kpi.k-subtle .kpi-label { color:var(--green-dark); }
+
+    .kpi-lines {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      align-items:start;
+    }
+
+    .kpi-block {
+      border-radius:8px;
+      padding:8px 9px;
+      background:rgba(255,255,255,.65);
+      border:1px solid rgba(226,232,226,.75);
+    }
+
+    .kpi-mini-label {
+      font-size:.50rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .kpi-value {
+      font-size:1.38rem;
+      font-weight:700;
+      line-height:1;
+      color:var(--text);
+    }
+
+    .kpi-sub {
+      font-size:.56rem;
+      font-weight:300;
+      color:var(--muted);
+      line-height:1.3;
+      margin-top:4px;
+    }
+
+    .chart-grid {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+      min-height:0;
+    }
+
+    .chart-card {
+      background:rgba(31,69,146,.06);
+      border-radius:10px;
+      padding:11px 12px 8px;
+      border:1.5px solid rgba(31,69,146,.20);
+      border-top:4px solid var(--blue);
+    }
+
+    .chart-card.cc-subtle {
+      background:var(--gray-bg);
+      border-color:var(--gray-line);
+      border-top-color:var(--green-dark);
+    }
+
+    .chart-title {
+      font-size:.65rem;
+      font-weight:600;
+      color:var(--blue);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      margin-bottom:2px;
+    }
+
+    .chart-card.cc-subtle .chart-title { color:var(--green-dark); }
+
+    svg { width:100%; height:200px; overflow:visible; }
+
+    .bar-blue   { fill:rgba(31,69,146,.35); }
+    .bar-subtle { fill:rgba(0,95,30,.18); }
+
+    .line-green {
+      fill:none;
+      stroke:var(--green);
+      stroke-width:3.5;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .dot-g {
+      fill:var(--white);
+      stroke:var(--green);
+      stroke-width:2.5;
+    }
+
+    .axis { stroke:var(--gray-line); stroke-width:1; }
+
+    .month {
+      font-family:'Poppins',sans-serif;
+      font-size:9px;
+      fill:var(--muted);
+      font-weight:400;
+    }
+
+    .pct-label {
+      font-family:'Poppins',sans-serif;
+      font-size:12.4px;
+      fill:var(--green-dark);
+      font-weight:700;
+    }
+
+    .bar-label {
+      font-family:'Poppins',sans-serif;
+      font-size:14.3px;
+      fill:var(--text);
+      font-weight:600;
+    }
+
+    .legend {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      font-size:.57rem;
+      font-weight:400;
+      color:var(--muted);
+      margin-top:3px;
+    }
+
+    .legend span { display:flex; align-items:center; gap:5px; }
+
+    .sw {
+      width:10px;
+      height:10px;
+      border-radius:2px;
+      display:inline-block;
+    }
+
+    .sw-bar-blue   { background:rgba(31,69,146,.40); }
+    .sw-bar-subtle { background:rgba(0,95,30,.28); }
+    .sw-line       { background:var(--green); }
+
+    .story-pills {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+
+    .pill {
+      border-radius:8px;
+      padding:8px 11px;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      font-size:.64rem;
+      font-weight:400;
+      line-height:1.35;
+    }
+
+    .pill.p-green  { background:var(--green-soft); color:var(--green-dark); }
+    .pill.p-blue   { background:rgba(31,69,146,.07); color:var(--blue); }
+    .pill.p-subtle { background:var(--gray-bg); color:var(--muted); border:1px solid var(--gray-line); }
+
+    .pill-dot {
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      margin-top:4px;
+      flex-shrink:0;
+    }
+
+    .p-green .pill-dot { background:var(--green); }
+    .p-blue .pill-dot { background:var(--blue); }
+    .p-subtle .pill-dot { background:var(--green-dark); }
+
+    .comparison-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .compare-card {
+      border-radius:10px;
+      padding:18px 20px;
+      border:1.5px solid var(--gray-line);
+      border-top:5px solid var(--blue);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap:6px;
+      min-height:300px;
+      justify-content:center;
+    }
+
+    .compare-card.cc-green { border-top-color:var(--green); background:var(--green-soft); }
+    .compare-card.cc-neutral { border-top-color:var(--blue); background:rgba(31,69,146,.04); }
+
+    .compare-title {
+      font-size:.65rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--blue);
+      margin-bottom:6px;
+    }
+
+    .cc-green .compare-title { color:var(--green-dark); }
+
+    .compare-number {
+      font-size:3.6rem;
+      font-weight:700;
+      line-height:1;
+      color:var(--text);
+    }
+
+    .compare-text {
+      font-size:.72rem;
+      font-weight:300;
+      color:var(--muted);
+      line-height:1.4;
+      margin-top:8px;
+    }
+
+    .stack {
+      width:100%;
+      height:16px;
+      border-radius:999px;
+      overflow:hidden;
+      background:var(--gray-line);
+      display:flex;
+      margin-top:10px;
+    }
+
+    .stack .s-green { background:var(--green); }
+    .stack .s-blue { background:rgba(31,69,146,.35); }
+    .stack .s-neutral { background:var(--gray-line); }
+
+    .calc-box {
+      border-radius:10px;
+      background:var(--gray-bg);
+      border:1px solid var(--gray-line);
+      padding:12px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .calc {
+      background:var(--white);
+      border-radius:8px;
+      padding:11px 13px;
+      border-left:4px solid var(--blue);
+    }
+
+    .calc.c-green { border-left-color:var(--green); }
+    .calc.c-dark { border-left-color:var(--green-dark); }
+
+    .calc-label {
+      font-size:.55rem;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted);
+    }
+
+    .calc-value {
+      font-size:1.5rem;
+      font-weight:700;
+      margin-top:3px;
+      line-height:1.1;
+      color:var(--text);
+    }
+
+    .message-box {
+      background:var(--green-soft);
+      border-left:5px solid var(--green);
+      border-radius:10px;
+      padding:12px 16px;
+      font-size:.80rem;
+      font-weight:400;
+      color:var(--green-dark);
+      line-height:1.45;
+    }
+
+    .message-box b { font-weight:700; }
+
+    @media print {
+      body { background:#fff; }
+      .slide { margin:0; box-shadow:none; }
+    }
+  </style>
+</head>
+
+<body>
+
+<section class="slide">
+  <div class="inner">
+
+    <div class="header">
+      <div>
+        <div class="title">Evolutivo de efectividad histórica</div>
+        <div class="subtitle">
+          Efectividad por origen de alertas hasta 05/2026. El piloto corresponde al consolidado 04/2026 + 05/2026 y se analiza por separado.
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="badge">Bca Minorista · PLAFT</div>
+        <div class="badge-sub">Gráficos: Nov-25, Feb-26–May-26</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:9px;">
+
+      <div class="kpi-row kpi-row-3">
+
+        <div class="kpi k-blue">
+          <div class="kpi-label">Bca Minorista</div>
+          <div class="kpi-lines">
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Promedio sin piloto</div>
+              <div class="kpi-value">18.8%</div>
+              <div class="kpi-sub">129 alertas con riesgo promedio.</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Piloto 04+05/2026</div>
+              <div class="kpi-value">38.8%</div>
+              <div class="kpi-sub">734 / 1.891 alertas.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi k-subtle">
+          <div class="kpi-label">Automático</div>
+          <div class="kpi-lines">
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Promedio sin piloto</div>
+              <div class="kpi-value">13.3%</div>
+              <div class="kpi-sub">72 alertas con riesgo promedio.</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Piloto 04+05/2026</div>
+              <div class="kpi-value">36.5%</div>
+              <div class="kpi-sub">482 / 1.320 alertas.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi k-subtle">
+          <div class="kpi-label">Adaptativo y Manual</div>
+          <div class="kpi-lines">
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Promedio sin piloto</div>
+              <div class="kpi-value">38.8%</div>
+              <div class="kpi-sub">58 alertas con riesgo promedio.</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-mini-label">Piloto 04+05/2026</div>
+              <div class="kpi-value">44.1%</div>
+              <div class="kpi-sub">252 / 571 alertas.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chart-grid">
+
+        <div class="chart-card">
+          <div class="chart-title">Bca Minorista</div>
+          <svg viewBox="0 0 500 210">
+            <line class="axis" x1="30" y1="165" x2="475" y2="165"/>
+            <rect class="bar-blue" x="45"  y="103.0" width="26" height="62.0"  rx="4"/>
+            <rect class="bar-blue" x="137" y="15.0"  width="26" height="150.0" rx="4"/>
+            <rect class="bar-blue" x="229" y="71.2"  width="26" height="93.8"  rx="4"/>
+            <rect class="bar-blue" x="321" y="40.8"  width="26" height="124.2" rx="4"/>
+            <rect class="bar-blue" x="413" y="28.2"  width="26" height="136.8" rx="4"/>
+            <text class="bar-label" x="58" y="100.0" text-anchor="middle">449</text>
+            <text class="bar-label" x="150" y="12.0" text-anchor="middle">1087</text>
+            <text class="bar-label" x="242" y="68.2" text-anchor="middle">680</text>
+            <text class="bar-label" x="334" y="37.8" text-anchor="middle">900</text>
+            <text class="bar-label" x="426" y="25.2" text-anchor="middle">991</text>
+            <polyline class="line-green" points="58,135.2 150,134.5 242,123.5 334,71.2 426,102.0"/>
+            <circle class="dot-g" cx="58" cy="135.2" r="4.5"/>
+            <circle class="dot-g" cx="150" cy="134.5" r="4.5"/>
+            <circle class="dot-g" cx="242" cy="123.5" r="4.5"/>
+            <circle class="dot-g" cx="334" cy="71.2" r="4.5"/>
+            <circle class="dot-g" cx="426" cy="102.0" r="4.5"/>
+            <text x="58" y="123.0" text-anchor="middle" class="pct-label">14.9%</text>
+            <text x="150" y="122.0" text-anchor="middle" class="pct-label">15.3%</text>
+            <text x="242" y="111.0" text-anchor="middle" class="pct-label">20.7%</text>
+            <text x="334" y="59.0" text-anchor="middle" class="pct-label">46.9%</text>
+            <text x="426" y="90.0" text-anchor="middle" class="pct-label">31.5%</text>
+            <text class="month" x="45" y="192">Nov-25</text>
+            <text class="month" x="128" y="192">Feb-26</text>
+            <text class="month" x="220" y="192">Mar-26</text>
+            <text class="month" x="312" y="192">Abr-26</text>
+            <text class="month" x="404" y="192">May-26</text>
+          </svg>
+          <div class="legend">
+            <span><i class="sw sw-bar-blue"></i>Total alertas</span>
+            <span><i class="sw sw-line"></i>% Casos con Riesgo</span>
+          </div>
+        </div>
+
+        <div class="chart-card cc-subtle">
+          <div class="chart-title">Automático</div>
+          <svg viewBox="0 0 500 210">
+            <line class="axis" x1="30" y1="165" x2="475" y2="165"/>
+            <rect class="bar-subtle" x="45" y="113.5" width="26" height="51.5" rx="4"/>
+            <rect class="bar-subtle" x="137" y="40.3" width="26" height="124.7" rx="4"/>
+            <rect class="bar-subtle" x="229" y="98.9" width="26" height="66.1" rx="4"/>
+            <rect class="bar-subtle" x="321" y="67.4" width="26" height="97.6" rx="4"/>
+            <rect class="bar-subtle" x="413" y="80.4" width="26" height="84.6" rx="4"/>
+            <text class="bar-label" x="58" y="110.5" text-anchor="middle">373</text>
+            <text class="bar-label" x="150" y="37.3" text-anchor="middle">904</text>
+            <text class="bar-label" x="242" y="95.9" text-anchor="middle">479</text>
+            <text class="bar-label" x="334" y="64.4" text-anchor="middle">707</text>
+            <text class="bar-label" x="426" y="77.4" text-anchor="middle">613</text>
+            <polyline class="line-green" points="58,146.8 150,141.6 242,135.4 334,74.0 426,112.8"/>
+            <circle class="dot-g" cx="58" cy="146.8" r="4.5"/>
+            <circle class="dot-g" cx="150" cy="141.6" r="4.5"/>
+            <circle class="dot-g" cx="242" cy="135.4" r="4.5"/>
+            <circle class="dot-g" cx="334" cy="74.0" r="4.5"/>
+            <circle class="dot-g" cx="426" cy="112.8" r="4.5"/>
+            <text x="58" y="134.0" text-anchor="middle" class="pct-label">9.1%</text>
+            <text x="150" y="129.0" text-anchor="middle" class="pct-label">11.7%</text>
+            <text x="242" y="123.0" text-anchor="middle" class="pct-label">14.8%</text>
+            <text x="334" y="88.0" text-anchor="middle" class="pct-label">45.5%</text>
+            <text x="426" y="100.0" text-anchor="middle" class="pct-label">26.1%</text>
+            <text class="month" x="45" y="192">Nov-25</text>
+            <text class="month" x="128" y="192">Feb-26</text>
+            <text class="month" x="220" y="192">Mar-26</text>
+            <text class="month" x="312" y="192">Abr-26</text>
+            <text class="month" x="404" y="192">May-26</text>
+          </svg>
+          <div class="legend">
+            <span><i class="sw sw-bar-subtle"></i>Total alertas</span>
+            <span><i class="sw sw-line"></i>% Casos con Riesgo</span>
+          </div>
+        </div>
+
+        <div class="chart-card cc-subtle">
+          <div class="chart-title">Adaptativo y Manual</div>
+          <svg viewBox="0 0 500 210">
+            <line class="axis" x1="30" y1="165" x2="475" y2="165"/>
+            <rect class="bar-subtle" x="45" y="154.5" width="26" height="10.5" rx="4"/>
+            <rect class="bar-subtle" x="137" y="139.7" width="26" height="25.3" rx="4"/>
+            <rect class="bar-subtle" x="229" y="137.3" width="26" height="27.7" rx="4"/>
+            <rect class="bar-subtle" x="321" y="138.4" width="26" height="26.6" rx="4"/>
+            <rect class="bar-subtle" x="413" y="112.8" width="26" height="52.2" rx="4"/>
+            <text class="bar-label" x="58" y="151.5" text-anchor="middle">76</text>
+            <text class="bar-label" x="150" y="136.7" text-anchor="middle">183</text>
+            <text class="bar-label" x="242" y="134.3" text-anchor="middle">201</text>
+            <text class="bar-label" x="334" y="135.4" text-anchor="middle">193</text>
+            <text class="bar-label" x="426" y="109.8" text-anchor="middle">378</text>
+            <polyline class="line-green" points="58,78.2 150,99.4 242,95.4 334,61.4 426,84.6"/>
+            <circle class="dot-g" cx="58" cy="78.2" r="4.5"/>
+            <circle class="dot-g" cx="150" cy="99.4" r="4.5"/>
+            <circle class="dot-g" cx="242" cy="95.4" r="4.5"/>
+            <circle class="dot-g" cx="334" cy="61.4" r="4.5"/>
+            <circle class="dot-g" cx="426" cy="84.6" r="4.5"/>
+            <text x="58" y="66.0" text-anchor="middle" class="pct-label">43.4%</text>
+            <text x="150" y="87.0" text-anchor="middle" class="pct-label">32.8%</text>
+            <text x="242" y="83.0" text-anchor="middle" class="pct-label">34.8%</text>
+            <text x="334" y="49.0" text-anchor="middle" class="pct-label">51.8%</text>
+            <text x="426" y="72.0" text-anchor="middle" class="pct-label">40.2%</text>
+            <text class="month" x="45" y="192">Nov-25</text>
+            <text class="month" x="128" y="192">Feb-26</text>
+            <text class="month" x="220" y="192">Mar-26</text>
+            <text class="month" x="312" y="192">Abr-26</text>
+            <text class="month" x="404" y="192">May-26</text>
+          </svg>
+          <div class="legend">
+            <span><i class="sw sw-bar-subtle"></i>Total alertas</span>
+            <span><i class="sw sw-line"></i>% Casos con Riesgo</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="story-pills">
+        <div class="pill p-blue">
+          <div class="pill-dot"></div>
+          <div><b>Bca Minorista:</b> en 04+05/2026 el piloto consolidó <b>1.891 alertas</b> y <b>734 con riesgo</b>.</div>
+        </div>
+        <div class="pill p-subtle">
+          <div class="pill-dot"></div>
+          <div><b>Automático:</b> el piloto acumuló <b>1.320 alertas</b>, con <b>482 casos de riesgo</b>.</div>
+        </div>
+        <div class="pill p-subtle">
+          <div class="pill-dot"></div>
+          <div><b>Adaptativo y Manual:</b> alcanzó <b>44.1%</b> de captura consolidada en 04+05/2026.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <span>Fuente: actualización de alertas hasta 05/2026</span>
+      <span>Interbank · PLAFT Analytics</span>
+    </div>
+
+  </div>
+  <div class="bottom-bar"></div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+
+    <div class="header">
+      <div>
+        <div class="title">Resultado piloto — Control vs Nuevas alertas</div>
+        <div class="subtitle">Comparación de captura entre alertas automáticas actuales y nuevas alertas identificadas por el piloto.</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="badge">Diseño de Piloto · Bca Minorista</div>
+        <div class="badge-sub">Piloto: 202504–202505</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <div class="kpi-row kpi-row-4">
+        <div class="kpi k-subtle">
+          <div class="kpi-label">Control automático</div>
+          <div class="kpi-value">16.1%</div>
+          <div class="kpi-sub">86 alertas con riesgo sobre 533.</div>
+        </div>
+        <div class="kpi k-green">
+          <div class="kpi-label">Nuevas alertas piloto</div>
+          <div class="kpi-value">96.2%</div>
+          <div class="kpi-sub">250 alertas con riesgo sobre 260.</div>
+        </div>
+        <div class="kpi k-blue">
+          <div class="kpi-label">Mejora relativa</div>
+          <div class="kpi-value">6.0×</div>
+          <div class="kpi-sub">Mayor captura vs control automático.</div>
+        </div>
+        <div class="kpi k-blue">
+          <div class="kpi-label">Diferencia</div>
+          <div class="kpi-value">+80.1 pp</div>
+          <div class="kpi-sub">Brecha de captura a favor del piloto.</div>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+        <div class="compare-card cc-neutral">
+          <div class="compare-title">Control · Automático</div>
+          <div class="compare-number">16.1%</div>
+          <div class="compare-text">533 alertas evaluadas · 86 con riesgo · 447 sin riesgo.</div>
+          <div class="stack">
+            <div class="s-blue" style="width:16.1%"></div>
+            <div class="s-neutral" style="width:83.9%"></div>
+          </div>
+          <div class="compare-text">Predomina el volumen sin riesgo, generando menor captura.</div>
+        </div>
+
+        <div class="compare-card cc-green">
+          <div class="compare-title">Piloto · Nuevas alertas</div>
+          <div class="compare-number">96.2%</div>
+          <div class="compare-text">260 alertas evaluadas · 250 con riesgo · 10 sin riesgo.</div>
+          <div class="stack">
+            <div class="s-green" style="width:96.2%"></div>
+            <div class="s-neutral" style="width:3.8%"></div>
+          </div>
+          <div class="compare-text">Las nuevas alertas concentran casos con riesgo y elevan significativamente la efectividad.</div>
+        </div>
+      </div>
+
+      <div class="calc-box">
+        <div class="calc c-green">
+          <div class="calc-label">Alertas con riesgo · Piloto</div>
+          <div class="calc-value">250</div>
+        </div>
+        <div class="calc c-dark">
+          <div class="calc-label">Alertas con riesgo · Control</div>
+          <div class="calc-value">86</div>
+        </div>
+        <div class="calc">
+          <div class="calc-label">Ratio de efectividad</div>
+          <div class="calc-value">96.2 / 16.1 = 6.0×</div>
+        </div>
+      </div>
+
+      <div class="message-box">
+        Las nuevas alertas identificadas por el piloto 202504–202505 registran una captura de <b>96.2%</b>, equivalente a una efectividad <b>6.0 veces mayor</b> que las alertas automáticas actuales.
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <span>Fuente: actualización de resultados hasta 05/2026</span>
+      <span>Interbank · PLAFT Analytics</span>
+    </div>
+
+  </div>
+  <div class="bottom-bar"></div>
+</section>
+
+</body>
+</html>

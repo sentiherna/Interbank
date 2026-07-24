@@ -1,0 +1,56 @@
+# Credenciales
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+secrets.json
+token.txt
+*_token.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datos y resultados
+*.csv
+*.parquet
+*.feather
+*.avro
+*.orc
+
+# Modelos
+*.pkl
+*.pickle
+*.joblib
+**/Model/
+**/models/
+**/artifacts/
+**/xgboost-model
+**/xgboost-model*
+
+# Documentos internos
+*.xlsx
+*.xls
+*.docx
+*.pdf
+*.pptx
+
+# Salidas gráficas generadas
+**/eda_graficos_train/
+**/eda_graficos_test/
+**/bivariados_graficos_train/
+**/bivariados_graficos_test/
+**/auditoria_tier4/
+
+# Temporales
+*.log
+*.tmp
+Thumbs.db

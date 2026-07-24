@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Resultado piloto mensual</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1F4592;
+  --green:#00BE50;
+  --green2:#005F1E;
+  --orange:#F59E0B;
+  --violet:#6B21A8;
+  --gray:#f4f6fb;
+  --muted:#666;
+}
+body{font-family:'Poppins',Arial,sans-serif;background:#e8ecf5;color:#1d1d1d;}
+.slide{width:1280px;height:720px;background:#fff;position:relative;overflow:hidden;margin:24px auto;}
+.inner{height:100%;padding:30px 38px 24px;display:grid;grid-template-rows:auto 1fr auto;gap:16px;}
+.header{display:flex;justify-content:space-between;align-items:flex-start;}
+.accent-line{height:5px;width:92px;background:var(--green);border-radius:3px;margin-bottom:10px;}
+.title{font-size:1.7rem;font-weight:900;color:var(--blue);}
+.subtitle{font-size:.78rem;color:var(--muted);margin-top:5px;line-height:1.35;}
+.badge{background:rgba(31,69,146,.08);border-radius:20px;padding:5px 15px;font-size:.68rem;color:var(--blue);font-weight:800;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kpi{border-radius:16px;padding:14px 15px;background:#fff;box-shadow:0 8px 20px rgba(31,69,146,.10);border-top:6px solid var(--blue);min-height:105px;display:flex;flex-direction:column;justify-content:center;}
+.kpi.green{border-top-color:var(--green);background:rgba(0,190,80,.09);}
+.kpi.orange{border-top-color:var(--orange);background:rgba(245,158,11,.10);}
+.kpi.violet{border-top-color:var(--violet);background:rgba(107,33,168,.07);}
+.kpi-label{font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);margin-bottom:8px;}
+.kpi.green .kpi-label{color:var(--green2);}
+.kpi.orange .kpi-label{color:#9A5A00;}
+.kpi.violet .kpi-label{color:var(--violet);}
+.kpi-value{font-size:1.95rem;font-weight:950;line-height:1;color:#111;}
+.kpi-sub{font-size:.66rem;color:var(--muted);line-height:1.25;margin-top:8px;}
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.month-card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 8px 20px rgba(31,69,146,.10);border-top:7px solid var(--blue);}
+.month-title{font-size:.86rem;font-weight:900;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+.month-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.compare-box{border-radius:16px;padding:18px;text-align:center;}
+.compare-box.orange{background:rgba(245,158,11,.10);border-top:5px solid var(--orange);}
+.compare-box.green{background:rgba(0,190,80,.10);border-top:5px solid var(--green);}
+.compare-label{font-size:.68rem;font-weight:900;text-transform:uppercase;color:#666;}
+.compare-number{font-size:3.2rem;font-weight:950;line-height:1;margin-top:8px;}
+.compare-text{font-size:.72rem;color:#666;font-weight:700;line-height:1.3;margin-top:8px;}
+.stack{height:20px;border-radius:999px;overflow:hidden;background:#e7edf6;display:flex;margin-top:14px;}
+.risk{background:var(--green);}
+.norisk{background:rgba(31,69,146,.35);}
+.month-insight{margin-top:14px;border-radius:14px;background:var(--gray);padding:12px 14px;font-size:.72rem;font-weight:750;color:#333;line-height:1.35;}
+.message-box{background:rgba(0,190,80,.10);border-left:7px solid var(--green);border-radius:16px;padding:13px 16px;font-size:.92rem;font-weight:850;color:var(--green2);line-height:1.35;}
+.footer{display:flex;justify-content:space-between;font-size:.62rem;color:#8a8a8a;font-weight:700;}
+.bottom-bar{position:absolute;bottom:0;left:0;width:100%;height:6px;background:var(--green);}
+@media print{body{background:#fff;}.slide{margin:0;box-shadow:none;}}
+</style>
+</head>
+
+<body>
+<section class="slide">
+  <div class="inner">
+
+    <div class="header">
+      <div>
+        <div class="accent-line"></div>
+        <div class="title">Resultado piloto — Apertura mensual</div>
+        <div class="subtitle">
+          Comparación mensual entre control automático sin piloto y nuevas alertas del piloto para 04/2026 y 05/2026.
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="badge">Piloto · Bca Minorista</div>
+        <div style="font-size:.62rem;color:#aaa;margin-top:4px;">Meses piloto: 202604 y 202605</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <div class="kpi-row">
+        <div class="kpi green">
+          <div class="kpi-label">Piloto total</div>
+          <div class="kpi-value">86.9%</div>
+          <div class="kpi-sub">226 alertas con riesgo sobre 260.</div>
+        </div>
+
+        <div class="kpi orange">
+          <div class="kpi-label">Control total</div>
+          <div class="kpi-value">21.9%</div>
+          <div class="kpi-sub">232 alertas con riesgo sobre 1.060.</div>
+        </div>
+
+        <div class="kpi blue">
+          <div class="kpi-label">Mejora consolidada</div>
+          <div class="kpi-value">4.0x</div>
+          <div class="kpi-sub">Vs control automático sin piloto.</div>
+        </div>
+
+        <div class="kpi violet">
+          <div class="kpi-label">Diferencia total</div>
+          <div class="kpi-value">+65.0 pp</div>
+          <div class="kpi-sub">86.9% piloto vs 21.9% control.</div>
+        </div>
+      </div>
+
+      <div class="comparison-grid">
+
+        <div class="month-card">
+          <div class="month-title">Abril 2026</div>
+
+          <div class="month-body">
+            <div class="compare-box orange">
+              <div class="compare-label">Control automático</div>
+              <div class="compare-number">28.3%</div>
+              <div class="compare-text">527 alertas · 149 con riesgo</div>
+              <div class="stack">
+                <div class="risk" style="width:28.3%"></div>
+                <div class="norisk" style="width:71.7%"></div>
+              </div>
+            </div>
+
+            <div class="compare-box green">
+              <div class="compare-label">Piloto</div>
+              <div class="compare-number">96.1%</div>
+              <div class="compare-text">180 alertas · 173 con riesgo</div>
+              <div class="stack">
+                <div class="risk" style="width:96.1%"></div>
+                <div class="norisk" style="width:3.9%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-insight">
+            El piloto de abril fue <b>3.4x</b> más efectivo que el control automático sin piloto, con una diferencia de <b>+67.8 pp</b>.
+          </div>
+        </div>
+
+        <div class="month-card">
+          <div class="month-title">Mayo 2026</div>
+
+          <div class="month-body">
+            <div class="compare-box orange">
+              <div class="compare-label">Control automático</div>
+              <div class="compare-number">15.6%</div>
+              <div class="compare-text">533 alertas · 83 con riesgo</div>
+              <div class="stack">
+                <div class="risk" style="width:15.6%"></div>
+                <div class="norisk" style="width:84.4%"></div>
+              </div>
+            </div>
+
+            <div class="compare-box green">
+              <div class="compare-label">Piloto</div>
+              <div class="compare-number">66.3%</div>
+              <div class="compare-text">80 alertas · 53 con riesgo</div>
+              <div class="stack">
+                <div class="risk" style="width:66.3%"></div>
+                <div class="norisk" style="width:33.7%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-insight">
+            El piloto de mayo fue <b>4.2x</b> más efectivo que el control automático sin piloto, con una diferencia de <b>+50.7 pp</b>.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="message-box">
+        El piloto consolidado 04/2026–05/2026 alcanzó una captura de <b>86.9%</b>, frente a <b>21.9%</b> del control automático sin piloto, equivalente a una mejora de <b>4.0x</b>.
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div>Fuente: actualización de resultados hasta 05/2026</div>
+      <div>Interbank · PLAFT Analytics</div>
+    </div>
+  </div>
+  <div class="bottom-bar"></div>
+</section>
+</body>
+</html>

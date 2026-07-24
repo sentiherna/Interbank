@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultados Piloto vs Control</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+  padding:40px 20px;
+  color:#1F4592;
+}
+.container{max-width:1450px;margin:0 auto;}
+.header{text-align:center;margin-bottom:42px;}
+.main-title{
+  font-size:36px;
+  font-weight:800;
+  color:#1F4592;
+  margin-bottom:12px;
+  text-transform:uppercase;
+}
+.subtitle{font-size:20px;color:#00BE50;font-weight:600;}
+
+.results-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  margin-bottom:50px;
+}
+.card{
+  background:white;
+  border-radius:18px;
+  padding:35px;
+  box-shadow:0 8px 25px rgba(0,0,0,.12);
+  border-top:7px solid #00BE50;
+}
+.card.control{border-top-color:#F59E0B;}
+.group-title{
+  font-size:26px;
+  font-weight:800;
+  text-align:center;
+  margin-bottom:25px;
+}
+.pilot-title{color:#005F1E;}
+.control-title{color:#9A5A00;}
+.metric{text-align:center;margin:24px 0;}
+.metric-value{
+  font-size:52px;
+  font-weight:800;
+  color:#1F4592;
+}
+.efectividad{
+  font-size:58px;
+  font-weight:900;
+  color:#00BE50;
+}
+.control .efectividad{color:#F59E0B;}
+.metric-label{
+  font-size:18px;
+  color:#555;
+  margin-top:8px;
+}
+
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:22px;
+  margin-bottom:50px;
+}
+.kpi{
+  background:white;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 8px 25px rgba(0,0,0,.10);
+  border-top:6px solid #1F4592;
+  text-align:center;
+}
+.kpi.green{border-top-color:#00BE50;}
+.kpi.orange{border-top-color:#F59E0B;}
+.kpi.violet{border-top-color:#6B21A8;}
+.kpi-label{
+  font-size:14px;
+  font-weight:800;
+  text-transform:uppercase;
+  color:#666;
+  margin-bottom:10px;
+}
+.kpi-value{
+  font-size:36px;
+  font-weight:900;
+  color:#1F4592;
+}
+.kpi.green .kpi-value{color:#005F1E;}
+.kpi.orange .kpi-value{color:#9A5A00;}
+.kpi.violet .kpi-value{color:#6B21A8;}
+.kpi-sub{
+  font-size:14px;
+  color:#666;
+  margin-top:8px;
+  line-height:1.3;
+}
+
+.chart-container{
+  background:white;
+  border-radius:18px;
+  padding:35px;
+  box-shadow:0 8px 25px rgba(0,0,0,.12);
+  margin-bottom:50px;
+}
+.chart-title{
+  font-size:24px;
+  font-weight:800;
+  color:#1F4592;
+  text-align:center;
+  margin-bottom:8px;
+}
+.chart-subtitle{
+  text-align:center;
+  color:#00BE50;
+  margin-bottom:25px;
+  font-size:16px;
+  font-weight:600;
+}
+.chart-wrapper{
+  position:relative;
+  height:440px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 4px 15px rgba(0,0,0,.10);
+  margin:30px 0 10px;
+}
+th,td{
+  padding:16px;
+  text-align:center;
+  font-size:15px;
+}
+th{
+  background:#1F4592;
+  color:white;
+  font-weight:800;
+}
+td{color:#333;}
+.highlight{
+  background:#f4f6fb;
+  font-weight:800;
+  color:#1F4592;
+}
+.good{color:#005F1E;font-weight:900;}
+.warn{color:#9A5A00;font-weight:900;}
+.diff{color:#00BE50;font-weight:900;}
+.negative{color:#e74c3c;font-weight:900;}
+.message-box{
+  background:rgba(0,190,80,.12);
+  border-left:8px solid #00BE50;
+  border-radius:16px;
+  padding:22px 26px;
+  color:#005F1E;
+  font-size:20px;
+  font-weight:800;
+  line-height:1.4;
+  margin-bottom:40px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1 class="main-title">Resultados del Piloto</h1>
+    <p class="subtitle">Grupo Piloto vs Grupo Control automático sin piloto · Abril y Mayo 2026</p>
+  </div>
+
+  <div class="results-grid">
+    <div class="card">
+      <h2 class="group-title pilot-title">Grupo Piloto</h2>
+      <div class="metric">
+        <div class="metric-value">260</div>
+        <div class="metric-label">Alertas Procesadas</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value">226</div>
+        <div class="metric-label">Calificadas con Riesgo</div>
+      </div>
+      <div class="metric">
+        <div class="efectividad">86.9%</div>
+        <div class="metric-label">Efectividad</div>
+      </div>
+    </div>
+
+    <div class="card control">
+      <h2 class="group-title control-title">Grupo Control</h2>
+      <div class="metric">
+        <div class="metric-value">1.060</div>
+        <div class="metric-label">Alertas Procesadas</div>
+      </div>
+      <div class="metric">
+        <div class="metric-value">232</div>
+        <div class="metric-label">Calificadas con Riesgo</div>
+      </div>
+      <div class="metric">
+        <div class="efectividad">21.9%</div>
+        <div class="metric-label">Efectividad</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi green">
+      <div class="kpi-label">Mejora consolidada</div>
+      <div class="kpi-value">4.0x</div>
+      <div class="kpi-sub">86.9% piloto vs 21.9% control.</div>
+    </div>
+    <div class="kpi orange">
+      <div class="kpi-label">Diferencia total</div>
+      <div class="kpi-value">+65.0 pp</div>
+      <div class="kpi-sub">Brecha de efectividad a favor del piloto.</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Abril 2026</div>
+      <div class="kpi-value">3.4x</div>
+      <div class="kpi-sub">96.1% piloto vs 28.3% control.</div>
+    </div>
+    <div class="kpi violet">
+      <div class="kpi-label">Mayo 2026</div>
+      <div class="kpi-value">4.2x</div>
+      <div class="kpi-sub">66.3% piloto vs 15.6% control.</div>
+    </div>
+  </div>
+
+  <div class="message-box">
+    El piloto consolidado 04/2026–05/2026 alcanzó una efectividad de <b>86.9%</b>, frente a <b>21.9%</b> del control automático sin piloto, equivalente a una mejora de <b>4.0x</b>.
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Resumen Comparativo Consolidado</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Indicador</th>
+          <th>Grupo Piloto</th>
+          <th>Grupo Control</th>
+          <th>Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">Total Alertas</td>
+          <td><strong>260</strong></td>
+          <td><strong>1.060</strong></td>
+          <td>-800</td>
+        </tr>
+        <tr>
+          <td class="highlight">Casos con Riesgo</td>
+          <td><strong>226</strong></td>
+          <td><strong>232</strong></td>
+          <td class="negative">-6</td>
+        </tr>
+        <tr>
+          <td class="highlight">Efectividad</td>
+          <td class="good">86.9%</td>
+          <td class="warn">21.9%</td>
+          <td class="diff">+65.0 pp</td>
+        </tr>
+        <tr>
+          <td class="highlight">Ratio de Mejora</td>
+          <td colspan="3" class="good">4.0x más efectivo que el control automático sin piloto</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Apertura Mensual del Piloto vs Control</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th>Grupo</th>
+          <th>Total Alertas</th>
+          <th>Con Riesgo</th>
+          <th>Efectividad</th>
+          <th>Mejora vs Control</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight" rowspan="2">Abril 2026</td>
+          <td>Control automático</td>
+          <td>527</td>
+          <td>149</td>
+          <td class="warn">28.3%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Piloto</td>
+          <td>180</td>
+          <td>173</td>
+          <td class="good">96.1%</td>
+          <td class="good">3.4x / +67.8 pp</td>
+        </tr>
+        <tr>
+          <td class="highlight" rowspan="2">Mayo 2026</td>
+          <td>Control automático</td>
+          <td>533</td>
+          <td>83</td>
+          <td class="warn">15.6%</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Piloto</td>
+          <td>80</td>
+          <td>53</td>
+          <td class="good">66.3%</td>
+          <td class="good">4.2x / +50.7 pp</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Participación - Volumen de Alertas</h2>
+    <p class="chart-subtitle">Cantidad total de alertas procesadas por grupo</p>
+    <div class="chart-wrapper">
+      <canvas id="chartBarras"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Distribución de Participación (%)</h2>
+    <p class="chart-subtitle">Porcentaje del total de alertas por grupo</p>
+    <div class="chart-wrapper">
+      <canvas id="chartPie"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Comparación de Efectividad Consolidada</h2>
+    <p class="chart-subtitle">Tasa de efectividad entre piloto y control automático sin piloto</p>
+    <div class="chart-wrapper">
+      <canvas id="chartLineas"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Efectividad Mensual</h2>
+    <p class="chart-subtitle">Comparación por mes entre control y piloto</p>
+    <div class="chart-wrapper">
+      <canvas id="chartMensual"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Comparación Combinada</h2>
+    <p class="chart-subtitle">Barras = Total Alertas | Línea = % Efectividad</p>
+    <div class="chart-wrapper">
+      <canvas id="chartCombinado"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const totalPiloto = 260;
+const riesgoPiloto = 226;
+const efectPiloto = 86.9;
+
+const totalControl = 1060;
+const riesgoControl = 232;
+const efectControl = 21.9;
+
+const totalGeneral = totalPiloto + totalControl;
+
+new Chart(document.getElementById('chartBarras'), {
+  type: 'bar',
+  data: {
+    labels: ['Grupo Piloto', 'Grupo Control'],
+    datasets: [{
+      label: 'Cantidad de Alertas',
+      data: [totalPiloto, totalControl],
+      backgroundColor: ['#00BE50', '#F59E0B'],
+      borderWidth: 3
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        offset: 12,
+        font: { size: 24, weight: 'bold' },
+        color: '#1F4592',
+        formatter: value => value.toLocaleString('es-AR')
+      }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { font: { size: 14 } } },
+      x: { ticks: { font: { size: 16, weight: 'bold' } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartPie'), {
+  type: 'pie',
+  data: {
+    labels: ['Grupo Piloto', 'Grupo Control'],
+    datasets: [{
+      data: [totalPiloto, totalControl],
+      backgroundColor: ['#00BE50', '#F59E0B'],
+      borderColor: '#ffffff',
+      borderWidth: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { font: { size: 16, weight: '600' }, padding: 20 }
+      },
+      datalabels: {
+        formatter: value => ((value / totalGeneral) * 100).toFixed(1) + '%',
+        font: { size: 24, weight: 'bold' },
+        color: '#ffffff'
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartLineas'), {
+  type: 'line',
+  data: {
+    labels: ['Grupo Control', 'Grupo Piloto'],
+    datasets: [{
+      label: 'Efectividad (%)',
+      data: [efectControl, efectPiloto],
+      borderColor: '#00BE50',
+      backgroundColor: 'rgba(0,190,80,.18)',
+      borderWidth: 8,
+      tension: 0.25,
+      pointRadius: 12,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#00BE50',
+      pointBorderWidth: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { font: { size: 16 } } },
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        offset: 20,
+        font: { size: 26, weight: 'bold' },
+        formatter: value => value + '%',
+        color: '#005F1E'
+      }
+    },
+    scales: {
+      y: { min: 0, max: 100, ticks: { callback: v => v + '%', font: { size: 14 } } },
+      x: { ticks: { font: { size: 16, weight: 'bold' } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartMensual'), {
+  type: 'bar',
+  data: {
+    labels: ['Abr-26 Control', 'Abr-26 Piloto', 'May-26 Control', 'May-26 Piloto'],
+    datasets: [{
+      label: 'Efectividad (%)',
+      data: [28.3, 96.1, 15.6, 66.3],
+      backgroundColor: ['#F59E0B', '#00BE50', '#F59E0B', '#00BE50']
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        offset: 12,
+        font: { size: 24, weight: 'bold' },
+        formatter: value => value + '%',
+        color: '#1F4592'
+      }
+    },
+    scales: {
+      y: { min: 0, max: 110, ticks: { callback: v => v + '%' } },
+      x: { ticks: { font: { size: 15, weight: 'bold' } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartCombinado'), {
+  type: 'bar',
+  data: {
+    labels: ['Grupo Control', 'Grupo Piloto'],
+    datasets: [
+      {
+        type: 'bar',
+        label: 'Total Alertas',
+        data: [totalControl, totalPiloto],
+        backgroundColor: ['#F59E0B', '#00BE50'],
+        yAxisID: 'y'
+      },
+      {
+        type: 'line',
+        label: 'Efectividad (%)',
+        data: [efectControl, efectPiloto],
+        borderColor: '#1F4592',
+        borderWidth: 6,
+        tension: 0.2,
+        pointRadius: 10,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#1F4592',
+        pointBorderWidth: 4,
+        yAxisID: 'y1'
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        offset: 12,
+        font: { size: 20, weight: 'bold' },
+        formatter: (value, ctx) =>
+          ctx.dataset.label.includes('%') ? value + '%' : value.toLocaleString('es-AR'),
+        color: (ctx) => ctx.dataset.label.includes('%') ? '#005F1E' : '#1F4592'
+      }
+    },
+    scales: {
+      y: {
+        position: 'left',
+        beginAtZero: true,
+        title: { display: true, text: 'Total Alertas' }
+      },
+      y1: {
+        position: 'right',
+        min: 0,
+        max: 100,
+        grid: { drawOnChartArea: false },
+        title: { display: true, text: 'Efectividad (%)' },
+        ticks: { callback: v => v + '%' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

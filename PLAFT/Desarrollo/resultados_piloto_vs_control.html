@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados Piloto vs Control - Efectividad de Alertas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--green-dark:#1a5f3a;--green:#2ecc71;--blue:#1e3a8a;--red:#c0392b;--orange:#f59e0b;--gray-bg:#f5f7fa;--gray-soft:#eef2f7;--gray-text:#5b6472;--white:#ffffff;}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:40px 20px;color:var(--green-dark);}
+    .container{max-width:1450px;margin:0 auto;}
+    .header{text-align:center;margin-bottom:40px;}
+    .eyebrow{display:inline-block;padding:7px 16px;border-radius:999px;background:rgba(30,58,138,.08);color:var(--blue);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+    .main-title{font-size:36px;font-weight:800;color:var(--green-dark);margin-bottom:12px;text-transform:uppercase;}
+    .subtitle{font-size:20px;color:var(--green);font-weight:600;}
+    .executive-message{background:var(--white);border-radius:16px;border-left:8px solid var(--green);padding:22px 28px;box-shadow:0 8px 25px rgba(0,0,0,.10);margin-bottom:32px;color:#344054;font-size:19px;line-height:1.45;}
+    .executive-message strong{color:var(--green-dark);}
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:36px;}
+    .kpi{background:var(--white);border-radius:16px;padding:22px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.10);border-top:6px solid var(--blue);}
+    .kpi.green{border-top-color:var(--green)} .kpi.orange{border-top-color:var(--orange)} .kpi.red{border-top-color:var(--red)}
+    .kpi-label{color:var(--gray-text);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+    .kpi-value{color:var(--blue);font-size:34px;font-weight:900;line-height:1;}
+    .kpi.green .kpi-value{color:var(--green-dark)} .kpi.orange .kpi-value{color:#9a5a00} .kpi.red .kpi-value{color:var(--red)}
+    .kpi-sub{color:var(--gray-text);font-size:14px;line-height:1.35;margin-top:8px;}
+    .results-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:50px;}
+    .card{background:var(--white);border-radius:16px;padding:35px;box-shadow:0 8px 25px rgba(0,0,0,.12);border-top:7px solid var(--green);}
+    .card.control{border-top-color:var(--blue)}
+    .group-title{font-size:26px;font-weight:800;text-align:center;margin-bottom:18px;}
+    .pilot-title{color:var(--green-dark)} .control-title{color:var(--blue)}
+    .group-description{min-height:48px;text-align:center;font-size:15px;color:var(--gray-text);line-height:1.4;margin-bottom:14px;}
+    .metric{text-align:center;margin:22px 0;}
+    .metric-value{font-size:52px;font-weight:800;color:var(--green-dark)} .control .metric-value{color:var(--blue)}
+    .efectividad{font-size:58px;font-weight:900;color:var(--green)} .control .efectividad{color:var(--blue)}
+    .metric-label{font-size:18px;color:#555;margin-top:8px;}
+    .chart-container{background:var(--white);border-radius:16px;padding:35px;box-shadow:0 8px 25px rgba(0,0,0,.12);margin-bottom:50px;}
+    .chart-title{font-size:24px;font-weight:800;color:var(--green-dark);text-align:center;margin-bottom:8px;}
+    .chart-subtitle{text-align:center;color:var(--green);margin-bottom:25px;font-size:16px;font-weight:600;}
+    .chart-wrapper{position:relative;height:460px;}
+    table{width:100%;border-collapse:collapse;background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.1);margin:28px 0 5px;}
+    th,td{padding:16px;text-align:center;} th{background:var(--green-dark);color:var(--white);} td{color:#344054;border-bottom:1px solid #edf0f4;}
+    .highlight{background:#f0f9f4;font-weight:700;color:var(--green-dark)} .positive{color:var(--green-dark);font-weight:800}.negative{color:var(--red);font-weight:800}
+    .interpretation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px;}
+    .interpretation{border-radius:14px;padding:20px;background:var(--gray-soft);color:#344054;font-size:15px;line-height:1.45;border-left:5px solid var(--blue);}
+    .interpretation.green{background:#f0f9f4;border-left-color:var(--green)} .interpretation.orange{background:#fff8eb;border-left-color:var(--orange)}
+    .interpretation strong{display:block;margin-bottom:5px;color:var(--green-dark)}
+    .footer-note{text-align:center;color:#667085;font-size:14px;margin:12px 0 6px;}
+    @media(max-width:1000px){.results-grid,.kpi-grid,.interpretation-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="eyebrow">Resumen ejecutivo</div>
+    <h1 class="main-title">Resultados del Piloto</h1>
+    <p class="subtitle">Nuevas alertas del piloto vs alertas automáticas del grupo control</p>
+  </div>
+
+  <div class="executive-message">
+    <strong>Conclusión principal:</strong> el grupo piloto alcanzó una efectividad de <strong>93,5%</strong>, frente a <strong>28,3%</strong> de las alertas automáticas del grupo control. Esto representa una mejora de <strong>3,3 veces</strong> y una brecha de <strong>+65,2 puntos porcentuales</strong>.
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi green"><div class="kpi-label">Efectividad piloto</div><div class="kpi-value">93,5%</div><div class="kpi-sub">173 casos con riesgo sobre 185 alertas evaluadas.</div></div>
+    <div class="kpi"><div class="kpi-label">Efectividad control</div><div class="kpi-value">28,3%</div><div class="kpi-sub">149 casos con riesgo sobre 527 alertas automáticas.</div></div>
+    <div class="kpi orange"><div class="kpi-label">Mejora relativa</div><div class="kpi-value">3,3x</div><div class="kpi-sub">El piloto multiplica por 3,3 la efectividad del control.</div></div>
+    <div class="kpi red"><div class="kpi-label">Brecha de efectividad</div><div class="kpi-value">+65,2 pp</div><div class="kpi-sub">Diferencia favorable al grupo piloto.</div></div>
+  </div>
+
+  <div class="results-grid">
+    <div class="card">
+      <h2 class="group-title pilot-title">Grupo Piloto</h2>
+      <div class="group-description">Muestra de nuevas alertas priorizadas para validar su capacidad de identificar casos con riesgo.</div>
+      <div class="metric"><div class="metric-value">185</div><div class="metric-label">Alertas procesadas</div></div>
+      <div class="metric"><div class="metric-value">173</div><div class="metric-label">Calificadas con riesgo</div></div>
+      <div class="metric"><div class="efectividad">93,5%</div><div class="metric-label">Efectividad</div></div>
+    </div>
+    <div class="card control">
+      <h2 class="group-title control-title">Grupo Control · Alertas automáticas</h2>
+      <div class="group-description">Alertas automáticas del proceso actual utilizadas como referencia para comparar el desempeño del piloto.</div>
+      <div class="metric"><div class="metric-value">527</div><div class="metric-label">Alertas procesadas</div></div>
+      <div class="metric"><div class="metric-value">149</div><div class="metric-label">Calificadas con riesgo</div></div>
+      <div class="metric"><div class="efectividad">28,3%</div><div class="metric-label">Efectividad</div></div>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <h2 class="chart-title">Resumen comparativo</h2>
+    <p class="chart-subtitle">Lectura ejecutiva del resultado consolidado</p>
+    <table>
+      <thead><tr><th>Indicador</th><th>Grupo Piloto</th><th>Control automático</th><th>Lectura de negocio</th></tr></thead>
+      <tbody>
+        <tr><td class="highlight">Total de alertas</td><td><strong>185</strong></td><td><strong>527</strong></td><td>El piloto opera sobre un volumen equivalente al 35,1% del control.</td></tr>
+        <tr><td class="highlight">Casos con riesgo</td><td><strong>173</strong></td><td><strong>149</strong></td><td>El piloto identifica 24 casos con riesgo adicionales, aun con un volumen mucho menor.</td></tr>
+        <tr><td class="highlight">Efectividad</td><td class="positive">93,5%</td><td>28,3%</td><td class="positive">+65,2 pp a favor del piloto</td></tr>
+        <tr><td class="highlight">Alertas necesarias por caso con riesgo</td><td class="positive">1,1</td><td>3,5</td><td>El piloto necesita aproximadamente 3,3 veces menos alertas para encontrar un positivo.</td></tr>
+      </tbody>
+    </table>
+    <div class="interpretation-grid">
+      <div class="interpretation green"><strong>Alta concentración de riesgo</strong>Más de 9 de cada 10 alertas del piloto fueron calificadas con riesgo.</div>
+      <div class="interpretation"><strong>Mayor eficiencia operativa</strong>El piloto identifica más positivos revisando solo el 35,1% del volumen del control.</div>
+      <div class="interpretation orange"><strong>Próximo paso recomendado</strong>Validar estabilidad con más meses y mayor volumen antes de escalar a producción.</div>
+    </div>
+  </div>
+
+  <div class="chart-container"><h2 class="chart-title">Volumen de alertas evaluadas</h2><p class="chart-subtitle">El piloto concentra la revisión en una muestra más acotada</p><div class="chart-wrapper"><canvas id="chartBarras"></canvas></div></div>
+  <div class="chart-container"><h2 class="chart-title">Participación sobre el volumen total</h2><p class="chart-subtitle">Distribución de las 712 alertas evaluadas</p><div class="chart-wrapper"><canvas id="chartPie"></canvas></div></div>
+  <div class="chart-container"><h2 class="chart-title">Comparación de efectividad</h2><p class="chart-subtitle">Porcentaje de alertas calificadas con riesgo</p><div class="chart-wrapper"><canvas id="chartLineas"></canvas></div></div>
+  <div class="chart-container"><h2 class="chart-title">Volumen y efectividad en una sola lectura</h2><p class="chart-subtitle">Barras = alertas evaluadas · Línea = efectividad</p><div class="chart-wrapper"><canvas id="chartCombinado"></canvas></div></div>
+  <div class="footer-note">Fuente: resultados del piloto y alertas automáticas del grupo control.</div>
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+const totalPiloto=185, riesgoPiloto=173, efectividadPiloto=93.51;
+const totalControl=527, riesgoControl=149, efectividadControl=28.27;
+const totalGeneral=totalPiloto+totalControl;
+new Chart(document.getElementById('chartBarras'),{type:'bar',data:{labels:['Grupo Piloto','Control automático'],datasets:[{label:'Cantidad de alertas',data:[totalPiloto,totalControl],backgroundColor:['#2ecc71','#1e3a8a'],borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:35}},plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',offset:8,font:{size:24,weight:'bold'},color:'#344054',formatter:v=>v.toLocaleString('es-AR')}},scales:{y:{beginAtZero:true,ticks:{font:{size:14}}},x:{ticks:{font:{size:16,weight:'bold'}}}}}});
+new Chart(document.getElementById('chartPie'),{type:'pie',data:{labels:['Grupo Piloto','Control automático'],datasets:[{data:[totalPiloto,totalControl],backgroundColor:['#2ecc71','#1e3a8a'],borderColor:'#ffffff',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:16,weight:'600'},padding:20}},datalabels:{formatter:v=>((v/totalGeneral)*100).toFixed(1).replace('.',',')+'%',font:{size:22,weight:'bold'},color:'#ffffff',padding:10}}}});
+new Chart(document.getElementById('chartLineas'),{type:'line',data:{labels:['Control automático','Grupo Piloto'],datasets:[{label:'Efectividad (%)',data:[efectividadControl,efectividadPiloto],borderColor:'#2ecc71',backgroundColor:'rgba(46,204,113,.18)',borderWidth:8,tension:.25,pointRadius:12,pointBackgroundColor:'#ffffff',pointBorderColor:'#2ecc71',pointBorderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:40}},plugins:{legend:{position:'top',labels:{font:{size:16}}},datalabels:{anchor:'end',align:'top',offset:15,font:{size:26,weight:'bold'},formatter:v=>v.toFixed(2).replace('.',',')+'%',color:'#1a5f3a'}},scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:14}}},x:{ticks:{font:{size:16,weight:'bold'}}}}}});
+new Chart(document.getElementById('chartCombinado'),{type:'bar',data:{labels:['Grupo Piloto','Control automático'],datasets:[{type:'bar',label:'Total de alertas',data:[totalPiloto,totalControl],backgroundColor:['#2ecc71','#1e3a8a'],yAxisID:'y'},{type:'line',label:'Efectividad (%)',data:[efectividadPiloto,efectividadControl],borderColor:'#f59e0b',backgroundColor:'#f59e0b',borderWidth:6,tension:.2,pointRadius:10,pointBackgroundColor:'#ffffff',pointBorderColor:'#f59e0b',pointBorderWidth:4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:35}},plugins:{legend:{position:'top'},datalabels:{anchor:'end',align:'top',offset:10,font:{size:19,weight:'bold'},formatter:(v,c)=>c.dataset.label.includes('%')?v.toFixed(2).replace('.',',')+'%':v.toLocaleString('es-AR'),color:c=>c.dataset.label.includes('%')?'#9a5a00':'#344054'}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Total de alertas'}},y1:{position:'right',min:0,max:100,grid:{drawOnChartArea:false},title:{display:true,text:'Efectividad (%)'},ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:16,weight:'bold'}}}}}});
+</script>
+</body>
+</html>
