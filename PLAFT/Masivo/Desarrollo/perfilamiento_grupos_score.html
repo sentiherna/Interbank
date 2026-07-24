@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perfilamiento por Grupos de Score – Interbank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --white:#FFF;
+      --ibk-green-suave:rgb(198,255,192);
+      --ibk-green-oscuro:rgb(0,95,30);
+      --ibk-blue:rgb(31,69,146);
+      --ink:#0F1B2C;
+      --radius:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:#f4f7f6;color:var(--ink);padding:20px;display:flex;justify-content:center;min-height:100vh}
+    .pagina{width:100%;max-width:1400px;background:var(--white);padding:40px;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+    .header-reporte{display:flex;justify-content:space-between;align-items:center;margin-bottom:35px;border-bottom:2px solid var(--ibk-green-suave);padding-bottom:20px;flex-wrap:wrap;gap:12px}
+    .titulo-principal{color:var(--ibk-blue);font-weight:700;font-size:24px}
+    .badge{background:#5A5A5A;color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;margin-left:12px;letter-spacing:.5px}
+    .periodo-tag{background:var(--ibk-green-suave);color:var(--ibk-green-oscuro);padding:8px 20px;border-radius:20px;font-weight:600;font-size:14px;white-space:nowrap}
+    .subtitulo{color:#64748b;font-size:13px;margin-bottom:24px;line-height:1.6}
+    .grupos-legend{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+    .grupo-badge{display:flex;align-items:center;gap:8px;padding:7px 18px;border-radius:20px;font-weight:600;font-size:12px}
+    .grupo-badge.p1{background:rgb(31,69,146);color:#fff}
+    .grupo-badge.p2{background:#3a6bc4;color:#fff}
+    .grupo-badge.p3{background:#789fd4;color:#fff}
+    .grupo-badge.p4{background:#b3cce8;color:var(--ink)}
+    .grupo-badge.p5{background:var(--ibk-green-suave);color:var(--ibk-green-oscuro)}
+    .tabla-wrapper{overflow-x:auto}
+    table.data-table{width:100%;border-collapse:collapse;font-family:'Poppins',sans-serif;font-size:13px}
+    .data-table th,.data-table td{border:1px solid #e2e8f0;padding:11px 14px;text-align:center}
+    .data-table th{background:rgb(31,69,146);color:#fff;text-transform:uppercase;font-size:11px;letter-spacing:.5px;line-height:1.5}
+    .data-table th.var-col{background:rgb(0,95,30);text-align:left;padding-left:16px}
+    .data-table th.ratio-col{background:#5A5A5A}
+    .data-table th.avg-col{background:rgb(0,95,30)}
+    .grad-bar{display:flex;align-items:center;gap:12px;margin-top:22px;font-size:12px;color:#64748b}
+    .grad-rect{height:14px;width:220px;border-radius:4px;background:linear-gradient(to right,rgb(180,230,176),rgb(253,253,170),rgb(240,165,130),rgb(218,100,90))}
+    .nota-box{margin-top:26px;background:#f9fbfb;border-left:4px solid var(--ibk-blue);padding:14px 20px;border-radius:0 var(--radius) var(--radius) 0;font-size:13px;color:#475569;line-height:1.7}
+    .nota-box b{color:var(--ibk-blue)}
+    .footer-text{text-align:center;font-size:13px;color:#94a3b8;margin-top:30px}
+    @media print{body{padding:0;background:white}.pagina{box-shadow:none;max-width:100%}}
+  </style>
+</head>
+<body>
+<div class="pagina">
+
+  <div class="header-reporte">
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+      <h1 class="titulo-principal">Perfilamiento de Variables por Grupo de Score</h1>
+      <span class="badge">Variables Seleccionadas · PLAFT Masivo PN</span>
+    </div>
+    <span class="periodo-tag">202508 &nbsp;·&nbsp; 202510 &nbsp;·&nbsp; 202511</span>
+  </div>
+
+  <p class="subtitulo">
+    El modelo asigna a cada cliente un <b>score de riesgo</b>: cuanto más alto, mayor es la probabilidad de que el cliente sea reportado como alerta PLAFT.
+    Los clientes fueron divididos en <b>5 grupos iguales</b> según su score (de mayor a menor), y para cada grupo se muestra el <b>valor promedio</b> de las variables más importantes del modelo.<br><br>
+    Un valor consistentemente más alto en <b>P1</b> que en <b>P5</b> confirma que esa variable distingue bien a los clientes de riesgo.
+    El <b>color rojo</b> indica el valor más alto dentro de cada fila; el <b>verde</b>, el más bajo.
+  </p>
+
+  <div class="grupos-legend">
+    <div class="grupo-badge p1">&#9650; P1 — Mayor Score</div>
+    <div class="grupo-badge p2">P2</div>
+    <div class="grupo-badge p3">P3</div>
+    <div class="grupo-badge p4">P4</div>
+    <div class="grupo-badge p5">&#9660; P5 — Menor Score</div>
+  </div>
+
+  <div class="tabla-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="var-col" style="min-width:320px">Variable</th>
+          <th style="min-width:105px">P1<br><small style="font-weight:400;opacity:.8">Mayor Score</small></th>
+          <th style="min-width:105px">P2</th>
+          <th style="min-width:105px">P3</th>
+          <th style="min-width:105px">P4</th>
+          <th style="min-width:105px">P5<br><small style="font-weight:400;opacity:.8">Menor Score</small></th>
+          <th class="ratio-col" style="min-width:115px">Ratio P1/P5<br><small style="font-weight:400;opacity:.8">Diferenciación</small></th>
+          <th class="avg-col" style="min-width:115px">Promedio<br><small style="font-weight:400;opacity:.8">General</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Monto depósitos totales acumulado (3m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">1,729,225.46</td><td style="background:#FFDDA2;color:#0F1B2C;font-weight:600">1,165,890.92</td><td style="background:#F1FFA2;color:#0F1B2C;font-weight:600">847,791.87</td><td style="background:#D2FFA2;color:#0F1B2C;font-weight:600">628,525.97</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">144,532.70</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">11.96</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">903,193.38</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Monto depósitos en efectivo acumulado (12m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">1,190,583.93</td><td style="background:#FAFFA2;color:#0F1B2C;font-weight:600">600,573.51</td><td style="background:#D2FFA2;color:#0F1B2C;font-weight:600">400,333.84</td><td style="background:#AAFFA2;color:#0F1B2C;font-weight:600">205,648.33</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">52,146.44</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">22.83</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">489,857.21</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Anomalía egresos: mes actual vs promedio mensual 6m</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">-0.14</td><td style="background:#AEFFA2;color:#0F1B2C;font-weight:600">-0.08</td><td style="background:#FFECA2;color:#0F1B2C;font-weight:600">0.11</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">0.29</td><td style="background:#FFC4A2;color:#0F1B2C;font-weight:600">0.18</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">-0.78</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">0.07</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Monto egresos en efectivo acumulado (12m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">1,299,289.83</td><td style="background:#FFD1A2;color:#0F1B2C;font-weight:600">927,400.37</td><td style="background:#D3FFA2;color:#0F1B2C;font-weight:600">451,172.15</td><td style="background:#BAFFA2;color:#0F1B2C;font-weight:600">317,245.95</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">67,100.83</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">19.36</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">612,441.83</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Flag incremento inusual depósitos: mes actual vs promedio 5m</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">0.38</td><td style="background:#ACFFA2;color:#0F1B2C;font-weight:600">0.40</td><td style="background:#FEFFA2;color:#0F1B2C;font-weight:600">0.45</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">0.52</td><td style="background:#FFC1A2;color:#0F1B2C;font-weight:600">0.49</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">0.78</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">0.45</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">N° egresos totales acumulado (12m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">1,520.94</td><td style="background:#FF8FA2;color:#0F1B2C;font-weight:600">1,504.14</td><td style="background:#FFE2A2;color:#0F1B2C;font-weight:600">1,077.61</td><td style="background:#FFEDA2;color:#0F1B2C;font-weight:600">1,015.90</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">338.08</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">4.50</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">1,091.34</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Dif. N° operaciones: depósitos menos egresos en efectivo (6m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">32.70</td><td style="background:#FFFEA2;color:#0F1B2C;font-weight:600">14.89</td><td style="background:#B9FFA2;color:#0F1B2C;font-weight:600">4.14</td><td style="background:#DDFFA2;color:#0F1B2C;font-weight:600">9.70</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">-2.94</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">-11.10</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">11.70</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Concentración día pico: trx del día más activo ÷ total trx del mes</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">0.16</td><td style="background:#93FFA2;color:#0F1B2C;font-weight:600">0.17</td><td style="background:#A8FFA2;color:#0F1B2C;font-weight:600">0.19</td><td style="background:#E9FFA2;color:#0F1B2C;font-weight:600">0.24</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">0.36</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">0.44</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">0.22</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Velocidad rotación: débitos mes / saldo pasivo promedio</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">48.25</td><td style="background:#8DFFA2;color:#0F1B2C;font-weight:600">58.78</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">54.08</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">42.53</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">3,559.94</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">0.01</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">752.72</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">N° depósitos totales acumulado (12m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">1,047.64</td><td style="background:#FFA2A2;color:#0F1B2C;font-weight:600">955.98</td><td style="background:#FDFFA2;color:#0F1B2C;font-weight:600">581.95</td><td style="background:#FFFCA2;color:#0F1B2C;font-weight:600">595.74</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">126.37</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">8.29</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">661.54</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Ratio N° débitos / N° créditos por operaciones (mes actual)</td>
+          <td style="background:#C3FFA2;color:#0F1B2C;font-weight:600">3.06</td><td style="background:#FFD4A2;color:#0F1B2C;font-weight:600">3.92</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">4.54</td><td style="background:#F7FFA2;color:#0F1B2C;font-weight:600">3.50</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">2.58</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">1.18</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">3.52</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">N° transferencias entre cuentas propias (mes actual)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">63.22</td><td style="background:#FF9FA2;color:#0F1B2C;font-weight:600">58.34</td><td style="background:#FFFEA2;color:#0F1B2C;font-weight:600">34.62</td><td style="background:#D2FFA2;color:#0F1B2C;font-weight:600">23.40</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">5.84</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">10.82</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">37.08</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Antigüedad del cliente en meses</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">9.72</td><td style="background:#F1FFA2;color:#0F1B2C;font-weight:600">13.61</td><td style="background:#FFF1A2;color:#0F1B2C;font-weight:600">14.63</td><td style="background:#FFE1A2;color:#0F1B2C;font-weight:600">15.20</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">18.48</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">0.53</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">14.33</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Monto máximo por transacción en soles (mes actual)</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">36,053.34</td><td style="background:#FFB2A2;color:#0F1B2C;font-weight:600">84,714.65</td><td style="background:#9CFFA2;color:#0F1B2C;font-weight:600">40,174.73</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">94,671.72</td><td style="background:#D0FFA2;color:#0F1B2C;font-weight:600">53,552.63</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">0.67</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">61,833.41</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Monto total transferencias en soles (mes actual)</td>
+          <td style="background:#FF95A2;color:#0F1B2C;font-weight:600">212,392.42</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">220,410.36</td><td style="background:#E3FFA2;color:#0F1B2C;font-weight:600">104,076.85</td><td style="background:#CEFFA2;color:#0F1B2C;font-weight:600">87,203.10</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">32,713.56</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">6.49</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">131,359.26</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Proporción monto depósitos en efectivo / total depósitos (6m)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">0.25</td><td style="background:#DEFFA2;color:#0F1B2C;font-weight:600">0.19</td><td style="background:#B0FFA2;color:#0F1B2C;font-weight:600">0.17</td><td style="background:#B8FFA2;color:#0F1B2C;font-weight:600">0.18</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">0.16</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">1.58</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">0.19</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Monto total débitos en soles (mes actual)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">280,085.88</td><td style="background:#FF94A2;color:#0F1B2C;font-weight:600">271,588.46</td><td style="background:#D6FFA2;color:#0F1B2C;font-weight:600">124,007.69</td><td style="background:#F1FFA2;color:#0F1B2C;font-weight:600">151,608.79</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">48,878.96</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">5.73</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">175,233.96</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">N° pagos realizados (mes actual)</td>
+          <td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">0.82</td><td style="background:#FFCBA2;color:#0F1B2C;font-weight:600">1.80</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">2.17</td><td style="background:#FFA1A2;color:#0F1B2C;font-weight:600">2.05</td><td style="background:#ABFFA2;color:#0F1B2C;font-weight:600">1.00</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">0.82</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">1.57</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Ratio salidas/entradas: débitos ÷ créditos en soles (mes actual)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">148,791.91</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">1,993.67</td><td style="background:#90FFA2;color:#0F1B2C;font-weight:600">4,849.80</td><td style="background:#A5FFA2;color:#0F1B2C;font-weight:600">18,031.72</td><td style="background:#BCFFA2;color:#0F1B2C;font-weight:600">33,215.94</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">4.48</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">41,376.61</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#FFFFFF;padding-left:16px">Monto acumulado TD en ventana de 1 hora (promedio)</td>
+          <td style="background:#C8FFA2;color:#0F1B2C;font-weight:600">263.99</td><td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">691.25</td><td style="background:#FFEEA2;color:#0F1B2C;font-weight:600">442.47</td><td style="background:#BEFFA2;color:#0F1B2C;font-weight:600">240.13</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">111.90</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#FFFFFF">2.36</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#FFFFFF">349.95</td>
+        </tr>
+        <tr>
+          <td style="text-align:left;font-weight:600;background:#f9fbfb;padding-left:16px">Monto total en dólares (mes actual)</td>
+          <td style="background:#FF8CA2;color:#0F1B2C;font-weight:600">173,037.26</td><td style="background:#F1FFA2;color:#0F1B2C;font-weight:600">85,903.54</td><td style="background:#FFD7A2;color:#0F1B2C;font-weight:600">121,716.59</td><td style="background:#F4FFA2;color:#0F1B2C;font-weight:600">88,491.47</td><td style="background:#8CFFA2;color:#0F1B2C;font-weight:600">17,416.04</td>
+          <td style="font-weight:700;color:rgb(31,69,146);background:#f9fbfb">9.94</td>
+          <td style="font-weight:700;color:rgb(0,95,30);background:#f9fbfb">97,312.98</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grad-bar">
+    <span>Valor bajo</span>
+    <div class="grad-rect"></div>
+    <span>Valor alto</span>
+    <small style="margin-left:10px;color:#b0bec5">(gradiente relativo por variable)</small>
+  </div>
+
+  <div class="nota-box">
+    <b>¿Cómo leer esta tabla?</b><br>
+    • Cada fila es una variable del modelo. Cada columna (P1–P5) muestra el <b>promedio de esa variable para ese grupo de clientes</b>.<br>
+    • El <b>Ratio P1/P5</b> indica cuántas veces es mayor el valor en el grupo de mayor riesgo respecto al de menor riesgo.
+      Un ratio alto (ej. &gt;3) significa que esa variable es clave para separar clientes riesgosos de los no riesgosos.<br>
+    • El <b>Promedio General</b> es la media de los cinco grupos y sirve como referencia de nivel base de la variable.
+  </div>
+
+  <div class="footer-text">© Interbank &nbsp;·&nbsp; Información confidencial &nbsp;·&nbsp; Segmentación: P1 (mayor score) → P5 (menor score)</div>
+</div>
+</body>
+</html>
