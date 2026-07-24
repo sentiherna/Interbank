@@ -1,0 +1,10 @@
+.venv/
+logs/
+output_batch/
+reportes_diarios/
+config/.env_email
+config/github.env
+config/groq.env
+config/credentials.sh
+*.pyc
+__pycache__/

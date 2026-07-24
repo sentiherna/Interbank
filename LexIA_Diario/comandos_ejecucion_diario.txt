@@ -1,0 +1,17 @@
+cd /media/santi/Work/Interbank/LexIA_Diario
+
+# Crear entorno e instalar dependencias
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+# Ejecutar el dia anterior y enviar email
+bash run_daily_lexia.sh
+
+# Ejecutar una fecha puntual sin enviar email
+bash run_daily_lexia.sh --date 2026-05-27 --no-email --force
+
+# Ejecutar sin descargar PDFs, usando PDFs ya guardados localmente
+bash run_daily_lexia.sh --date 2026-05-27 --no-download --no-email --force
+
+# Programar corrida diaria a las 10 AM
+bash install_cron_8am.sh
