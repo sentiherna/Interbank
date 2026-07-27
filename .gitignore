@@ -37,11 +37,11 @@ env/
 **/xgboost-model*
 
 # Documentos internos
-*.xlsx
-*.xls
-*.docx
-*.pdf
-*.pptx
+#*.xlsx
+#*.xls
+#*.docx
+#*.pdf
+#*.pptx
 
 # Salidas gráficas generadas
 **/eda_graficos_train/
