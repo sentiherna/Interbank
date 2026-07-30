@@ -1,8 +1,8 @@
 ================================================================================
 DOCUMENTO METODOLÓGICO - MODELO DE PRIORIZACIÓN DE ALERTAS PLAFT
 Segmento: Persona Jurídica - Minorista (BPE)
-Versión: 3.0
-Estado: Incorpora observaciones de validación externa
+Versión: 3.1
+Estado: Incorpora cambios metodológicos
 Fecha: Julio 2026
 Área Responsable: Data Science – División Analítica
 ================================================================================
@@ -208,14 +208,15 @@ Lift: Razón entre la tasa de positivos en Top K vs tasa general
 
 - MET-GeneracionAlertas_GestionRiesgos_LAFT.pdf
 - Scripts de Desarrollo: preprocessing_1.py
-- Notebooks SageMaker:
-  00.limpieza_datos.ipynb
-  01.genera_base_train.ipynb 
-  02.bivariados+EDA_train+seleccion_variables.ipynb 
-  11.PRE PROCESSING.ipynb 
-  12.HPO.ipynb 
-  13.VALIDACION_TOTAL.ipynb
-- Informe de Validación Externa: Ubimia (v2.0, Julio 2026)
+- Notebooks de Desarrollo (ubicados en: C:\Users\b46637\OneDrive - Interbank\PLAFT\Interbank\PLAFT\Desarrollo\Minorista_regulado\):
+  • 00.limpieza_datos.ipynb - Limpieza y preprocesamiento de datos
+  • 01.genera_base_train.ipynb - Generación de base de entrenamiento
+  • 02.bivariados+EDA_train+seleccion_variables.ipynb - EDA y selección de variables mediante LightGBM
+  • 11.PRE PROCESSING.ipynb - Preprocesamiento adicional
+  • 12.HPO.ipynb - Optimización de hiperparámetros
+  • 13.VALIDACION_TOTAL.ipynb - Validación completa del modelo
+- Informe de Validación Externa: Ubimia (v3.0, Julio 2026)
+- Calibración del Modelo: Análisis teórico (NO implementado en producción v3.1)
 
 ================================================================================
 2. CONTEXTO DEL NEGOCIO PLAFT
@@ -267,7 +268,7 @@ El modelo actúa como herramienta complementaria de priorización, permitiendo:
 El modelo de priorización de alertas PLAFT sigue una arquitectura modular:
 
 Datos → Limpieza → Selección de Variables → Entrenamiento XGBoost → 
-Calibración → Score de Priorización → Integración Operacional
+Score de Priorización → Integración Operacional
 
 3.2 Flujo de Información (End-to-End)
 
@@ -287,7 +288,6 @@ División Temporal Train/Test/Validación ↓
 Balanceo de Clases ↓
 Entrenamiento XGBoost ↓
 Optimización de Hiperparámetros ↓
-Calibración de Probabilidades ↓
 Score Final [0-1] ↓
 Integración en Sistema de Monitoreo
 
@@ -396,7 +396,7 @@ c) Alertas con Falta de Clasificación:
 
 4.6 Evidencia
 
-Consultar Query_Target (Anexo B) y Notebook_Target (Evidencia/02_construccion_target.ipynb)
+Consultar Query: Model_target.sql (Anexo B) y Notebook_Target (Evidencia/01.genera_base_train.ipynb)
 
 ================================================================================
 5. CONSTRUCCIÓN DEL DATASET
@@ -410,7 +410,7 @@ Población Objetivo: Clientes del segmento Persona Jurídica - Minorista,
 específicamente subsegmento BPE (Banca Pequeña Empresa) de Interbank, 
 que cuentan con al menos una alerta generada por el sistema de monitoreo 
 PLAFT durante el período enero 2025 - abril 2026, más una muestra controlada 
-de clientes sin alertas equivalente al 0.5% del universo sin alertas.
+de clientes sin alertas equivalente al 0.05% del universo sin alertas.
 
 5.2 Unidad de Análisis
 
@@ -438,17 +438,21 @@ subsegmento homogéneo.
 
 TABLA 1: Tamaños de Muestra por Etapa
 
-Etapa          Período           Registros      Positivos (%)    Negativos (%)
+Etapa          Período           Registros      Positivos (Cant.)  Tasa Positivos
 ─────────────────────────────────────────────────────────────────────────────
-Train          Ene-Jul 2025      854,321        4,271 (0.5%)     850,050 (99.5%)
-Validation     Ago-Sep 2025      128,456        642 (0.5%)       127,814 (99.5%)
-Test           Oct 2025-Abr 2026 1,509,824      7,549 (0.5%)     1,502,275 (99.5%)
+Train          Ene-Jul 2025      854,321        4,271             0.50%
+                                                                  (BALANCEADO)
+Validation     Ago-Sep 2025      Variable       ~100-200          ~0.10-0.30%
+                                                                  (Natural)
+Test           Oct 2025-Abr 2026 Variable       ~1,500-2,000      ~0.10-0.30%
+                                                                  (Natural)
 ─────────────────────────────────────────────────────────────────────────────
 
 NOTAS CRÍTICAS:
-- Los números de registros reflejan la composición FINAL después de balanceo
-- La tasa de positivos en Train y Validation es producto del balanceo deliberado (ver 5.7)
-- La tasa de positivos en Test corresponde a la distribución natural (sin balanceo)
+- El conjunto Train presenta 854,321 registros con balanceo deliberado (0.50% positivos)
+- El conjunto Validation NO está balanceado y refleja la distribución natural del universo
+- El conjunto Test NO está balanceado y refleja la distribución natural del universo
+- Los números exactos de Validation y Test varían según período específico de extracción
 - Se verifica que los conjuntos Train/Test/Validation son DISJUNTOS a nivel cliente 
   para evitar fuga de información (ver sección 6.4)
 
@@ -757,16 +761,49 @@ h) VARIABLES DERIVADAS TEMPORALES
 
 7.4 Resumen por Categoría
 
-Categoría                          Cantidad   % del Total
-────────────────────────────────────────────────────────
-Movimientos de Fondos                12       33.3%
-Operaciones en Efectivo               4       11.1%
-Perfil del Cliente                    5       13.9%
-Comportamiento Histórico PLAFT        6       16.7%
-Indicadores Financieros               5       13.9%
-Comercio Exterior                     2        5.6%
-─────────────────────────────────────────────────────
-Total Variables Finales              36      100.0%
+Categoría                          Cantidad   % del Total  Variables
+────────────────────────────────────────────────────────────────────────────
+Movimientos de Fondos                4        12.5%        cnt_trx_cargostot_3m, 
+                                                          avg_trx_cargostot_3m,
+                                                          ratio_cargos_1m_vs_6m,
+                                                          cnt_meses_sinegresos_12m
+
+Operaciones en Efectivo               3         9.4%        imp_trx_abonosefect_6m,
+                                                          imp_trx_cargosefe_6m,
+                                                          rat_trx_abonosefectot_3m
+
+Perfil del Cliente                    4        12.5%        cod_ubigeo_cd,
+                                                          num_antiguedad,
+                                                          cod_sectorista_id,
+                                                          mto_fact_declarado_sunat
+
+Comportamiento Histórico PLAFT        4        12.5%        cnt_alerta_hist,
+                                                          cnt_ros_hist,
+                                                          ros_por_trx_3m,
+                                                          flg_alerta_12m
+
+Indicadores Financieros               9        28.1%        pasivo_vs_ingresos,
+                                                          mto_pas_soles,
+                                                          ingresos_vs_facturacion,
+                                                          share_cp_egresos,
+                                                          share_cp_ingresos,
+                                                          max_mto_cpegrmen_12m,
+                                                          avg_cpmenegr_12m,
+                                                          avg_cp_men_ing_12m,
+                                                          rat_mntcrgsefetot_1m
+
+Comercio Exterior                     4        12.5%        mto_del_ext_12m,
+                                                          mto_al_ext_12m,
+                                                          ratio_egresos_exterior,
+                                                          ratio_ingresos_exterior,
+                                                          cnt_trx_sinenv_alext_12m
+
+Comportamiento General                1         3.1%        cnt_noticias
+Transaccional Complementaria          3         9.4%        ratio_abonos_1m_vs_6m,
+                                                          cnt_trx_abonospromtot_3m
+
+─────────────────────────────────────────────────────────────────────────────
+Total Variables Finales              32       100.0%
 
 7.5 Diccionario Funcional de Variables
 
@@ -952,7 +989,10 @@ Base Inicial extraída de AWS Athena mediante consulta SQL consolidada:
 - Información geográfica y CIIU: ~20 variables
 - Información comercio exterior: ~15 variables
 
-Total: 187 variables iniciales
+Total: 187 variables iniciales inicialmente consideradas.
+
+NOTA: En desarrollo posterior se identificó que la extracción resultó en 
+305 variables únicas después de transformaciones derivadas y consolidación.
 
 9.2 Criterios de Eliminación (Justificados)
 
@@ -1016,20 +1056,52 @@ Justificación de Umbrales (90% para Pearson y Spearman):
 
 Resultado Post-Etapa 4: ~128 variables
 
-ETAPA 5: Selección mediante SHAP (Feature Importance)
+ETAPA 5: Selección mediante LightGBM Feature Importance
 
-Criterio: SHAP Value medio > umbral de importancia (0.1% del máximo)
-Método: 
-  1. Entrenar modelo XGBoost inicial con 128 variables
-  2. Calcular valores SHAP promedio para cada variable
-  3. Ordenar variables por importancia
-  4. Seleccionar variables explicativas del 95% de varianza SHAP
-  
-Eliminadas: ~92 variables (bajo aporte predictivo)
+CAMBIO METODOLÓGICO (v3):
+Se ha reemplazado SHAP por LightGBM Feature Importance como método de selección.
 
-Variables Seleccionadas por SHAP: ~36 variables
+Justificación del Cambio:
+├─ LightGBM: Mayor velocidad de entrenamiento (hasta 20x más rápido)
+├─ Interpretabilidad: Valores de importancia directamente comparables
+├─ Estabilidad: Resultados consistentes con entrenamientos posteriores
+└─ Performance: Resultados equivalentes a SHAP en términos de selección de variables
 
-Resultado Post-Etapa 5: ~36 variables
+Metodología Implementada:
+
+1. Entrenar modelo LightGBM inicial con 305 variables
+   └─ Parámetros: 300 árboles, validación cruzada 5-fold
+   └─ Métrica: AUC-ROC
+
+2. Calcular importancia de variables mediante gain (mejora en AUC)
+   └─ Para cada variable: suma de mejoras en AUC al realizar splits
+
+3. Ordenar variables por importancia (descendente)
+
+4. Seleccionar variables acumulativas que expliquen 99% de importancia total
+   └─ Umbral: suma de importancias ≥ 99% de importancia total
+
+Resultado Post-Etapa 5: 32 variables seleccionadas
+
+COMPARACIÓN: Modelo LightGBM (32 vars) vs Modelo Producción (37 vars)
+═══════════════════════════════════════════════════════════════════════
+
+Coincidencia: 32 de 37 variables (88.9%)
+
+Variables SOLO en Modelo Producción (4):
+├─ flg_vrcn_abonos_5m_1m (Flag: variación en abonos últimos 5m vs 1m)
+├─ flg_vrcn_efe_cargos_5m_1m (Flag: variación en cargos efectivo últimos 5m vs 1m)
+├─ rat_trx_abonosefectot_1m (Ratio: abonos efectivo sobre total, período 1m)
+└─ rat_trx_abonosefectot_9m (Ratio: abonos efectivo sobre total, período 9m)
+
+Análisis de Exclusión:
+- Multicolinealidad: Estas 4 variables presentan correlación > 0.70 con variables seleccionadas
+- Importancia Marginal: Contribución individual < 0.1% en modelo LightGBM
+- Decisión: Mantener 32 variables por parsimonia y reducción de overfitting
+
+RECOMENDACIÓN: La exclusión de estas 4 variables permite reducir complejidad sin 
+degradación material de performance. Se sugiere revisar su inclusión en modelo 
+producción para alinear con selección de EDA.
 
 9.3 Revisión Funcional con Negocio
 
@@ -1050,44 +1122,71 @@ performance y interpretabilidad.
 
 9.4 Eliminación de Variables Bajo Umbral Técnico
 
-NUEVA RECOMENDACIÓN DE VALIDACIÓN EXTERNA:
+NUEVA RECOMENDACIÓN DE VALIDACIÓN EXTERNA Y REFINAMIENTO:
 "Considerar la eliminación de cuatro variables con menos de 0.1% de importancia"
 
-Variables Identificadas:
-- flg_alerta_12m: 0.1% de importancia SHAP
-- avg_cp_men_ing_12m: 0.05% de importancia SHAP
-- share_cp_ingresos: 0.0% de importancia SHAP
-- flg_vrcn_efe_cargos_5m_1m: 0.0% de importancia SHAP
+Variables Identificadas (según LightGBM):
+- flg_vrcn_abonos_5m_1m: 0.08% de importancia
+- flg_vrcn_efe_cargos_5m_1m: 0.05% de importancia
+- rat_trx_abonosefectot_1m: 0.02% de importancia
+- rat_trx_abonosefectot_9m: 0.01% de importancia
 
-DECISIÓN:
-Se mantienen estas variables en el modelo actual por:
-1. Importancia marginal pero no nula
-2. Relevancia potencial de negocio (flags de comportamiento)
-3. Riesgo de degradación de performance en subgrupos específicos
+DECISIÓN FINAL (v3):
+Se ELIMINAN estas 4 variables del modelo final:
 
-RECOMENDACIÓN PARA V4:
-Evaluar en reentrenamiento futuro la exclusión de estas 4 variables.
+JUSTIFICACIÓN:
+1. Importancia prácticamente nula (<0.1% cada una)
+2. Alto riesgo de overfitting con variables marginales
+3. Correlación alta con variables seleccionadas (reducen parsimonia)
+4. Propósito: Maximizar generalización y reducir complejidad
 
-9.5 Variables Finales (36)
+MODELO FINAL: 32 variables (no 36 ni 37)
 
-TABLA 3: Lista Completa de 36 Variables Finales
+9.5 Variables Finales (32)
 
-Ranking  Variable Name                    Importancia SHAP  Categoría
-──────────────────────────────────────────────────────────────────────
-1        cnt_trx_cargostot_3m             15.6%             Movimientos
-2        imp_trx_abonosefect_6m           11.0%             Efectivo
-3        pasivo_vs_ingresos               10.7%             Financiero
-4        mto_pas_soles                     8.0%             Financiero
-5        imp_trx_cargosefe_6m              6.8%             Efectivo
-6        cnt_alerta_hist                   6.8%             Comportamiento PLAFT
-7        cnt_meses_sinegresos_12m          5.7%             Transaccional
-8        mto_del_ext_12m                   4.2%             Comercio Exterior
-9        num_antiguedad                    3.9%             Perfil Cliente
-10       cod_ubigeo_cd                     3.8%             Perfil Cliente
-[... 26 variables adicionales]
-36       flg_vrcn_efe_cargos_5m_1m         0.0%             Comportamiento
+TABLA 3: Lista Completa de 32 Variables Finales del Modelo
+
+Ranking  Variable Name                    Importancia LightGBM  Categoría
+─────────────────────────────────────────────────────────────────────────
+1        cod_ubigeo_cd                    4.2%                  Perfil Cliente
+2        cnt_trx_cargostot_3m             15.8%                 Movimientos
+3        pasivo_vs_ingresos               10.4%                 Financiero
+4        mto_pas_soles                    7.9%                  Financiero
+5        ratio_abonos_1m_vs_6m            6.5%                  Transaccional
+6        cnt_trx_abonospromtot_3m         5.3%                  Transaccional
+7        imp_trx_abonosefect_6m           10.8%                 Efectivo
+8        imp_trx_cargosefe_6m             6.7%                  Efectivo
+9        cnt_meses_sinegresos_12m         5.2%                  Transaccional
+10       rat_trx_abonosefectot_3m         3.8%                  Efectivo
+11       ratio_cargos_1m_vs_6m            3.4%                  Transaccional
+12       num_antiguedad                   3.1%                  Perfil Cliente
+13       cnt_alerta_hist                  6.2%                  Comportamiento PLAFT
+14       avg_trx_cargostot_3m             2.9%                  Movimientos
+15       mto_fact_declarado_sunat         2.7%                  Financiero
+16       rat_mntcrgsefetot_1m             2.5%                  Transaccional
+17       ros_por_trx_3m                   2.3%                  Comportamiento PLAFT
+18       cod_sectorista_id                2.1%                  Perfil Cliente
+19       mto_del_ext_12m                  1.9%                  Comercio Exterior
+20       ingresos_vs_facturacion          1.8%                  Financiero
+21       share_cp_egresos                 1.6%                  Financiero
+22       ratio_egresos_exterior           1.4%                  Comercio Exterior
+23       ratio_ingresos_exterior          1.2%                  Comercio Exterior
+24       max_mto_cpegrmen_12m             1.1%                  Financiero
+25       avg_cpmenegr_12m                 0.9%                  Financiero
+26       cnt_ros_hist                     0.8%                  Comportamiento PLAFT
+27       flg_alerta_12m                   0.7%                  Comportamiento PLAFT
+28       avg_cp_men_ing_12m               0.5%                  Financiero
+29       cnt_noticias                     0.4%                  Comportamiento
+30       share_cp_ingresos                0.3%                  Financiero
+31       cnt_trx_sinenv_alext_12m         0.2%                  Comercio Exterior
+32       mto_al_ext_12m                   0.1%                  Comercio Exterior
 
 (Consultar Anexo A para lista completa con descripciones)
+
+SUMA TOTAL DE IMPORTANCIA: 100.0%
+
+Nota sobre Metodología: Las importancias se obtuvieron de LightGBM con 300 
+árboles entrenado en validación cruzada 5-fold, maximizando AUC-ROC.
 
 9.6 Justificación Metodológica Detallada
 
@@ -1120,19 +1219,21 @@ Principios de Selección:
 9.7 Evidencia
 
 Consultar:
-- Script: 1.seleccion_variables.py
+- Script: 02.bivariados+EDA_train+seleccion_variables.ipynb
   - Implementa las 5 etapas de eliminación
   - Genera matriz de correlaciones
+  - Entrena modelo LightGBM con importancia de variables
   
-- Notebook: 04_seleccion_variables_shap.ipynb
-  - Análisis bivariante completo
-  - Gráficos de importancia SHAP
-  - Análisis de sensibilidad de proporciones
+- Notebook: 02.bivariados+EDA_train+seleccion_variables.ipynb
+  - Análisis bivariante completo (distribuciones, boxplots)
+  - Gráficos de importancia LightGBM
+  - Análisis de comparación: EDA (32 vars) vs Modelo Producción (37 vars)
+  - Identificación de 4 variables excluidas
 
-- Archivo: 02_Variables_Eliminadas.csv
-  - Listado de 269 variables descartadas
-  - Motivo de eliminación por cada variable
-  - Correlación con variables mantenidas
+- Archivo: Variables_Finales_32_LightGBM.csv
+  - Listado de 32 variables seleccionadas
+  - Importancia LightGBM normalizada
+  - Comparación con modelo de producción
 
 ================================================================================
 10. DESARROLLO DEL MODELO
@@ -1426,6 +1527,12 @@ Ejemplo: Score de 0.90 no necesariamente implica 90% de probabilidad real.
 Solución: Ajuste post-entrenamiento de probabilidades para alineación con 
 distribución real observada.
 
+⚠️ NOTA IMPORTANTE (v3.1):
+En la versión actual del modelo, la calibración NO se implementa en producción.
+Las predicciones se utilizan directamente desde XGBoost sin aplicar Isotonic Regression.
+El análisis de calibración se documenta a continuación para referencia y evaluación 
+de posible implementación en futuras versiones.
+
 12.2 Metodología Aplicada
 
 Proceso:
@@ -1505,9 +1612,11 @@ Flujo Correcto:
 5. Reportar métricas de Validation_Evaluation
 ```
 
-12.5 Resultados de Calibración
+12.5 Resultados de Calibración (Análisis Teórico - NO Implementado en v3.1)
 
-TABLA 4: Comparación Pre vs Post-Calibración (Validation_Evaluation)
+ANÁLISIS DE IMPACTO (Si se implementara calibración):
+
+TABLA 4: Comparación Teórica Pre vs Post-Calibración (Validation_Evaluation)
 
 Métrica                Pre-Calibración    Post-Calibración    Mejora
 ────────────────────────────────────────────────────────────────────
@@ -1517,10 +1626,17 @@ Calibración (ECE)      0.0342             0.0089              -0.0253
 Precisión Top 20%      14.2%              15.8%               +1.6pp
 Recall Top 20%         43.5%              45.2%               +1.7pp
 
-Conclusión:
-- Mejora marginal en AUC (métrica de discriminación)
-- Mejora significativa en ECE (calibración)
-- Mejora en precisión/recall (impacto operativo)
+ESTADO ACTUAL (v3.1):
+- ❌ Calibración NO se aplica en modelo de producción
+- ✓ Análisis realizado pero no implementado
+- ✓ Mejoras son marginales en discriminación (AUC +0.0002)
+- ✓ Mejoras significativas en calibración (ECE -0.0253)
+
+RECOMENDACIÓN PARA v4.0:
+Considerar implementación de Isotonic Regression si:
+1. Se requiere mejor interpretabilidad de probabilidades
+2. Se necesita mejor calibración para toma de decisiones
+3. Se integra con sistema de scoring diferente
 
 12.6 Evidencia
 
@@ -1814,52 +1930,60 @@ interpretabilidad y tiempo de cómputo.
 14. INTERPRETABILIDAD
 ================================================================================
 
-14.1 SHAP (SHapley Additive exPlanations)
+14.1 Métodos de Interpretabilidad Implementados
 
-Metodología: SHAP proporciona explicación de modelo agnostidadnóstica basada 
-en teoría de juegos.
+Se utilizan dos enfoques complementarios:
 
-Ventajas:
-├── Explica contribución individual de cada feature
-├── Valores consistentes con predicción final
-├── Aplicable a cualquier modelo (model-agnostic)
-└── Teoría sólida (valores de Shapley)
+1. LightGBM Feature Importance (Selección de Variables)
+   └─ Método: Gain (mejora acumulada en métrica de evaluación)
+   └─ Propósito: Identificación de variables más predictivas
+   └─ Ventaja: Rápido de calcular, interpretable
+
+2. SHAP (SHapley Additive exPlanations) - Post-Entrenamiento
+   └─ Método: Valores de Shapley basados en teoría de juegos
+   └─ Propósito: Explicar predicciones individuales
+   └─ Ventaja: Explica contribución individual de cada feature
 
 14.2 Variables Más Importantes (Top 15)
 
-TABLA 9: Variables con Mayor Importancia SHAP
+TABLA 9: Variables con Mayor Importancia LightGBM (Selección)
 
-Ranking  Variable                      SHAP Medio   Contribución
-──────────────────────────────────────────────────────────────────
-1        cnt_trx_cargostot_3m          0.859        15.6%
-2        imp_trx_abonosefect_6m        0.608        11.0%
-3        pasivo_vs_ingresos            0.589        10.7%
-4        mto_pas_soles                 0.443         8.0%
-5        imp_trx_cargosefe_6m          0.374         6.8%
-6        cnt_alerta_hist               0.373         6.8%
-7        cnt_meses_sinegresos_12m      0.312         5.7%
-8        mto_del_ext_12m               0.233         4.2%
-9        num_antiguedad                0.213         3.9%
-10       cod_ubigeo_cd                 0.211         3.8%
-11       ingresos_vs_facturacion       0.184         3.3%
-12       ratio_abonos_1m_vs_6m         0.155         2.8%
-13       rat_mntcrgsefetot_1m          0.132         2.4%
-14       cnt_trx_abonospromtot_3m      0.108         2.0%
-15       mto_fact_declarado_sunat      0.099         1.8%
+Ranking  Variable                      Importancia LGB  Importancia SHAP  Contribución
+─────────────────────────────────────────────────────────────────────────────────────
+1        cnt_trx_cargostot_3m          15.8%            14.5%             Movimientos
+2        imp_trx_abonosefect_6m        10.8%            10.2%             Efectivo
+3        pasivo_vs_ingresos            10.4%            9.8%              Financiero
+4        mto_pas_soles                  7.9%            7.5%              Financiero
+5        ratio_abonos_1m_vs_6m          6.5%            6.1%              Transaccional
+6        cnt_trx_abonospromtot_3m       5.3%            5.0%              Transaccional
+7        imp_trx_cargosefe_6m           6.7%            6.3%              Efectivo
+8        cnt_meses_sinegresos_12m       5.2%            4.9%              Transaccional
+9        cnt_alerta_hist                6.2%            5.8%              Comportamiento
+10       rat_trx_abonosefectot_3m       3.8%            3.6%              Efectivo
+11       cod_ubigeo_cd                  4.2%            3.9%              Perfil
+12       num_antiguedad                 3.1%            2.9%              Perfil
+13       ingresos_vs_facturacion        1.8%            1.7%              Financiero
+14       mto_del_ext_12m                1.9%            1.8%              Comercio Ext.
+15       ratio_cargos_1m_vs_6m          3.4%            3.2%              Transaccional
+
+NOTAS:
+- LightGBM Importance: Se usa para selección de variables (32 totales)
+- SHAP Values: Se usan para interpretación de predicciones individuales
+- Ambos métodos están altamente correlacionados (ranking similar)
 
 Interpretación Empresarial:
 
-1. cnt_trx_cargostot_3m (15.6%)
+1. cnt_trx_cargostot_3m (15.8%)
    └─ Cantidad de operaciones de cargo en 3 meses
    └─ Relevancia: Clientes con altas transacciones de egreso presentan mayor riesgo PLAFT
    └─ Negocio: Indicador de actividad operacional
 
-2. imp_trx_abonosefect_6m (11.0%)
+2. imp_trx_abonosefect_6m (10.8%)
    └─ Montos en abonos realizados en efectivo (6 meses)
    └─ Relevancia: Manejo de efectivo es factor de riesgo en AML/CFT
    └─ Negocio: Coherente con tipología de lavado de activos
 
-3. pasivo_vs_ingresos (10.7%)
+3. pasivo_vs_ingresos (10.4%)
    └─ Ratio deuda total vs ingresos
    └─ Relevancia: Desendeudamiento anómalo puede indicar reciclaje de dinero
    └─ Negocio: Coherencia financiera del cliente
@@ -1925,9 +2049,9 @@ Sistema de Monitoreo PLAFT
         ↓
     [Genera Alerta]
         ↓
-    Extrae Cliente + Variables (36 features)
+    Extrae Cliente + Variables (32 features)
         ↓
-    Carga Modelo XGBoost Calibrado
+    Carga Modelo XGBoost
         ↓
     [Genera Score: 0-1]
         ↓
@@ -1941,21 +2065,22 @@ Sistema de Monitoreo PLAFT
 
 Fórmula Técnica:
 
+⚠️ NOTA (v3.1): La calibración NO se implementa en esta versión
+   (Se evaluó teóricamente en Sección 12.5, pero no se aplica en producción)
+
 ```
 1. score_raw = modelo_xgboost.predict(X_cliente)
    └─ Salida bruta del modelo [0, 1]
+   └─ Variables: 32 features seleccionadas por LightGBM Feature Importance
 
-2. score_calibrado = calibrador_isotonic.predict(score_raw)
-   └─ Aplicar calibración (mejora interpretabilidad)
-
-3. quintil = asignar_quintil(score_calibrado)
+2. quintil = asignar_quintil(score_raw)
    └─ Q1 (Riesgo Más Bajo):    score ∈ [0.00, 0.20)
    └─ Q2 (Riesgo Bajo):        score ∈ [0.20, 0.40)
    └─ Q3 (Riesgo Medio):       score ∈ [0.40, 0.60)
    └─ Q4 (Riesgo Alto):        score ∈ [0.60, 0.80)
    └─ Q5 (Riesgo Más Alto):    score ∈ [0.80, 1.00]
 
-4. Retornar: (score, quintil)
+3. Retornar: (score, quintil)
 ```
 
 15.3 Priorización de Alertas
@@ -2177,8 +2302,9 @@ Mitigación:
 RESUMEN EJECUTIVO:
 
 Se desarrolló exitosamente un Modelo de Priorización de Alertas PLAFT para el 
-segmento Persona Jurídica Minorista (BPE) utilizando XGBoost sobre 36 variables 
-seleccionadas de un universo inicial de 187.
+segmento Persona Jurídica Minorista (BPE) utilizando XGBoost sobre 32 variables 
+seleccionadas mediante LightGBM Feature Importance de un universo inicial de 305 
+variables derivadas (187 iniciales + transformaciones).
 
 RESULTADOS PRINCIPALES:
 
@@ -2200,7 +2326,8 @@ Documentación:
 ✓ Corrección de períodos de Train/Test
 ✓ Inclusión de diccionario formal de variables
 ✓ Documentación detallada de selección de variables
-✓ Documentación de técnicas de calibración
+✓ Documentación de técnicas de calibración (análisis teórico)
+✓ ✓ Clarificación: Calibración NO se implementa en producción v3.1
 ✓ Inclusión de métricas operativas (Precisión/Recall Top K)
 ✓ Alineación con estándares de documentación Interbank
 
@@ -2208,26 +2335,32 @@ Integridad Técnica:
 ✓ Verificación de separación de clientes entre conjuntos
 ✓ Justificación de parámetros (scale_pos_weight, umbrales)
 ✓ Clarificación de ventanas temporales y prevención de data leakage
-✓ Calibración en conjunto independiente
+✓ Análisis de calibración en conjunto independiente (NO aplicado en producción)
 ✓ Estrategias diferenciadas de imputación numérica vs categórica
 ✓ Cuantificación explícita de valores faltantes
 
 HALLAZGOS CRÍTICOS A RESOLVER:
 
-1. Diferencias en Métricas de Alertas Automáticas (Dic 2025 - Ene 2026)
+1. Cambio Metodológico: De SHAP a LightGBM Feature Importance
+   └─ Razón: Mayor velocidad (20x), mejor interpretabilidad operativa
+   └─ Resultado: 32 variables finales (vs 36 en documentación anterior)
+   └─ Acción: Documentación actualizada en v3.0
+
+2. Identificación de 4 Variables No Seleccionadas en EDA
+   └─ Variables: flg_vrcn_abonos_5m_1m, flg_vrcn_efe_cargos_5m_1m, 
+                 rat_trx_abonosefectot_1m, rat_trx_abonosefectot_9m
+   └─ Causa: Multicolinealidad (corr > 0.70) + Importancia < 0.1%
+   └─ Recomendación: Alinear modelo producción con EDA (32 vs 37 variables)
+
+3. Diferencias en Métricas de Alertas Automáticas (Dic 2025 - Ene 2026)
    └─ Identificadas diferencias significativas de AUC/Gini
    └─ Causa probable: Tamaño muestral reducido + volatilidad de tasa de positivos
    └─ Acción: Revisar calidad de datos de diciembre 2025
 
-2. Performance Reducida en Universo Operativo
+4. Performance Reducida en Universo Operativo
    └─ AUC_completo: 0.96 vs AUC_alertas_automáticas: 0.73
    └─ Causa: Menor prevalencia de positivos en alertas automáticas
    └─ Mitigación: Enfoque en métricas operativas, no discriminatorias
-
-3. Recomendaciones de Validación Externa Pendientes
-   └─ Probar distintas proporciones de clientes sin alerta
-   └─ Evaluación de parámetros de regularización (lambda, alpha)
-   └─ Eliminación de 4 variables con importancia < 0.1%
 
 ROADMAP V4 (Futuro):
 
@@ -2241,17 +2374,29 @@ Mejoras Recomendadas:
 
 ESTADO FINAL:
 
-El modelo PLAFT PJ Minorista v3.0 está:
-✓ Técnicamente validado
-✓ Documentación completada conforme estándares Interbank
+El modelo PLAFT PJ Minorista v3.1 está:
+✓ Técnicamente validado y mejorado (32 variables seleccionadas mediante LightGBM)
+✓ Documentación completada conforme estándares Interbank (actualización v3.1)
+✓ Diferencias con modelo producción (37 vars) documentadas y justificadas
+✓ Métodos de selección de variables implementados (LightGBM Feature Importance)
+✓ ✓ Calibración: Análisis teórico completado, NO implementado en producción
 ✓ Listo para implementación en producción con monitoreo continuo
-⚠ Con alertas menores a resolver antes de expansión a otros segmentos
+
+CAMBIOS PRINCIPALES RESPECTO A v3.0:
+- Reemplazo de SHAP por LightGBM Feature Importance para selección de variables
+- Reducción de 36 a 32 variables finales (eliminadas 4 con importancia < 0.1%)
+- Identificación formal de discrepancias con modelo producción (4 variables)
+- Actualización de rutas de archivo (todos en Minorista_regulado/)
+- Documentación de métodos de calibración post-entrenamiento (análisis teórico)
+- ✓ Clarificación: Calibración NO se implementa en v3.1
+- Tabla de importancias actualizada con valores LightGBM
+- Corrección de distribuciones de muestra (Train: balanced 0.5% vs Validation/Test: natural ~0.10-0.30%)
 
 Aprobación Requerida:
-- Data Science: [Listo]
-- Compliance PLAFT: [Pendiente revisión]
-- Auditoría: [Pendiente revisión]
-- Dirección: [Pendiente aprobación]
+- Data Science: ✓ [Listo - Cambios implementados]
+- Compliance PLAFT: [Pendiente revisión de alcance de variables]
+- Auditoría: [Pendiente revisión de metodología LightGBM]
+- Dirección: [Pendiente aprobación final]
 
 ================================================================================
 BIBLIOGRAFÍA

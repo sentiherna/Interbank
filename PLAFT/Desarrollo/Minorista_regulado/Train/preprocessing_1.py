@@ -57,21 +57,21 @@ def TratamientoDF(df, train=1):
 
     df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mean())
 
-    if train == 1:
+ #   if train == 1:
         # Solo eliminamos columnas que NO deben ir al modelo
-        cols_drop = ["cod_mes", "key_value", "tipo_alerta_n2","cod_cli","codmes_lag1","max_trx_abonos_3m","trx_riesgo_cliente","flg_ros_12m",
-"num_edad_constitucion","desc_nivel_rsg_lsb_tot","cod_ciiu_v4","flg_casos_hist","cnt_ro_debajo_umbral",
-"flg_al_ext_12m","flg_pep","cod_rsg_pep","flg_activo_pep","flg_kyc_12m","flg_kyc_hist","cnt_kyc_hist",
-"gap_riesgo_pep_lsb","desc_provincia","desc_departamento","max_mto_cpmening_12m","cnt_trx_al_ext_1000_12m","cnt_meses_siningresos_12m","alertas_por_antiguedad",
-                    "flg_del_ext_12m",""]
-        df = df.drop(columns=cols_drop, errors="ignore")
+       # cols_drop = ["cod_mes", "key_value", "tipo_alerta_n2","cod_cli","codmes_lag1","max_trx_abonos_3m","trx_riesgo_cliente","flg_ros_12m",
+#"num_edad_constitucion","desc_nivel_rsg_lsb_tot","cod_ciiu_v4","flg_casos_hist","cnt_ro_debajo_umbral",
+#"flg_al_ext_12m","flg_pep","cod_rsg_pep","flg_activo_pep","flg_kyc_12m","flg_kyc_hist","cnt_kyc_hist",
+#"gap_riesgo_pep_lsb","desc_provincia","desc_departamento","max_mto_cpmening_12m","cnt_trx_al_ext_1000_12m","cnt_meses_siningresos_12m","alertas_por_antiguedad",
+ #                   "flg_del_ext_12m",""]
+ #       df = df.drop(columns=cols_drop, errors="ignore")
 
-  #  DIR_COLUMNS = '/opt/ml/processing/input/Columns'
+    DIR_COLUMNS = '/opt/ml/processing/input/Columns'
 
-   # path_columns = f'{DIR_COLUMNS}/selected_columns.csv'
-   ## columnas = pd.read_csv(path_columns, header=None)
-   # list_var = columnas[0].tolist()
-   # df = df[list_var]    
+    path_columns = f'{DIR_COLUMNS}/selected_columns.csv'
+    columnas = pd.read_csv(path_columns, header=None)
+    list_var = columnas[0].tolist()
+    df = df[list_var]    
 
     print("--- %s min ---" % ((time.time() - start_time)/60))
     print("======Fin Tratamiento")
@@ -102,10 +102,21 @@ if __name__ == '__main__':
     # Tratamiento para modelo (solo variables de entrenamiento)
     df_modelo = TratamientoDF(df.copy(), train=1)
 
+ # =============================================================
+    # 3) validación
+    # =============================================================
+    meses_val = ['202508','202509']
+    df_val_raw = LecturaDatos(meses_val, cols_Exclude=[])
+
+    extras_val = df_val_raw[['cod_mes','key_value', 'tipo_alerta_n2','cod_cli','trx_riesgo_cliente']].copy()
+    df_val = TratamientoDF(df_val_raw.copy(), train=1)  # solo variables para modelo
+
+
+
     # Split 33% para validación
-    df_train, df_val, extras_train, extras_val = train_test_split(
-        df_modelo, extras, test_size=0.33, random_state=123, shuffle=True
-    )
+    #df_train, df_val, extras_train, extras_val = train_test_split(
+    #    df_modelo, extras, test_size=0.33, random_state=123, shuffle=True
+    #)
 
     # =============================================================
     # 3) Test
@@ -119,7 +130,7 @@ if __name__ == '__main__':
     # =============================================================
     # 4) Headers del modelo
     # =============================================================
-    df_headers = df_train.dtypes.to_frame("dtypes").reset_index()
+    df_headers = df_modelo.dtypes.to_frame("dtypes").reset_index()
     df_headers.columns = ["variables","dtypes"]
 
     # =============================================================
@@ -130,7 +141,7 @@ if __name__ == '__main__':
     val_path = '/opt/ml/processing/val/validation_total.csv'
     test_path = '/opt/ml/processing/test/test_total.csv'
 
-    df_train.to_csv(train_path, header=False, index=False)
+    df_modelo.to_csv(train_path, header=False, index=False)
     df_val.to_csv(val_path, header=False, index=False)
     df_test.to_csv(test_path, header=False, index=False)
     df_headers.to_csv(headers_path, index=False)

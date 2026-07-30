@@ -1,0 +1,719 @@
+insert into d_perm_aws.t_agg_alertas_p1_plaft(
+cod_mes
+,cod_cli
+,cod_tip_doc
+,tip_cliente
+,desc_subsegmento
+,key_value
+,fec_vinculacion
+,fec_nac_value
+,num_edad_value
+,fec_constitucion
+,num_edad_constitucion
+,cod_nacionalidad
+,desc_provincia
+,desc_departamento
+,cod_ubigeo_cd
+,cod_sectorista_id
+,num_antiguedad
+,mto_fact_declarado_sunat
+,key_value_rele
+,cod_ciiu_v4
+,flg_casos_hist
+,flg_desv_activa
+,flg_ros_hist
+,flg_vrcn_abonos_5m_1m
+,flg_vrcn_efe_cargos_5m_1m
+,cnt_lsb
+,desc_nivel_rsg_lsb_tot
+,desc_nivel_rsg_lsb_ultima
+,ts_mas_antiguo_lsb
+,ts_mas_reciente_lsb
+,mto_pas_soles
+,cnt_trx_abonostot_1m
+,cnt_trx_abonostot_3m
+,cnt_trx_abonostot_6m
+,cnt_trx_abonostot_9m
+,cnt_trx_abonostot_12m
+,imp_trx_abonostot_1m
+,imp_trx_abonostot_3m
+,imp_trx_abonostot_6m
+,imp_trx_abonostot_9m
+,imp_trx_abonostot_12m
+,imp_trx_cargostot_1m
+,imp_trx_cargostot_3m
+,imp_trx_cargostot_6m
+,imp_trx_cargostot_9m
+,imp_trx_cargostot_12m
+,cnt_trx_cargostot_1m
+,cnt_trx_cargostot_3m
+,cnt_trx_cargostot_6m
+,cnt_trx_cargostot_9m
+,cnt_trx_cargostot_12m
+,cnt_trx_abonosefect_1m
+,cnt_trx_abonosefect_3m
+,cnt_trx_abonosefect_6m
+,cnt_trx_abonosefect_9m
+,cnt_trx_abonosefect_12m
+,imp_trx_abonosefect_1m
+,imp_trx_abonosefect_3m
+,imp_trx_abonosefect_6m
+,imp_trx_abonosefect_9m
+,imp_trx_abonosefect_12m
+,imp_trx_cargosefe_1m
+,imp_trx_cargosefe_3m
+,imp_trx_cargosefe_6m
+,imp_trx_cargosefe_9m
+,imp_trx_cargosefe_12m
+,cnt_trx_cargosefe_1m
+,cnt_trx_cargosefe_3m
+,cnt_trx_cargosefe_6m
+,cnt_trx_cargosefe_9m
+,cnt_trx_cargosefe_12m
+,cnt_trx_abonospromtot_3m
+,cnt_trx_abonospromtot_6m
+,cnt_trx_abonospromtot_9m
+,cnt_trx_abonospromtot_12m
+,avg_trx_abonostot_3m
+,avg_trx_abonostot_6m
+,avg_trx_abonostot_9m
+,avg_trx_abonostot_12m
+,avg_trx_cargostot_3m
+,avg_trx_cargostot_6m
+,avg_trx_cargostot_9m
+,avg_trx_cargostot_12m
+,rat_trx_abonosefectot_1m
+,rat_trx_abonosefectot_3m
+,rat_trx_abonosefectot_6m
+,rat_trx_abonosefectot_9m
+,rat_trx_abonosefectot_12m
+,rat_trx_mntabnsefetot_1m
+,rat_trx_mntabnsefetot_3m
+,rat_trx_mntabnsefetot_6m
+,rat_trx_mntabnsefetot_9m
+,rat_trx_mntabnsefetot_12m
+,mto_dif_abn_crgsefe_6m
+,cnt_dif_abn_crgsefe_6m
+,flg_alerta
+,ts_carga
+,p_codmes
+)
+WITH wrk_dim_tiempo AS (
+SELECT 
+codmes, 
+DATE_FORMAT(DATE_ADD('month', -0, calendar_date), '%Y%m') AS lcodmesm00,
+DATE_FORMAT(DATE_ADD('month', -1, calendar_date), '%Y%m') AS lcodmesm01,
+DATE_FORMAT(DATE_ADD('month', -2, calendar_date), '%Y%m') AS lcodmesm02,
+DATE_FORMAT(DATE_ADD('month', -3, calendar_date), '%Y%m') AS lcodmesm03,
+DATE_FORMAT(DATE_ADD('month', -4, calendar_date), '%Y%m') AS lcodmesm04,
+DATE_FORMAT(DATE_ADD('month', -5, calendar_date), '%Y%m') AS lcodmesm05,
+DATE_FORMAT(DATE_ADD('month', -6, calendar_date), '%Y%m') AS lcodmesm06,
+DATE_FORMAT(DATE_ADD('month', -7, calendar_date), '%Y%m') AS lcodmesm07,
+DATE_FORMAT(DATE_ADD('month', -8, calendar_date), '%Y%m') AS lcodmesm08,
+DATE_FORMAT(DATE_ADD('month', -9, calendar_date), '%Y%m') AS lcodmesm09,
+DATE_FORMAT(DATE_ADD('month', -10, calendar_date), '%Y%m') AS lcodmesm10,
+DATE_FORMAT(DATE_ADD('month', -11, calendar_date), '%Y%m') AS lcodmesm11,
+DATE_FORMAT(DATE_ADD('month', -12, calendar_date), '%Y%m') AS lcodmesm12,
+DATE_FORMAT(DATE_ADD('month', -13, calendar_date), '%Y%m') AS lcodmesm13,
+DATE_FORMAT(DATE_ADD('month', -14, calendar_date), '%Y%m') AS lcodmesm14,
+DATE_ADD('month', 0, calendar_date) AS dlcodmesm00,
+DATE_ADD('month', -6, calendar_date) AS dlcodmesm06,
+DATE_ADD('month', -12, calendar_date) AS dlcodmesm12,
+DATE_ADD('month', -13, calendar_date) AS dlcodmesm13,
+DATE_TRUNC('month', calendar_date) + INTERVAL '1' month - INTERVAL '1' day AS lcoddaym0,
+DATE_TRUNC('month', calendar_date) + INTERVAL '0' month - INTERVAL '1' day AS lcoddaym1
+FROM ( 
+SELECT 
+DATE_FORMAT(DATE_PARSE(calendar_date, '%Y-%m-%d'), '%Y%m') AS codmes, 
+DATE_PARSE(calendar_date, '%Y-%m-%d') AS calendar_date 
+FROM e_perm_aws.t_calendar_summary 
+WHERE calendar_date = DATE_FORMAT(DATE_PARSE('202606','%Y%m'),'%Y-%m-%d')
+)
+),
+base_clientes as (
+select a.codunico
+from e_perm_aws.t_rm_cliente a
+inner join e_perm_aws.t_fem_all_instr_rsk b
+cross join wrk_dim_tiempo t
+on a.codunico = b.cod_cuc
+where b.p_codmes = t.lcodmesm02
+AND a.codunico IS NOT NULL
+AND TRIM(a.codunico) <> ''
+group by 1
+union
+select a.codunico
+from e_perm_aws.t_rm_cliente a
+inner join e_perm_aws.t_fct_transacciones_captaciones b
+cross join wrk_dim_tiempo t
+on a.codunico = b.CUC_NUM
+where b.p_mesinformacion = t.lcodmesm01
+AND a.codunico IS NOT NULL
+AND TRIM(a.codunico) <> ''
+),
+wrk_flg_alerta as (
+select a.codunico,
+max(calificacion_monitoreo) flg_alerta
+from e_perm_aws.t_alertas_plaft a
+inner join base_clientes b on a.codunico = b.codunico
+cross join wrk_dim_tiempo t
+where periodo_alerta = t.lcodmesm01
+group by 1
+),
+segmento_cliente as (
+SELECT 
+t.fch_periodo,
+t.nro_documento_cuc AS codunico,
+t.cod_segmento,
+t.nom_segmento,
+ROW_NUMBER() OVER (
+PARTITION BY t.nro_documento_cuc 
+ORDER BY t.fch_periodo DESC
+) AS rn
+FROM e_perm_aws.t_fct_segmento_cuc t
+CROSS JOIN wrk_dim_tiempo d
+WHERE CAST(date_format(t.fch_periodo, '%Y%m') AS VARCHAR(6)) = d.lcodmesm01
+),
+base_cucibk AS (
+SELECT cod_cuc, key_value
+FROM (
+SELECT
+cod_cuc,
+key_value,
+ROW_NUMBER() OVER (PARTITION BY cod_cuc ORDER BY fch_priprd DESC) AS rn
+FROM e_perm_aws.t_mst_ctaibk_rsk
+)
+WHERE rn = 1
+),
+wrk_base_cliente AS (
+SELECT
+bc.codunico,
+bcuc.key_value,
+rcl.tipdoc,
+dcl.tipo_identificacion_desc,
+TRY_CAST(rcl.fecnacimiento AS DATE) AS fecnacimiento,
+rcl.provincia,
+rcl.departamento,
+rcl.cod_sectorista,
+rcl.nacionalidad,
+dcl.tipo_persona_desc,
+CASE 
+WHEN dcl.tipo_persona_desc = 'INDIVIDUAL' THEN sc.nom_segmento
+WHEN dcl.tipo_persona_desc = 'ORGANIZATION' AND rcl.tipo_banca = '1' THEN 'Corpo'
+WHEN dcl.tipo_persona_desc = 'ORGANIZATION' AND rcl.tipo_banca = '2' THEN 'Mediana Empresa'
+WHEN dcl.tipo_persona_desc = 'ORGANIZATION' AND rcl.tipo_banca = '3' THEN 'BPE'
+ELSE sc.nom_segmento
+END AS nom_segmento,
+dcl.ubigeo_cd,
+CASE 
+WHEN TRY_CAST(dcl.fecha_creacion AS DATE) = DATE '1900-12-31'
+THEN TRY_CAST(rcl.fec_apertura_cliente AS DATE)
+ELSE TRY_CAST(dcl.fecha_creacion AS DATE)
+END AS fecha_vinculacion,
+CASE 
+WHEN (
+CASE 
+WHEN TRY_CAST(dcl.fecha_creacion AS DATE) = DATE '1900-12-31'
+THEN TRY_CAST(rcl.fec_apertura_cliente AS DATE)
+ELSE TRY_CAST(dcl.fecha_creacion AS DATE)
+END
+) IS NOT NULL 
+THEN DATE_DIFF(
+'year', 
+(
+CASE 
+WHEN TRY_CAST(dcl.fecha_creacion AS DATE) = DATE '1900-12-31'
+THEN TRY_CAST(rcl.fec_apertura_cliente AS DATE)
+ELSE TRY_CAST(dcl.fecha_creacion AS DATE)
+END
+), 
+t.lcoddaym1
+)
+END AS antiguedad,
+CASE 
+WHEN rcl.tipdoc NOT IN ('2') 
+AND dcl.tipo_identificacion_desc <> 'RUC' 
+THEN TRY_CAST(rcl.fecnacimiento AS DATE)
+ELSE NULL
+END AS fecha_nacimiento,
+CASE 
+WHEN rcl.tipdoc NOT IN ('2') 
+AND dcl.tipo_identificacion_desc <> 'RUC' 
+AND TRY_CAST(rcl.fecnacimiento AS DATE) IS NOT NULL THEN
+DATE_DIFF(
+'year',
+TRY_CAST(rcl.fecnacimiento AS DATE),
+t.lcoddaym1
+)
+ELSE NULL
+END AS edad
+FROM base_clientes bc
+LEFT JOIN e_perm_aws.t_rm_cliente rcl
+ON bc.codunico = rcl.codunico
+left join base_cucibk bcuc
+on bc.codunico = bcuc.cod_Cuc
+CROSS JOIN wrk_dim_tiempo t
+LEFT JOIN e_perm_aws.t_dim_cliente dcl
+ON bc.codunico = dcl.cuc_num
+LEFT JOIN segmento_cliente sc
+ON bc.codunico = sc.codunico AND rn = 1
+WHERE bc.CODUNICO <> ''
+),
+consolidado_sunat AS (
+SELECT
+b.cod_cuc AS codunico,
+b.key_value,
+t.fecconstitucion AS fecha_constitucion,
+t.coddocrele,
+t.numruc,
+t.ciiuv4,
+t.fecconstitucion,
+t.fecvigenciarele,
+DATE_DIFF('year', TRY_CAST(t.fecconstitucion AS DATE), d.lcoddaym1)
+- case when DATE_FORMAT(d.lcoddaym1, '%m-%d') < DATE_FORMAT(TRY_CAST(t.fecconstitucion AS DATE), '%m-%d') 
+THEN 1 ELSE 0 
+END AS edad_constitucion,
+ROW_NUMBER() OVER (
+PARTITION BY t.numruc 
+ORDER BY t.fecvigenciarele DESC
+) AS rn
+FROM base_cucibk b
+INNER JOIN e_perm_aws.t_consolidado_sunat t
+ON b.key_value = t.numruc
+CROSS JOIN wrk_dim_tiempo d
+),
+wkr_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen,fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross JOIN wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') BETWEEN t.lcodmesm14 AND t.codmes
+and cod_moneda_origen in ('USD','EUR')
+and cod_tipo_cambio = '1002'
+) tc
+where tc.r=1
+order by 1 desc
+),
+wrk_trx_captaciones as (
+select
+date_format(fechinievento,'%Y%m') as periodo,
+cuc_num,
+sum(case when codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 then 1 end) AS q_abonos,
+SUM(CASE WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS ABONOS_SOLARIZADO,
+SUM(CASE WHEN CodigoTransaccion IN ('1200','2200','7200') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 THEN 1
+ELSE 0 END) AS Q_ABONOS_EFECTIVO_DEPOSITOS,
+SUM(CASE WHEN CodigoTransaccion IN ('1200','2200','7200') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN CodigoTransaccion IN ('1200','2200','7200') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN CodigoTransaccion IN ('1200','2200','7200') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 43 AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS ABONOS_SOLARIZADO_EFECTIVO_DEPOSITOS,
+sum(case when codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 then 1 end) as q_cargos,
+SUM(CASE WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS CARGOS_SOLARIZADO,
+SUM(CASE WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 THEN 1
+ELSE 0 END) AS Q_CARGOS_EFECTIVO_RETIROS,
+SUM(CASE WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) = 45 AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS CARGOS_SOLARIZADO_EFECTIVO_RETIROS
+FROM e_perm_aws.t_fct_transacciones_captaciones m
+cross join wrk_dim_tiempo t
+left join wkr_tipo_cambio b on date_format(m.fechinievento,'%Y%m') = b.codmes and m.monedacd = b.cod_moneda_origen
+WHERE m.fechinievento between t.dlcodmesm13 and t.lcoddaym1
+and codepoint(cast(substr(nullif(m.signomonto,''),1,1) as varchar(1))) in (43,45) and cuc_num is not null
+and cuc_num <> coalesce(cuc_num_ord_ben, 'abc')
+group by 1,2
+),
+cantidad_monto_abonos_cargos_total AS (
+SELECT
+w.CUC_NUM,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_12M_TOTAL
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.CUC_NUM
+),
+cantidad_monto_abonos_cargos_efectivo AS (
+SELECT
+w.cuc_num,
+SUM(case when w.periodo = t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_12m_efectivo
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.cuc_num
+),
+trx_q_abonos_ratios_efectivo_total AS (
+SELECT
+TQAT.CUC_NUM AS codunico,
+COALESCE(CAST(TQAE.trx_q_abonos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_1m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_q_abonos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_3m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_q_abonos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_6m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_q_abonos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_9m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_q_abonos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQAE
+ON TQAT.CUC_NUM = TQAE.CUC_NUM
+),
+trx_monto_abonos_ratios_efectivo_total AS (
+SELECT
+TQAT.CUC_NUM AS codunico,
+COALESCE(CAST(TQAE.trx_monto_abonos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_1m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQAE
+ON TQAE.CUC_NUM = TQAT.CUC_NUM
+),
+trx_q_cargos_ratios_efectivo_total AS (
+SELECT
+TQCE.CUC_NUM AS codunico,
+COALESCE(CAST(TQCE.trx_q_cargos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_1m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000'
+) AS trx_q_cargos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQCE
+ON TQCE.CUC_NUM = TQAT.CUC_NUM
+),
+trx_monto_cargos_ratios_efectivo_total AS (
+SELECT
+TMCE.CUC_NUM AS codunico,
+COALESCE(CAST(TMCE.trx_monto_cargos_1m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_1m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_monto_cargos_ratio_1m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_3m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_3m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_6m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_6m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_9m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_9m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_12m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TMAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TMCE
+ON TMCE.CUC_NUM = TMAT.CUC_NUM
+),
+promedio_monto_cargo_total_efectivo AS (
+SELECT
+W.codunico,
+COALESCE(CAST(cmact.trx_q_abonos_3m_total * 1.000000 / 3 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_Q_ABONOS_PROMEDIO_3M_TOTAL,
+COALESCE(CAST(cmact.trx_q_abonos_6m_total * 1.000000 / 6 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_Q_ABONOS_PROMEDIO_6M_TOTAL,
+COALESCE(CAST(cmact.trx_q_abonos_9m_total * 1.000000 / 9 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_Q_ABONOS_PROMEDIO_9M_TOTAL,
+COALESCE(CAST(cmact.trx_q_abonos_12m_total * 1.000000 / 12 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_Q_ABONOS_PROMEDIO_12M_TOTAL,
+COALESCE(CAST(cmact.trx_monto_abonos_3m_total * 1.000000 / 3 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_ABONOS_PROMEDIO_3M_TOTAL,
+COALESCE(CAST(cmact.trx_monto_abonos_6m_total * 1.000000 / 6 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_ABONOS_PROMEDIO_6M_TOTAL,
+COALESCE(CAST(cmact.trx_monto_abonos_9m_total * 1.000000 / 9 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_ABONOS_PROMEDIO_9M_TOTAL,
+COALESCE(CAST(cmact.trx_monto_abonos_12m_total * 1.000000 / 12 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_ABONOS_PROMEDIO_12M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_3m_efectivo * 1.000000 / 3 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_3M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_6m_efectivo * 1.000000 / 6 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_6M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_9m_efectivo * 1.000000 / 9 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_9M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_12m_efectivo * 1.000000 / 12 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_12M_TOTAL
+FROM wrk_base_cliente w
+LEFT JOIN cantidad_monto_abonos_cargos_total cmact
+ON w.CODUNICO = cmact.CUC_NUM
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo cmace
+ON w.CODUNICO = cmace.CUC_NUM
+),
+informacion_lsb AS (
+SELECT 
+codunico,
+fecinformacion,
+cantidad_lsb,
+nivel_riesgo_lsb_total,
+fecha_mas_antiguo_lsb,
+fecha_mas_reciente_lsb,
+nivel_riesgo_lsb_ultima
+FROM e_perm_aws.T_CLIENTE_PLAFT
+),
+wrk_var_fem_all_instr as (
+select cod_cuc as cod_cli,
+SUM(CASE WHEN substr(cast(GL_ACCOUNT_ID as varchar),1,1) ='2' AND ISO_CURRENCY_CD = 'PSS' THEN CUR_BOOK_BAL 
+WHEN substr(cast(GL_ACCOUNT_ID as varchar),1,1) ='2' AND ISO_CURRENCY_CD = 'USD' THEN CUR_BOOK_BAL*b.tipo_cambio
+WHEN substr(cast(GL_ACCOUNT_ID as varchar),1,1) ='2' AND ISO_CURRENCY_CD = 'PS2' THEN CUR_BOOK_BAL 
+END) as pasivo_soles
+from e_perm_aws.t_fem_all_instr_rsk a
+cross JOIN wrk_dim_tiempo t
+left join wkr_tipo_cambio b on a.codmes = b.codmes and a.ISO_CURRENCY_CD = b.cod_moneda_origen
+WHERE a.p_codmes = t.lcodmesm02
+group by 1
+),
+wrk_var_alertas_plaft as (
+select trim(codunico) cod_cli,
+max(case when fecha_inicio_investigacion <= t.lcoddaym1 then 1 end) as flag_casos_hist,
+max( case when fecha_inicio_desvinculacion <= t.lcoddaym1
+and coalesce(fecha_fin_desvinculacion, (localtimestamp - interval '5' hour)) >= t.lcoddaym1 then 1 end) flag_desv_activa,
+max(case when fecha_inicio_ros <= t.lcoddaym1 then 1 end) flag_ros_hist
+from e_perm_aws.t_alertas_plaft a
+cross JOIN wrk_dim_tiempo t
+where
+(
+((periodo_inusual >= t.lcodmesm01 or (periodo_ros >= t.lcodmesm01)) and flag_formulario = 1)
+OR
+(flag_formulario = 1 and alca_codigo_alerta > 0 and calificacion_investigacion = 'PENDIENTE')
+)
+group by 1
+),
+wrk_var_trx_captaciones as (
+select cuc_num as cod_cli,
+sum(case when periodo = t.lcodmesm01 then abonos_solarizado end) as trx_monto_abonos_1m_total,
+sum(case when periodo between t.lcodmesm06 and t.lcodmesm01 then q_abonos_efectivo_depositos end) as trx_q_abonos_6m_efectivo,
+sum(case when periodo between t.lcodmesm06 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) as trx_monto_abonos_6m_efectivo,
+sum(case when periodo between t.lcodmesm06 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) as trx_monto_cargos_6m_efectivo,
+sum(case when periodo = t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) as trx_monto_cargos_1m_efectivo,
+sum(case when periodo between t.lcodmesm06 and t.lcodmesm01 then q_cargos_efectivo_retiros end) as trx_q_cargos_6m_efectivo,
+avg(case when periodo between t.lcodmesm05 and t.lcodmesm01 then abonos_solarizado end) as trx_monto_abonos_promedio_5m_total,
+(stddev_pop(case when periodo between t.lcodmesm06 and t.lcodmesm01 then abonos_solarizado end) / 
+nullif(avg(case when periodo between t.lcodmesm06 and t.lcodmesm01 then abonos_solarizado end), 0)) * 100 as cv_abono_total_monto_6m,
+(stddev_pop(case when periodo between t.lcodmesm06 and t.lcodmesm01 then cargos_solarizado end) / 
+nullif(avg(case when periodo between t.lcodmesm06 and t.lcodmesm01 then cargos_solarizado end), 0)) * 100 as cv_cargos_total_monto_6m,
+sum(case when periodo between t.lcodmesm05 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) as trx_monto_cargos_5m_efectivo
+from wrk_trx_captaciones a
+cross join wrk_dim_tiempo t
+group by 1
+),
+base_facturacion_vpc AS (
+SELECT
+cod_unico_cli AS codunico,
+FacturacionSol_Amt
+FROM (
+SELECT 
+t.fechaproceso_dt, t.cod_unico_cli, t.FacturacionSol_Amt,
+ROW_NUMBER() OVER (
+PARTITION BY t.cod_unico_cli 
+ORDER BY 
+t.fechaproceso_dt DESC,
+t.fuenteanio_val DESC
+) AS rn
+FROM e_perm_aws.T_FACTURACION_VPC t
+CROSS JOIN wrk_dim_tiempo d
+WHERE p_codmes = d.lcodmesm01
+AND TRIM(UPPER(t.fuente_des)) = 'SUNAT'
+)
+WHERE rn = 1
+),
+wrk_flag_variacion_diferencia AS(
+select 
+a.codunico AS cod_cli,
+case when (d.trx_monto_abonos_1m_total + d.cv_abono_total_monto_6m) > d.trx_monto_abonos_promedio_5m_total then 1 else 0 end as flag_variacion_abono_monto_total_5m_1m,
+case when (trx_monto_cargos_1m_efectivo + cv_cargos_total_monto_6m ) > trx_monto_cargos_5m_efectivo then 1 else 0 end as flag_variacion_efect_cargos_monto_5m_1m,
+d.trx_q_abonos_6m_efectivo - d.trx_q_cargos_6m_efectivo as dif_q_abonos_cargos_efectivo_6m,
+d.trx_monto_abonos_6m_efectivo - d.trx_monto_cargos_6m_efectivo as dif_monto_abonos_cargos_efectivo_6m
+from base_clientes a
+left join wrk_var_fem_all_instr b on a.codunico = b.cod_cli
+left join wrk_var_alertas_plaft c on a.codunico = c.cod_cli
+left join wrk_var_trx_captaciones d on a.codunico = d.cod_cli
+)
+SELECT 
+CAST(t.codmes AS VARCHAR) AS COD_MES,
+CAST(bc.codunico AS VARCHAR) AS COD_CLI,
+CAST(wbc.tipdoc AS VARCHAR) AS cod_tip_doc,
+CAST(wbc.tipo_persona_desc AS VARCHAR) AS TIP_CLIENTE,
+CAST(wbc.nom_segmento AS VARCHAR) AS DESC_SUBSEGMENTO,
+CAST(wbc.key_value AS VARCHAR) AS KEY_VALUE,
+TRY_CAST(TRIM(CAST(wbc.fecha_vinculacion AS VARCHAR)) AS DATE) AS FEC_VINCULACION,
+TRY_CAST(TRIM(CAST(wbc.fecha_nacimiento AS VARCHAR)) AS DATE) AS FEC_NAC_VALUE,
+CAST(wbc.edad AS INT) AS NUM_EDAD_VALUE,
+TRY_CAST(TRIM(CAST(cs.fecha_constitucion AS VARCHAR)) AS DATE) AS FEC_CONSTITUCION,
+CAST(cs.edad_constitucion AS INT) AS NUM_EDAD_CONSTITUCION,
+CAST(wbc.nacionalidad AS VARCHAR) AS COD_NACIONALIDAD,
+CAST(wbc.provincia AS VARCHAR) AS DESC_PROVINCIA,
+CAST(wbc.departamento AS VARCHAR) AS DESC_DEPARTAMENTO,
+CAST(wbc.ubigeo_cd AS VARCHAR) AS COD_UBIGEO_CD,
+CAST(wbc.cod_sectorista AS VARCHAR) AS COD_SECTORISTA_ID,
+CAST(wbc.antiguedad AS INT) AS NUM_ANTIGUEDAD,
+COALESCE(CAST(bfv.FacturacionSol_Amt AS DECIMAL(38,6)), 0) AS MTO_FACT_DECLARADO_SUNAT,
+CAST(cs.coddocrele AS VARCHAR) AS KEY_VALUE_RELE,
+CAST(cs.ciiuv4 AS VARCHAR) AS COD_CIIU_V4,
+CASE WHEN wvap.flag_casos_hist = 1 THEN 1 ELSE 0 END AS FLG_CASOS_HIST,
+CASE WHEN wvap.flag_desv_activa = 1 THEN 1 ELSE 0 END AS FLG_DESV_ACTIVA,
+CASE WHEN wvap.flag_ros_hist = 1 THEN 1 ELSE 0 END AS FLG_ROS_HIST,
+CASE WHEN WFVD.flag_variacion_abono_monto_total_5m_1m = 1 THEN 1 ELSE 0 END AS FLG_VRCN_ABONOS_5M_1M,
+CASE WHEN WFVD.flag_variacion_efect_cargos_monto_5m_1m = 1 THEN 1 ELSE 0 END AS FLG_VRCN_EFE_CARGOS_5M_1M,
+CAST(ILSB.cantidad_lsb AS INT) AS CNT_LSB,
+CAST(ILSB.nivel_riesgo_lsb_total AS VARCHAR) AS DESC_NIVEL_RSG_LSB_TOT,
+CAST(ILSB.nivel_riesgo_lsb_ultima AS VARCHAR) AS DESC_NIVEL_RSG_LSB_ULTIMA,
+CAST(COALESCE(
+TRY(date_parse(TRIM(ILSB.fecha_mas_antiguo_lsb), '%Y-%m-%d %H:%i:%s')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_antiguo_lsb), '%Y/%m/%d %H:%i:%s')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_antiguo_lsb), '%Y-%m-%d')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_antiguo_lsb), '%Y/%m/%d'))
+) AS TIMESTAMP) AS TS_MAS_ANTIGUO_LSB,
+CAST(COALESCE(
+TRY(date_parse(TRIM(ILSB.fecha_mas_reciente_lsb), '%Y-%m-%d %H:%i:%s')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_reciente_lsb), '%Y/%m/%d %H:%i:%s')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_reciente_lsb), '%Y-%m-%d')),
+TRY(date_parse(TRIM(ILSB.fecha_mas_reciente_lsb), '%Y/%m/%d'))
+) AS TIMESTAMP) AS TS_MAS_RECIENTE_LSB,
+COALESCE(CAST(wvfai.pasivo_soles AS DECIMAL(38,6)), 0) AS MTO_PAS_SOLES,
+CAST(cmact.TRX_Q_ABONOS_1M_TOTAL AS INT) AS CNT_TRX_ABONOSTOT_1M,
+CAST(cmact.TRX_Q_ABONOS_3M_TOTAL AS INT) AS CNT_TRX_ABONOSTOT_3M,
+CAST(cmact.TRX_Q_ABONOS_6M_TOTAL AS INT) AS CNT_TRX_ABONOSTOT_6M,
+CAST(cmact.TRX_Q_ABONOS_9M_TOTAL AS INT) AS CNT_TRX_ABONOSTOT_9M,
+CAST(cmact.TRX_Q_ABONOS_12M_TOTAL AS INT) AS CNT_TRX_ABONOSTOT_12M,
+COALESCE(CAST(cmact.TRX_MONTO_ABONOS_1M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSTOT_1M,
+COALESCE(CAST(cmact.TRX_MONTO_ABONOS_3M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSTOT_3M,
+COALESCE(CAST(cmact.TRX_MONTO_ABONOS_6M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSTOT_6M,
+COALESCE(CAST(cmact.TRX_MONTO_ABONOS_9M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSTOT_9M,
+COALESCE(CAST(cmact.TRX_MONTO_ABONOS_12M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSTOT_12M,
+COALESCE(CAST(cmact.TRX_MONTO_CARGOS_1M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSTOT_1M,
+COALESCE(CAST(cmact.TRX_MONTO_CARGOS_3M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSTOT_3M,
+COALESCE(CAST(cmact.TRX_MONTO_CARGOS_6M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSTOT_6M,
+COALESCE(CAST(cmact.TRX_MONTO_CARGOS_9M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSTOT_9M,
+COALESCE(CAST(cmact.TRX_MONTO_CARGOS_12M_TOTAL AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSTOT_12M,
+CAST(cmact.TRX_Q_CARGOS_1M_TOTAL AS INT) AS CNT_TRX_CARGOSTOT_1M,
+CAST(cmact.TRX_Q_CARGOS_3M_TOTAL AS INT) AS CNT_TRX_CARGOSTOT_3M,
+CAST(cmact.TRX_Q_CARGOS_6M_TOTAL AS INT) AS CNT_TRX_CARGOSTOT_6M,
+CAST(cmact.TRX_Q_CARGOS_9M_TOTAL AS INT) AS CNT_TRX_CARGOSTOT_9M,
+CAST(cmact.TRX_Q_CARGOS_12M_TOTAL AS INT) AS CNT_TRX_CARGOSTOT_12M,
+CAST(cmace.TRX_Q_ABONOS_1M_EFECTIVO AS INT) AS CNT_TRX_ABONOSEFECT_1M,
+CAST(cmace.TRX_Q_ABONOS_3M_EFECTIVO AS INT) AS CNT_TRX_ABONOSEFECT_3M,
+CAST(cmace.TRX_Q_ABONOS_6M_EFECTIVO AS INT) AS CNT_TRX_ABONOSEFECT_6M,
+CAST(cmace.TRX_Q_ABONOS_9M_EFECTIVO AS INT) AS CNT_TRX_ABONOSEFECT_9M,
+CAST(cmace.TRX_Q_ABONOS_12M_EFECTIVO AS INT) AS CNT_TRX_ABONOSEFECT_12M,
+COALESCE(CAST(cmace.TRX_MONTO_ABONOS_1M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSEFECT_1M,
+COALESCE(CAST(cmace.TRX_MONTO_ABONOS_3M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSEFECT_3M,
+COALESCE(CAST(cmace.TRX_MONTO_ABONOS_6M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSEFECT_6M,
+COALESCE(CAST(cmace.TRX_MONTO_ABONOS_9M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSEFECT_9M,
+COALESCE(CAST(cmace.TRX_MONTO_ABONOS_12M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_ABONOSEFECT_12M,
+COALESCE(CAST(cmace.TRX_MONTO_CARGOS_1M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSEFE_1M,
+COALESCE(CAST(cmace.TRX_MONTO_CARGOS_3M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSEFE_3M,
+COALESCE(CAST(cmace.TRX_MONTO_CARGOS_6M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSEFE_6M,
+COALESCE(CAST(cmace.TRX_MONTO_CARGOS_9M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSEFE_9M,
+COALESCE(CAST(cmace.TRX_MONTO_CARGOS_12M_EFECTIVO AS DECIMAL(38,6)), 0) AS IMP_TRX_CARGOSEFE_12M,
+CAST(cmace.TRX_Q_CARGOS_1M_EFECTIVO AS INT) AS CNT_TRX_CARGOSEFE_1M,
+CAST(cmace.TRX_Q_CARGOS_3M_EFECTIVO AS INT) AS CNT_TRX_CARGOSEFE_3M,
+CAST(cmace.TRX_Q_CARGOS_6M_EFECTIVO AS INT) AS CNT_TRX_CARGOSEFE_6M,
+CAST(cmace.TRX_Q_CARGOS_9M_EFECTIVO AS INT) AS CNT_TRX_CARGOSEFE_9M,
+CAST(cmace.TRX_Q_CARGOS_12M_EFECTIVO AS INT) AS CNT_TRX_CARGOSEFE_12M,
+COALESCE(CAST(pmcte.TRX_Q_ABONOS_PROMEDIO_3M_TOTAL AS DECIMAL(38,6)), 0) AS CNT_TRX_ABONOSPROMTOT_3M,
+COALESCE(CAST(pmcte.TRX_Q_ABONOS_PROMEDIO_6M_TOTAL AS DECIMAL(38,6)), 0) AS CNT_TRX_ABONOSPROMTOT_6M, 
+COALESCE(CAST(pmcte.TRX_Q_ABONOS_PROMEDIO_9M_TOTAL AS DECIMAL(38,6)), 0) AS CNT_TRX_ABONOSPROMTOT_9M,
+COALESCE(CAST(pmcte.TRX_Q_ABONOS_PROMEDIO_12M_TOTAL AS DECIMAL(38,6)), 0) AS CNT_TRX_ABONOSPROMTOT_12M,
+COALESCE(CAST(pmcte.TRX_MONTO_ABONOS_PROMEDIO_3M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_ABONOSTOT_3M,
+COALESCE(CAST(pmcte.TRX_MONTO_ABONOS_PROMEDIO_6M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_ABONOSTOT_6M,
+COALESCE(CAST(pmcte.TRX_MONTO_ABONOS_PROMEDIO_9M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_ABONOSTOT_9M,
+COALESCE(CAST(pmcte.TRX_MONTO_ABONOS_PROMEDIO_12M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_ABONOSTOT_12M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_3M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOSTOT_3M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_6M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOSTOT_6M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_9M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOSTOT_9M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_12M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOSTOT_12M,
+COALESCE(CAST(TQARET.trx_q_abonos_ratio_1m_efectivo_total AS DECIMAL(38,6)), 0) RAT_TRX_ABONOSEFECTOT_1M,
+COALESCE(CAST(TQARET.trx_q_abonos_ratio_3m_efectivo_total AS DECIMAL(38,6)), 0) RAT_TRX_ABONOSEFECTOT_3M,
+COALESCE(CAST(TQARET.trx_q_abonos_ratio_6m_efectivo_total AS DECIMAL(38,6)), 0) RAT_TRX_ABONOSEFECTOT_6M,
+COALESCE(CAST(TQARET.trx_q_abonos_ratio_9m_efectivo_total AS DECIMAL(38,6)), 0) RAT_TRX_ABONOSEFECTOT_9M,
+COALESCE(CAST(TQARET.trx_q_abonos_ratio_12m_efectivo_total AS DECIMAL(38,6)), 0) RAT_TRX_ABONOSEFECTOT_12M,
+COALESCE(CAST(TMAR.trx_monto_abonos_ratio_1m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABNSEFETOT_1M,
+COALESCE(CAST(TMAR.trx_monto_abonos_ratio_3m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABNSEFETOT_3M,
+COALESCE(CAST(TMAR.trx_monto_abonos_ratio_6m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABNSEFETOT_6M,
+COALESCE(CAST(TMAR.trx_monto_abonos_ratio_9m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABNSEFETOT_9M,
+COALESCE(CAST(TMAR.trx_monto_abonos_ratio_12m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABNSEFETOT_12M,
+COALESCE(CAST(WFVD.dif_monto_abonos_cargos_efectivo_6m AS DECIMAL(38,6)), 0) AS MTO_DIF_ABN_CRGSEFE_6M,
+CAST(WFVD.dif_q_abonos_cargos_efectivo_6m AS INT) AS CNT_DIF_ABN_CRGSEFE_6M,
+CAST(WFA.flg_alerta AS VARCHAR) AS FLG_ALERTA,
+(localtimestamp - interval '5' hour) AS ts_carga,
+T.codmes AS p_codmes
+FROM base_clientes bc
+LEFT JOIN wrk_base_cliente wbc
+ON bc.codunico = wbc.codunico
+CROSS JOIN wrk_dim_tiempo t
+LEFT JOIN consolidado_sunat cs
+ON bc.codunico = cs.codunico AND cs.rn = 1
+LEFT JOIN cantidad_monto_abonos_cargos_total cmact
+ON bc.CODUNICO = cmact.CUC_NUM
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo cmace
+ON bc.CODUNICO = cmace.CUC_NUM
+LEFT JOIN promedio_monto_cargo_total_efectivo pmcte
+ON bc.CODUNICO = pmcte.codunico
+LEFT JOIN wrk_flag_variacion_diferencia WFVD
+ON bc.CODUNICO = WFVD.cod_cli
+LEFT JOIN wrk_var_fem_all_instr wvfai
+ON bc.CODUNICO = wvfai.cod_cli
+LEFT JOIN wrk_var_alertas_plaft wvap
+ON bc.CODUNICO = wvap.cod_cli
+LEFT JOIN INFORMACION_LSB ILSB
+ON bc.codunico = ILSB.codunico
+LEFT JOIN wrk_flg_alerta WFA
+ON bc.codunico = WFA.codunico
+LEFT JOIN TRX_Q_ABONOS_RATIOS_EFECTIVO_TOTAL TQARET
+ON bc.codunico = TQARET.codunico
+LEFT JOIN TRX_MONTO_ABONOS_RATIOS_EFECTIVO_TOTAL TMAR
+ON bc.codunico = TMAR.codunico
+LEFT JOIN trx_monto_cargos_ratios_efectivo_total TMCRET
+ON bc.codunico = TMCRET.codunico
+LEFT JOIN trx_q_cargos_ratios_efectivo_total TQCRET
+ON bc.codunico = TQCRET.codunico
+LEFT JOIN base_facturacion_vpc BFV
+ON bc.codunico = BFV.codunico
+;
