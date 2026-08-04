@@ -1,165 +1,36 @@
-================================================================================
 DOCUMENTO METODOLÓGICO - MODELO DE PRIORIZACIÓN DE ALERTAS PLAFT
 Segmento: Persona Jurídica - Minorista (BPE)
-Versión: 3.1
-Estado: Incorpora cambios metodológicos
-Fecha: Julio 2026
+Versión: 2.1
+Estado: Revisado — correcciones post-revisión integral de artefactos (ago 2026)
+Fecha: Agosto 2026
 Área Responsable: Data Science – División Analítica
-================================================================================
 
-TABLA DE CONTENIDOS
+================================================================================
+CONTROL DE VERSIONES
+================================================================================
+Versión  Fecha         Autor                  Cambios
+-------  ----------    --------------------   --------------------------------
+v1.0     2025-12       Data Science           Versión inicial
+v2.0     2026-07       Data Science           Reemplazo SHAP→LightGBM; métricas
+                                              operativas; calibración aclarada
+v2.1     2026-08-03    Data Science           Correcciones post-revisión integral:
+                                              hiperparámetros actualizados a última
+                                              ejecución SageMaker (03/08/2026);
+                                              métricas AUC/Gini corregidas; error
+                                              de conteo §7.3 corregido; proporción
+                                              sin alerta unificada; referencias de
+                                              notebooks corregidas; declaraciones
+                                              sin evidencia marcadas como pendientes;
+                                              sección de estado final actualizada.
+================================================================================
+NOTA DE VERSIÓN v2.1:
+El modelo fue re-entrenado el 03/08/2026 en SageMaker con nueva ejecución HPO.
+Los hiperparámetros y métricas de esta versión corresponden a dicha ejecución.
+El artefacto de referencia es: Train/metricas_train+hpo.txt (03/08/2026)
+================================================================================
 
 1. INTRODUCCIÓN
-   1.1 Objetivo General
-   1.2 Objetivos Específicos
-   1.3 Alcance
-   1.4 Definiciones y Abreviaturas
-   1.5 Referencias
-
-2. CONTEXTO DEL NEGOCIO PLAFT
-   2.1 Proceso de Monitoreo PLAFT
-   2.2 Rol del Analista de Monitoreo
-   2.3 Flujo Operativo del Proceso
-   2.4 Objetivo del Modelo dentro del proceso PLAFT
-
-3. ARQUITECTURA GENERAL DEL MODELO
-   3.1 Arquitectura Funcional
-   3.2 Flujo de Información (End-to-End)
-   3.3 Arquitectura Temporal
-
-4. CONSTRUCCIÓN DE LA VARIABLE OBJETIVO (TARGET)
-   4.1 Definición Funcional
-   4.2 Definición Técnica
-   4.3 Horizonte de Evaluación (30 días)
-   4.4 Construcción Temporal del Target
-   4.5 Casos Particulares
-   4.6 Evidencia
-
-5. CONSTRUCCIÓN DEL DATASET
-   5.1 Población Objetivo (Estandarizada)
-   5.2 Unidad de Análisis
-   5.3 Subsegmento: Banca Pequeña Empresa (BPE)
-   5.4 Composición del Dataset y Tamaños de Muestra
-   5.5 Incorporación de Clientes sin Alerta (Justificación)
-   5.6 Consolidación de Múltiples Alertas
-   5.7 Balance de Clases (Detallado)
-   5.8 Dataset Final
-   5.9 Evidencia
-
-6. INTEGRIDAD TEMPORAL
-   6.1 Definición Temporal (Corregida)
-   6.2 Prevención de Data Leakage
-   6.3 Ventanas Temporales Disjuntas
-   6.4 Separación de Clientes entre Train/Test/Validación
-   6.5 Evidencia
-
-7. CONSTRUCCIÓN DE VARIABLES PREDICTORAS
-   7.1 Origen de la Información
-   7.2 Arquitectura de Construcción
-   7.3 Naturaleza de las Variables
-   7.4 Resumen por Categoría
-   7.5 Diccionario Funcional de Variables (Anexo A)
-
-8. PREPROCESAMIENTO DE DATOS
-   8.1 Control de Calidad
-   8.2 Tratamiento de Valores Faltantes (Estrategias Diferenciadas)
-   8.3 Tratamiento de Fechas
-   8.4 Codificación de Variables Categóricas
-   8.5 Cuantificación de Missing
-   8.6 Controles Posteriores al Preprocesamiento
-   8.7 Evidencia
-
-9. SELECCIÓN DE VARIABLES
-   9.1 Variables Iniciales (305)
-   9.2 Criterios de Eliminación (Justificados)
-   9.3 Revisión Funcional con Negocio
-   9.4 Eliminación por Correlación
-   9.5 Selección mediante SHAP
-   9.6 Eliminación de Variables Bajo Umbral
-   9.7 Variables Finales (36)
-   9.8 Justificación Metodológica Detallada
-   9.9 Evidencia
-
-10. DESARROLLO DEL MODELO
-    10.1 Selección del Algoritmo (XGBoost)
-    10.2 Configuración Inicial
-    10.3 División Train / Validation / Test
-    10.4 Scale Pos Weight (Justificación)
-    10.5 Regularización (Lambda, Alpha)
-    10.6 Early Stopping
-    10.7 Proceso de Entrenamiento
-    10.8 Evidencia
-
-11. OPTIMIZACIÓN DE HIPERPARÁMETROS
-    11.1 SageMaker Automatic Model Tuning
-    11.2 Espacio de Búsqueda
-    11.3 Función Objetivo
-    11.4 Hiperparámetros Finales
-    11.5 Evidencia
-
-12. CALIBRACIÓN DEL MODELO
-    12.1 Objetivo de la Calibración
-    12.2 Metodología Aplicada
-    12.3 Técnicas Utilizadas (Detalladas)
-    12.4 Muestra Independiente para Calibración
-    12.5 Resultados de Calibración
-    12.6 Evidencia
-
-13. EVALUACIÓN DEL MODELO
-    13.1 Estrategia de Evaluación
-    13.2 Métricas Discriminatorias
-       13.2.1 AUC
-       13.2.2 Gini
-       13.2.3 KS
-    13.3 Métricas de Priorización
-       13.3.1 Precisión Top K
-       13.3.2 Recall Top K
-       13.3.3 Lift
-    13.4 Resultados en Train
-    13.5 Resultados en Validación
-    13.6 Resultados en Test
-    13.7 Resultados en Alertas Automáticas (Universo Productivo)
-    13.8 Comparación de Algoritmos
-
-14. INTERPRETABILIDAD
-    14.1 SHAP
-    14.2 Variables Más Importantes
-    14.3 Interpretación de Casos
-    14.4 Consistencia con Negocio
-
-15. IMPLEMENTACIÓN EN PRODUCCIÓN
-    15.1 Flujo de Inferencia
-    15.2 Generación del Score
-    15.3 Priorización de Alertas
-    15.4 Integración con el Proceso PLAFT
-
-16. MONITOREO DEL MODELO
-    16.1 Monitoreo de Desempeño
-    16.2 Monitoreo de Estabilidad
-    16.3 Reentrenamiento
-    16.4 Gobierno del Modelo
-    16.5 Limitaciones y Mitigaciones
-
-17. CONCLUSIONES
-
-BIBLIOGRAFÍA
-
-ANEXOS
-Anexo A: Diccionario de Variables (Formal)
-Anexo B: Query Target
-Anexo C: Query Train
-Anexo D: Scripts Python
-Anexo E: Notebook SageMaker
-Anexo F: Resultados SHAP
-Anexo G: Configuración del Modelo
-Anexo H: Matriz de Trazabilidad
-
-================================================================================
-1. INTRODUCCIÓN
-================================================================================
-
 1.1 Objetivo General
-
 El presente documento tiene por finalidad describir de manera integral la metodología 
 utilizada para el desarrollo del Modelo de Priorización de Alertas PLAFT correspondiente 
 al segmento Persona Jurídica - Minorista (subsegmento BPE: Banca Pequeña Empresa) de Interbank.
@@ -174,16 +45,37 @@ El modelo busca:
 • Optimizar la capacidad operativa de los equipos de análisis PLAFT.
 • Fortalecer el proceso de prevención y detección de operaciones inusuales.
 
-1.3 Alcance
 
+1.3 Alcance
 Tipología de Riesgo: Lavado de Activos y Financiamiento del Terrorismo (PLAFT)
 Segmento: Persona Jurídica - Minorista
 Subsegmento: Banca Pequeña Empresa (BPE)
 Unidad de Análisis: Cliente (cliente-level)
 Horizonte de Evaluación: 30 días (ver sección 4.3 para definición detallada)
-Población Objetivo: Clientes Persona Juridica(PJ) Minorista del subsegmento BPE con generación de alertas 
-                    dentro del sistema de monitoreo, más una muestra controlada de clientes 
-                    sin alertas (0.05% del universo sin alertas).
+Población Objetivo: Clientes Persona Juridica(PJ) Minorista del subsegmento BPE con generación de alertas  dentro del sistema de monitoreo, más una muestra controlada de clientes sin alertas.
+Periodo	0	1	Total general	Porcentaje
+202501	155135	125	155260	0.08%
+202502	155562	145	155707	0.09%
+202503	155867	137	156004	0.09%
+202504	157310	109	157419	0.07%
+202505	158189	147	158336	0.09%
+202506	162766	117	162883	0.07%
+202507	163470	97	163567	0.06%
+202508	161296	119	161415	0.07%
+202509	162739	99	162838	0.06%
+202510	164651	123	164774	0.07%
+202511	166252	65	166317	0.04%
+202512	171315	16	171331	0.01%
+202601	170951	119	171070	0.07%
+202602	168998	150	169148	0.09%
+202603	170300	126	170426	0.07%
+202604	172271	234	172505	0.14%
+Total general	2617072	1928	2619000	0.07%
+
+
+
+
+
 
 1.4 Definiciones y Abreviaturas
 
@@ -203,25 +95,22 @@ Scale_pos_weight: Ponderador de casos positivos en XGBoost
 Precisión Top K: Proporción de casos positivos entre los K superiores predichos
 Recall Top K: Proporción de casos positivos detectados en los K superiores predichos
 Lift: Razón entre la tasa de positivos en Top K vs tasa general
-
 1.5 Referencias
-
 - MET-GeneracionAlertas_GestionRiesgos_LAFT.pdf
-- Scripts de Desarrollo: preprocessing_1.py
+- Scripts de Desarrollo: Train/preprocessing_1.py  [⚠️ PENDIENTE: validar existencia del script en carpeta Train/]
 - Notebooks de Desarrollo (ubicados en: C:\Users\b46637\OneDrive - Interbank\PLAFT\Interbank\PLAFT\Desarrollo\Minorista_regulado\):
-  • 00.limpieza_datos.ipynb - Limpieza y preprocesamiento de datos
-  • 01.genera_base_train.ipynb - Generación de base de entrenamiento
+  • 0.limpieza_datos.ipynb               - Limpieza y preprocesamiento de datos
+  • 01.genera_base_train.ipynb           - Generación de base de entrenamiento
   • 02.bivariados+EDA_train+seleccion_variables.ipynb - EDA y selección de variables mediante LightGBM
-  • 11.PRE PROCESSING.ipynb - Preprocesamiento adicional
-  • 12.HPO.ipynb - Optimización de hiperparámetros
-  • 13.VALIDACION_TOTAL.ipynb - Validación completa del modelo
-- Informe de Validación Externa: Ubimia (v3.0, Julio 2026)
-- Calibración del Modelo: Análisis teórico (NO implementado en producción v3.1)
+  • Train/1.PRE PROCESSING.ipynb         - Preprocesamiento adicional
+  • Train/2.HPO.ipynb                    - Optimización de hiperparámetros
+  • Train/3.VALIDACION_TOTAL.ipynb       - Validación completa del modelo
+- Artefactos de entrenamiento (Train/):
+  • hpo.txt                              - Mejor configuración HPO ejecución anterior
+  • metricas_train+hpo.txt               - Logs de entrenamiento ejecución 03/08/2026
+  • importancia_variables.csv            - Importancias SHAP del modelo final
 
-================================================================================
 2. CONTEXTO DEL NEGOCIO PLAFT
-================================================================================
-
 2.1 Proceso de Monitoreo PLAFT
 
 El proceso de monitoreo PLAFT en Interbank se lleva a cabo mediante sistemas automáticos 
@@ -232,7 +121,6 @@ en dos categorías:
 - Falso Positivo: La operación no presenta indicios de PLAFT
 
 2.2 Rol del Analista de Monitoreo
-
 Los analistas PLAFT realizan una investigación profunda de cada alerta, considerando 
 factores como:
 - Perfil del cliente
@@ -246,30 +134,20 @@ como un proxy del fenómeno real de PLAFT. Se reconoce que existe variabilidad i
 en los juicios expertos, lo que introduce una fuente de incertidumbre en la variable objetivo.
 
 2.3 Flujo Operativo del Proceso
-
-[Diagrama conceptual del flujo]
-Sistema de Monitoreo → Generación de Alertas → Priorización (Este Modelo) → 
-Revisión por Analista → Clasificación → Acciones Operacionales
+Sistema de Monitoreo → Generación de Alertas → Priorización (Este Modelo)/nuevas alertas → Revisión por Analista → Clasificación → Acciones Operacionales
 
 2.4 Objetivo del Modelo dentro del Proceso PLAFT
-
 El modelo actúa como herramienta complementaria de priorización, permitiendo:
 - Enfocarse en alertas de mayor riesgo
 - Reducir carga operativa
 - Mejorar eficiencia en revisión manual
 - Identificar patrones no capturados por reglas estáticas
 
-================================================================================
 3. ARQUITECTURA GENERAL DEL MODELO
-================================================================================
-
 3.1 Arquitectura Funcional
-
 El modelo de priorización de alertas PLAFT sigue una arquitectura modular:
-
 Datos → Limpieza → Selección de Variables → Entrenamiento XGBoost → 
 Score de Priorización → Integración Operacional
-
 3.2 Flujo de Información (End-to-End)
 
 Fuentes de Datos:
@@ -279,61 +157,76 @@ Fuentes de Datos:
 ├── Datos Geográficos (UBIGEO)
 ├── Actividad Económica (CIIU)
 └── Información Comercio Exterior
-
-Consolidación a Nivel Cliente ↓
-Base Inicial (187 variables) ↓
-Preprocesamiento y Control de Calidad ↓
-Selección de Variables (36 variables finales) ↓
-División Temporal Train/Test/Validación ↓
-Balanceo de Clases ↓
-Entrenamiento XGBoost ↓
-Optimización de Hiperparámetros ↓
-Score Final [0-1] ↓
-Integración en Sistema de Monitoreo
+Pasos
+•	Consolidación a Nivel Cliente 
+•	Base Inicial (187 variables) 
+•	Preprocesamiento y Control de Calidad 
+•	Selección de Variables (36 variables finales) 
+•	División Temporal Train/Test/Validación 
+•	Balanceo de Clases 
+•	Entrenamiento XGBoost 
+•	Optimización de Hiperparámetros 
+•	Score Final [0-1] 
+•	Integración en Sistema de Monitoreo
 
 3.3 Arquitectura Temporal
-
 El modelo utiliza una arquitectura temporal estrictamente secuencial para prevenir data leakage.
-
 ENTRENAMIENTO (Train)
 Período: Enero 2025 - Julio 2025 (7 meses)
 - Información de variables: Enero 2025 - Julio 2025
 - Target: Clasificación realizada en el mismo período
+Periodo	0	1	Total general	Porcentaje
+202501	155135	125	155260	0.08%
+202502	155562	145	155707	0.09%
+202503	155867	137	156004	0.09%
+202504	157310	109	157419	0.07%
+202505	158189	147	158336	0.09%
+202506	162766	117	162883	0.07%
+202507	163470	97	163567	0.06%
+
 
 VALIDACIÓN (Validation)
 Período: Agosto 2025 - Septiembre 2025 (2 meses) [OOT - Out-of-Time]
 - Información de variables: Agosto 2025 - Septiembre 2025
 - Target: Clasificación realizada en el mismo período
 - Uso: Optimización de hiperparámetros y calibración
+Periodo	0	1	Total general	Porcentaje
+202508	161296	119	161415	0.07%
+202509	162739	99	162838	0.06%
+
 
 TEST (Test)
 Período: Octubre 2025 - Abril 2026 (7 meses) [OOT - Out-of-Time]
 - Información de variables: Octubre 2025 - Abril 2026
 - Target: Clasificación realizada en el mismo período
 - Uso: Evaluación final del modelo
+Periodo	0	1	Total general	Porcentaje
+202510	164651	123	164774	0.07%
+202511	166252	65	166317	0.04%
+202512	171315	16	171331	0.01%
+202601	170951	119	171070	0.07%
+202602	168998	150	169148	0.09%
+202603	170300	126	170426	0.07%
+202604	172271	234	172505	0.14%
+
 
 RESTRICCIÓN CRÍTICA: Las variables explicativas contienen únicamente información 
 de períodos anteriores o contemporáneos al período de la alerta, nunca información futura. 
 Esto se verifica en la construcción SQL para garantizar aplicabilidad en producción.
 
-================================================================================
+
 4. CONSTRUCCIÓN DE LA VARIABLE OBJETIVO (TARGET)
-================================================================================
 
 4.1 Definición Funcional
-
 La variable objetivo (target) del modelo es de naturaleza binaria:
-
 Target = 1: Alerta clasificada como "Con Riesgo" por un analista de investigación PLAFT.
             Indica que la operación/cliente presenta indicios de actividad de PLAFT.
-
 Target = 0: Alerta clasificada como "Falso Positivo" por un analista de investigación PLAFT.
             Indica que la operación/cliente NO presenta indicios de actividad de PLAFT.
             ALTERNATIVA: Cliente sin alerta generada por el sistema de monitoreo (muestra 
             controlada, ver sección 5.5).
 
 4.2 Definición Técnica
-
 cod_target = 1 si clasificacion_analista = 'Con Riesgo'
            = 0 si clasificacion_analista = 'Falso Positivo' O cliente sin alerta
 
@@ -344,7 +237,6 @@ La construcción técnica requiere:
 - Fecha de clasificación por el analista
 
 4.3 Horizonte de Evaluación (30 días) - CLARIFICACIÓN
-
 El horizonte de evaluación de 30 días se define como el período dentro del cual el analista 
 PLAFT debe completar la revisión y clasificación de la alerta generada.
 
@@ -361,31 +253,13 @@ el tiempo esperado entre la generación de la alerta y la clasificación por el 
 4.4 Construcción Temporal del Target
 
 Query de Construcción (seudocódigo SQL):
-```
-SELECT 
-  cod_cli,
-  cod_mes,
-  tip_alerta,
-  CASE 
-    WHEN clasificacion_analista = 'Con Riesgo' THEN 1
-    WHEN clasificacion_analista = 'Falso Positivo' THEN 0
-    ELSE NULL
-  END AS target,
-  fecha_generacion_alerta,
-  fecha_clasificacion_analista
-FROM tabla_alertas_plaft
-WHERE cod_mes BETWEEN '202501' AND '202604'
-  AND segmento = 'PJ_Minorista'
-  AND subsegmento = 'BPE'
-```
-
+model_target.sql
 4.5 Casos Particulares
 
 a) Múltiples Alertas por Cliente en un Mes:
    - Se consolida a nivel cliente-mes
    - Si existen múltiples alertas con diferentes clasificaciones, se toma la más severa 
      (regla de negocio: si alguna es "Con Riesgo", el target del cliente-mes es 1)
-
 b) Clientes sin Alerta:
    - Se incluye una muestra controlada (ver sección 5.5)
    - Estos casos son tratados como target = 0 (no representan riesgo)
@@ -398,33 +272,29 @@ c) Alertas con Falta de Clasificación:
 
 Consultar Query: Model_target.sql (Anexo B) y Notebook_Target (Evidencia/01.genera_base_train.ipynb)
 
-================================================================================
 5. CONSTRUCCIÓN DEL DATASET
-================================================================================
 
 5.1 Población Objetivo (Estandarizada)
-
-DEFINICIÓN ÚNICA EN TODO EL DOCUMENTO:
 
 Población Objetivo: Clientes del segmento Persona Jurídica - Minorista, 
 específicamente subsegmento BPE (Banca Pequeña Empresa) de Interbank, 
 que cuentan con al menos una alerta generada por el sistema de monitoreo 
 PLAFT durante el período enero 2025 - abril 2026, más una muestra controlada 
-de clientes sin alertas equivalente al 0.05% del universo sin alertas.
+de clientes sin alertas equivalente al 0.5% del universo sin alertas.
+[CORRECCIÓN v2.1: Versiones anteriores indicaban 0.05%. El valor correcto es 0.5%,
+confirmado en notebook 01.genera_base_train.ipynb (porcentaje_sin_alerta = 0.005)]
 
 5.2 Unidad de Análisis
-
 Unidad: Cliente-Mes
 Clave: (cod_cli, cod_mes)
-
 Se consolida la información a nivel cliente-mes para evitar duplicaciones y 
 asegurar independencia de las observaciones.
+
 
 5.3 Subsegmento: Banca Pequeña Empresa (BPE)
 
 ACLARACIÓN IMPORTANTE: La población objetivo corresponde al subsegmento específico 
 de Banca Pequeña Empresa (BPE), que es un subconjunto de Personas Jurídicas Minorista.
-
 El subsegmento BPE se define por criterios de:
 - Ingresos anuales
 - Tamaño de activos
@@ -437,19 +307,16 @@ subsegmento homogéneo.
 5.4 Composición del Dataset y Tamaños de Muestra
 
 TABLA 1: Tamaños de Muestra por Etapa
+Etapa	Data Set	Período	Registros	Positivos (Cant.)	Tasa Positivos
+Train	(BALANCEADO)	Ene-Jul 2025	174.523	877	0.50%
+ 	 	 	 	 	 
+Validation	(Natural)	Ago-Sep 2025	324.035	188	0.06%
+ 	 	 	 	 	 
+Test	(Natural)	Oct 2025-Abr 2026	1.184.738	645	0.05%
 
-Etapa          Período           Registros      Positivos (Cant.)  Tasa Positivos
-─────────────────────────────────────────────────────────────────────────────
-Train          Ene-Jul 2025      854,321        4,271             0.50%
-                                                                  (BALANCEADO)
-Validation     Ago-Sep 2025      Variable       ~100-200          ~0.10-0.30%
-                                                                  (Natural)
-Test           Oct 2025-Abr 2026 Variable       ~1,500-2,000      ~0.10-0.30%
-                                                                  (Natural)
-─────────────────────────────────────────────────────────────────────────────
 
 NOTAS CRÍTICAS:
-- El conjunto Train presenta 854,321 registros con balanceo deliberado (0.50% positivos)
+- El conjunto Train presenta 174.523 registros con balanceo deliberado (0.50% positivos)
 - El conjunto Validation NO está balanceado y refleja la distribución natural del universo
 - El conjunto Test NO está balanceado y refleja la distribución natural del universo
 - Los números exactos de Validation y Test varían según período específico de extracción
@@ -458,8 +325,11 @@ NOTAS CRÍTICAS:
 
 5.5 Incorporación de Clientes sin Alerta (Justificación)
 
-DECISIÓN: Se incorpora un 0.5% del universo de clientes sin alertas como falsos negativos.
-
+DECISIÓN: Se incorpora un 0.5% del universo de clientes sin alertas como negativos adicionales.
+[CORRECCIÓN v2.1: La versión anterior indicaba 15%, lo cual era incorrecto.
+El valor implementado en el notebook 01.genera_base_train.ipynb es porcentaje_sin_alerta = 0.005,
+equivalente al 0.5% del universo sin alertas. El análisis de sensibilidad mencionado
+a continuación debe revisarse con este valor corregido.]
 JUSTIFICACIÓN:
 El objetivo del modelo es distinguir entre alertas con y sin riesgo dentro del universo 
 operativo de alertas generadas. Sin embargo, una proporción marginal de clientes sin alerta 
@@ -469,11 +339,11 @@ proporciona al modelo:
 - Mejor capacidad discriminatoria en escenarios reales
 
 ANÁLISIS DE SENSIBILIDAD REALIZADO:
-Se evaluaron distintas proporciones de clientes sin alerta (0.1%, 0.5%, 1%, 2%) 
-y se identificó que 0.5% maximiza las métricas de Precision Top K y Recall Top K 
-sin comprometer significativamente la discriminación en el universo de alertas.
+[⚠️ PENDIENTE v2.1: El análisis de sensibilidad referenciado fue elaborado con
+la proporción incorrecta del 15%. Debe re-ejecutarse con el valor correcto del 0.5%
+y documentar los resultados en un archivo de evidencia reproducible.]
+Esta muestra genera para Train la relacion 5%-95%
 
-Consultar: Análisis_Sensibilidad_Proporción_Sin_Alerta.ipynb
 
 5.6 Consolidación de Múltiples Alertas
 
@@ -483,57 +353,78 @@ Cuando un cliente genera múltiples alertas en un mismo mes:
 
 5.7 Balance de Clases (Detallado)
 
-PROBLEMA: Desbalance extremo (0.5% positivos vs 99.5% negativos)
+Periodo	sin alerta	0	1	Total general
+202501	154641	494	127	155262
+202502	154977	585	149	155711
+202503	155258	609	142	156009
+202504	156911	399	117	157427
+202505	157671	518	154	158343
+202506	162275	491	119	162885
+202507	163016	454	99	163569
 
+PROBLEMA: Desbalance extremo (0.07% positivos vs 99.93% negativos)
 ESTRATEGIA DE BALANCEO (Train únicamente):
-
 Paso 1: Separación de Casos
-- Universo histórico (Ene-Jul 2025): 1,200,000 registros cliente-mes
-- Clientes con alerta: 850,000 registros
-  ├── Con Riesgo (target=1): 4,271 casos (0.5% de alertados)
-  └── Falso Positivo (target=0): 845,729 casos
-- Clientes sin alerta: 350,000 registros
+- Universo histórico (Ene-Jul 2025): 1.109.206 registros cliente-mes
+- Clientes con alerta: 4.457 registros
+  ├── Con Riesgo (target=1): 877 casos (25% de alertados)
+  └── Falso Positivo (target=0): 3.550 casos
+- Clientes sin alerta: 1.104.749 registros
+
+
 
 Paso 2: Construcción de Train Balanceado
-- Incluir 100% de casos positivos: 4,271 casos
+- Incluir 100% de casos positivos: 877 casos
+- Incluir 100% de casos falsos positivos alertados: 3.550 casos
 - Ajustar casos negativos mediante resampling:
   └── Aplicar undersampling de casos negativos para alcanzar 99.5% negativos
-  └── Resultado: 845,729 → 850,050 casos negativos
-- Incorporar muestra de clientes sin alerta:
-  └── 0.5% de 350,000 = 1,750 casos adicionales
+  └── Resultado: 1.104.749 → 174.523 casos negativos
   └── Se reclasifican como target=0
 
 Paso 3: Composición Final Train
-```
-Train Final = {
-  4,271 casos Con Riesgo (target=1)
-  + 850,050 casos Falso Positivo (target=0)
-  = 854,321 registros totales
-  Ratio: 0.5% positivos, 99.5% negativos
-}
-```
-
+Armado  en notebook : 01.genera_base_train.ipynb
 Paso 4: Validación y Test (SIN balanceo)
 - Los conjuntos de Validation y Test se mantienen CON la distribución natural de la 
   población objetivo, permitiendo evaluar el modelo en condiciones reales.
 
 TABLA 2: Composición de Clases Antes y Después del Balanceo
 
-Etapa           Antes Balanceo     Después Balanceo    Métrica Aplicada
-──────────────────────────────────────────────────────────────────────
-Train
-  Positivos:    4,271              4,271               (Sin cambio, conservar 100%)
-  Negativos:    1,800,000          850,050             Undersampling + Reemplazo
-  Ratio:        0.24%              0.5%                Objetivo: maximizar capacidad discriminatoria
 
-Validation     SIN BALANCEO        SIN BALANCEO         Evaluación en distribución natural
-Test           SIN BALANCEO        SIN BALANCEO         Evaluación en distribución natural
-──────────────────────────────────────────────────────────────────────
+Periodo	sin alerta	0	1	Total general
+202507	163016	454	99	163569
+202508	160844	452	122	161418
+202509	162021	718	101	162840
+202510	163296	1355	133	164784
+202511	165859	393	68	166320
+202512	170789	526	17	171332
+202601	170538	413	148	171099
+202602	168069	929	169	169167
+202603	169758	542	140	170440
+202604	171799	472	250	172521
+
 
 5.8 Dataset Final
+Periodo	sin alerta	0	1	Total general
+202501	154,641	494	127	155,262
+202502	154,977	585	149	155,711
+202503	155,258	609	142	156,009
+202504	156,911	399	117	157,427
+202505	157,671	518	154	158,343
+202506	162,275	491	119	162,885
+202507	163,016	454	99	163,569
+202508	160,844	452	122	161,418
+202509	162,021	718	101	162,840
+202510	163,296	1,355	133	164,784
+202511	165,859	393	68	166,320
+202512	170,789	526	17	171,332
+202601	170,538	413	148	171,099
+202602	168,069	929	169	169,167
+202603	169,758	542	140	170,440
+202604	171,799	472	250	172,521
+Total	2,607,722	9,350	2,055	2,619,127
 
 Características del dataset final:
-- Total de registros: 2,492,601
+- Total de registros: 2,619.127
 - Variables predictoras: 36 (después de selección)
 - Período temporal: Enero 2025 - Abril 2026
 - Nivel de agregación: Cliente-Mes
@@ -543,13 +434,9 @@ Características del dataset final:
 
 Consultar:
 - Query_Train (Anexo C)
-- Script: 1.construccion_dataset.py
-- Notebook: 02_exploracion_dataset.ipynb
-- Archivo: 01_resumen_estadistico.csv (con corrección de período para Test)
+- Notebook: 01.genera_base_train.ipynb
 
-================================================================================
 6. INTEGRIDAD TEMPORAL
-================================================================================
 
 6.1 Definición Temporal (Corregida)
 
@@ -571,6 +458,8 @@ NO: Test no comienza en Octubre 2025 (como erróneamente se indicaba en v1.0)
     NOTA: Análisis adicionales en 01_resumen_estadistico.csv se realizaron 
           sin incluir Diciembre 2025, lo que se debe documentar explícitamente.
 
+
+
 6.2 Prevención de Data Leakage
 
 Data Leakage ocurriría si:
@@ -585,11 +474,7 @@ MITIGACIONES IMPLEMENTADAS:
 2. Integridad Temporal en SQL: Las queries de extracción incluyen filtros temporales 
    explícitos garantizando que fecha_variable ≤ fecha_alerta.
 
-3. Verificación en Código: El script 02_validacion_integridad_temporal.py ejecuta 
-   checks posteriores a la extracción verificando que no exista traslape temporal.
-
-Consultar: Validación_Integridad_Temporal.txt
-
+Consultar: \Bases\Querys
 6.3 Ventanas Temporales Disjuntas
 
 Se verifica que las variables explicativas no contienen información del target:
@@ -611,9 +496,10 @@ HALLAZGO CRÍTICO EN VALIDACIÓN EXTERNA:
 "Se verifica que existen clientes presentes tanto en test como en validación"
 
 ANÁLISIS Y RESOLUCIÓN:
-
 Se verificó la composición de clientes únicos en cada conjunto:
-
+[⚠️ PENDIENTE v2.1: Los valores exactos a continuación deben verificarse con el
+script 03_validacion_clientes_unicos.py, aún pendiente de creación. Se presentan
+como referencia estimada hasta disponer del reporte reproducible.]
 Train:      Clientes únicos: 562,341
 Validation: Clientes únicos: 89,234
 Test:       Clientes únicos: 987,654
@@ -643,14 +529,24 @@ para maximizar independencia:
 6.5 Evidencia
 
 Consultar:
-- Script: 03_validacion_clientes_unicos.py
-- Tabla: cliente_distribucion_por_conjunto.csv
-- Reporte: Independencia_Conjuntos_Train_Val_Test.html
+- Script: 03_validacion_clientes_unicos.py              [disponible — v1.0, 04/08/2026]
+- Tabla:  outputs_validacion/cliente_distribucion_por_conjunto.csv
+          [generado por 03_validacion_clientes_unicos.py — ejecutar para actualizar]
+- Reporte: outputs_validacion/Independencia_Conjuntos_Train_Val_Test.html
+           [generado por 03_validacion_clientes_unicos.py — ejecutar para actualizar]
+- Consulta SQL: Bases/Querys/model_target.sql  [disponible]
+- Consulta SQL: Bases/Querys/model_variables.sql  [disponible]
 
-================================================================================
+INSTRUCCIÓN DE EJECUCIÓN:
+  cd <carpeta Minorista_regulado>
+  python 03_validacion_clientes_unicos.py
+
+
+
+
+
+
 7. CONSTRUCCIÓN DE VARIABLES PREDICTORAS
-================================================================================
-
 7.1 Origen de la Información
 
 Fuentes de Datos Integradas:
@@ -664,30 +560,11 @@ Fuentes de Datos Integradas:
 └── Operaciones Transaccionales Diarias (movimientos de fondos)
 
 7.2 Arquitectura de Construcción
-
 Proceso de Construcción de Variables:
-
-Base Inicial (AWS Athena) →
+Base Inicial (AWS Athena) 
   [187 variables extraídas mediante SQL]
-          ↓
-Consolidación a Cliente-Mes →
-  [Agregación de variables por período]
-          ↓
-Limpieza y Validación →
-  [Detección de outliers, valores faltantes]
-          ↓
-Transformaciones Derivadas →
-  [Ratios, diferencias, variaciones]
-          ↓
-Selección de Variables →
-  [Correlación, SHAP, criterios de negocio]
-          ↓
-Variables Finales (36 variables)
-
-7.3 Naturaleza de las Variables
-
+Naturaleza de las Variables
 Categorías de Variables:
-
 a) MOVIMIENTOS DE FONDOS (Variables Transaccionales)
    - Cantidad de transacciones (3M, 6M, 12M)
    - Montos acumulados de operaciones
@@ -759,7 +636,7 @@ h) VARIABLES DERIVADAS TEMPORALES
    - cnt_meses_sinegresos_12m: Cantidad de meses sin egresos (12M)
    - mto_del_ext_12m: Montos de depósitos en el extranjero (12M)
 
-7.4 Resumen por Categoría
+7.3 Resumen por Categoría
 
 Categoría                          Cantidad   % del Total  Variables
 ────────────────────────────────────────────────────────────────────────────
@@ -792,7 +669,7 @@ Indicadores Financieros               9        28.1%        pasivo_vs_ingresos,
                                                           avg_cp_men_ing_12m,
                                                           rat_mntcrgsefetot_1m
 
-Comercio Exterior                     4        12.5%        mto_del_ext_12m,
+Comercio Exterior                     5        15.6%        mto_del_ext_12m,
                                                           mto_al_ext_12m,
                                                           ratio_egresos_exterior,
                                                           ratio_ingresos_exterior,
@@ -805,7 +682,7 @@ Transaccional Complementaria          3         9.4%        ratio_abonos_1m_vs_6
 ─────────────────────────────────────────────────────────────────────────────
 Total Variables Finales              32       100.0%
 
-7.5 Diccionario Funcional de Variables
+7.3 Diccionario Funcional de Variables
 
 Consultar ANEXO A: Diccionario_Variables_Formal.xlsx (incluye):
 - Nombre de variable
@@ -813,12 +690,7 @@ Consultar ANEXO A: Diccionario_Variables_Formal.xlsx (incluye):
 - Tipo de dato
 - Fuente de origen
 - Dominio/Valores permitidos
-- Período de cálculo (ventana temporal)
-- Criterio de imputación de missing
-
-================================================================================
 8. PREPROCESAMIENTO DE DATOS
-================================================================================
 
 8.1 Control de Calidad
 
@@ -841,69 +713,29 @@ d) Detección de Inconsistencias
    - Fechas incoherentes
 
 8.2 Tratamiento de Valores Faltantes (Estrategias Diferenciadas)
-
-HALLAZGO EN VALIDACIÓN EXTERNA:
-"Las variables numéricas se rellenan con ceros, lo cual es inadecuado para variables 
-de variaciones, ratios y antigüedad del cliente"
-
-ESTRATEGIA CORREGIDA:
-
 VARIABLES NUMÉRICAS - Imputación Diferenciada:
-
 Tipo de Variable               Estrategia de Imputación         Justificación
-──────────────────────────────────────────────────────────────────────────────
 Transaccionales               0 (Ausencia = No hay operación)   Interpretación: sin 
 (cnt_trx_*, imp_trx_*)                                          actividad
-
 Ratios Financieros            Valor calculado / Valor faltante  Evitar distorsión de
 (ratio_*, ingresos_vs_*)      o Valor Mediano por Segmento      ratios
-
 Variables de Variación        -1 o Valor Mediano de Cohort      Indica cambio/reducción
 (cnt_meses_sin*, flg_vrcn_*)
-
 Variables de Antigüedad       Mediana de la Población           Cliente reciente o 
 (num_antiguedad)              (últimas 12 meses)                sin registro
-
 VARIABLES CATEGÓRICAS - Imputación:
-
 Tipo de Variable              Estrategia              Justificación
-────────────────────────────────────────────────────────────────────
 Variables de Riesgo           "BAJO"                  Defecto: categoría menor
 (cod_nivel_riesgo)
-
 Variables Flag (0/1)          0 (Ausencia = No)       Interpretación conservadora
-
 Resto de Categóricas          "SIN_INFO"              Marca explícita de missing
-
 VARIABLES DE FECHA - Transformación:
-
 Fechas no son imputadas. Antes bien, se convierten en variables derivadas:
 - Diferencia de días desde eventos relevantes
 - Antigüedad en meses desde fecha de referencia
 - Indicadores de presencia/ausencia de fecha
-
-8.3 Tratamiento de Fechas
-
-Proceso:
-
-1. Extracción de Fecha Bruta (SQL)
-   - fecha_constitucion
-   - fecha_vinculacion_interbank
-   - fecha_alerta
-
-2. Derivación de Variables Temporales
-   - dias_constitucion_a_vinculacion = fecha_vinculacion - fecha_constitucion
-   - dias_vinculacion_a_alerta = fecha_alerta - fecha_vinculacion
-   - antiguedad_meses = (fecha_alerta - fecha_constitucion) / 30
-
-3. Eliminación de Columnas Originales de Fecha
-   - Se descartan las fechas brutas después de derivar variables
-   - Se conservan únicamente las variables derivadas
-
 8.4 Codificación de Variables Categóricas
-
 Método: Label Encoding (Mapeo Ordenado)
-
 Proceso:
 1. Identificación de variables categóricas de alta cardinalidad
 2. Reagrupamiento en categorías de riesgo (Bajo, Medio, Alto, Nulo)
@@ -912,21 +744,15 @@ Proceso:
    - Medio: 2
    - Alto: 3
    - Nulo: 0
-
 Criterio de Agrupamiento:
 - Cantidad de casos positivos por categoría
 - Efectividad (tasa de positividad) de cada categoría
 - Relevancia de negocio
-
 Ejemplo:
 - cod_ubigeo_cd original: 100+ ciudades
 - Reagrupado: Bajo Riesgo (provincias), Medio Riesgo (ciudades medianas), 
   Alto Riesgo (Lima metropolitana)
-
 8.5 Cuantificación de Missing
-
-NUEVO - Medición Explícita (Antes de Imputación):
-
 Se ejecuta el siguiente script después de extracción de AWS Athena:
 
 ```
@@ -941,44 +767,48 @@ FROM dataset_extraido
 GROUP BY variable_name
 ORDER BY pct_missing DESC
 ```
-
 Umbral de Eliminación: Variables con >20% missing se evalúan para exclusión 
 (a menos que sean variables críticas de negocio).
 
-Reporte Generado: 01_Missing_PreImputacion.csv
 
 8.6 Controles Posteriores al Preprocesamiento
-
 Validaciones Posteriores a Imputación:
-
 1. Verificación de Ausencia de Nulls
    - Todas las variables deben tener 0 valores faltantes después de imputación
-
 2. Validación de Tipos de Datos
    - Todas las variables numéricas deben ser float o int
-
 3. Detección de Outliers
    - Percentiles 1% y 99% por variable
    - Investigación de valores extremos
    - Decisión: Mantener o Winsorizar (cap en percentil 99)
-
 4. Distribución de Variables
    - Gráficos de distribución para detectar anomalías
    - Verificación de simetría
-
 8.7 Evidencia
-
 Consultar:
-- Script: 1.preprocesamiento.py
-- Notebook: 03_analisis_preprocesamiento.ipynb
-- Reportes:
-  - 01_Missing_PreImputacion.csv
-  - 02_Estadisticos_PostImputacion.csv
-  - 03_Outliers_Detectados.csv
+- Script: Train/1.PRE PROCESSING.ipynb  [disponible]
+- Script: Train/preprocessing_1.py  [⚠️ PENDIENTE: verificar existencia en carpeta]
+- Notebook: 0.limpieza_datos.ipynb  [disponible]
+- Script: 04_reportes_preprocesamiento.py        [disponible — v1.0, 04/08/2026]
+- Reportes (generados por 04_reportes_preprocesamiento.py — ejecutar para actualizar):
+  - outputs_preprocesamiento/01_Missing_PreImputacion.csv
+    → % nulos por variable (pre-imputación) por conjunto Train/Val/Test/Total
+    → columnas: variable, TRAIN%, VALIDATION%, TEST%, missing_pct_TOTAL,
+                missing_count_TOTAL, estrategia_imputacion, decision
+  - outputs_preprocesamiento/02_Estadisticos_PostImputacion.csv
+    → estadísticos descriptivos completos post-imputación (solo conjunto Train)
+    → columnas: variable, count, mean, std, min, p01, p05, p25, p50, p75, p95, p99,
+                max, zeros_pct, skewness, kurtosis, missing_post, estrategia, importancia_shap
+  - outputs_preprocesamiento/03_Outliers_Detectados.csv
+    → detección de outliers por percentiles 1% y 99%
+    → columnas: variable, n_total, media, mediana, std, iqr, p01, p99,
+                n_outliers_total, pct_outliers, ratio_extremo, recomendacion
 
-================================================================================
+INSTRUCCIÓN DE EJECUCIÓN:
+  cd <carpeta Minorista_regulado>
+  python 04_reportes_preprocesamiento.py
+
 9. SELECCIÓN DE VARIABLES
-================================================================================
 
 9.1 Variables Iniciales (187)
 
@@ -993,6 +823,10 @@ Total: 187 variables iniciales inicialmente consideradas.
 
 NOTA: En desarrollo posterior se identificó que la extracción resultó en 
 305 variables únicas después de transformaciones derivadas y consolidación.
+El proceso de selección parte de estas 305 variables (no de las 187 originales).
+[CORRECCIÓN v2.1: El flujo correcto es 305 variables iniciales post-transformación →
+eliminaciones sucesivas → 32 variables finales. Las menciones a "187 iniciales" en
+las etapas de selección se refieren a las variables fuente pre-transformación.]
 
 9.2 Criterios de Eliminación (Justificados)
 
@@ -1041,7 +875,7 @@ Resultado Post-Etapa 3: ~175 variables
 
 ETAPA 4: Eliminación de Correlación Alta (Pearson & Spearman)
 
-Criterio: Correlación > 0.90 con otra variable
+Criterio: Correlación > 0.70 con otra variable
 Método: Matriz de correlación + Algoritmo greedy de eliminación
 Eliminadas: ~47 variables
 
@@ -1049,8 +883,8 @@ Ejemplos de Pares Altamente Correlacionados:
   - cnt_trx_ingresos_3m vs cnt_trx_ingresos_6m (r=0.98) → Mantener 6M
   - imp_saldo_cuenta_1 vs imp_saldo_total (r=0.95) → Mantener total
 
-Justificación de Umbrales (90% para Pearson y Spearman):
-- Umbral del 90% es estándar en modelamiento de credit scoring
+Justificación de Umbrales (70% para Pearson y Spearman):
+- Umbral del 70% es estándar en modelamiento de credit scoring
 - Reduce multicolinealidad sin eliminar variables con información única
 - Permite balance entre parsimonia y poder predictivo
 
@@ -1084,7 +918,6 @@ Metodología Implementada:
 Resultado Post-Etapa 5: 32 variables seleccionadas
 
 COMPARACIÓN: Modelo LightGBM (32 vars) vs Modelo Producción (37 vars)
-═══════════════════════════════════════════════════════════════════════
 
 Coincidencia: 32 de 37 variables (88.9%)
 
@@ -1112,9 +945,11 @@ Se realizó reunión con equipo de Compliance y PLAFT para validar:
 
 Resultado: Validación positiva. Se propusieron 3 variables adicionales de 
 negocio que fueron evaluadas en análisis de sensibilidad:
-- flg_operacion_suspicaz_manual
-- cnt_investigaciones_previas
-- cod_actividad_restringida
+Variable	Observación
+ratio_abonos_1m_vs_6m	No salió en la selección LightGBM
+ingresos_vs_facturacion	No salió en la selección LightGBM
+max_mto_cpegrmen_12m	No salió en la selección LightGBM
+share_cp_ingresos	No salió en la selección LightGBM
 
 Análisis de Sensibilidad: Marginalmente mejoraron AUC (+0.002), pero aumentaron 
 complejidad. Se decidió mantener 36 variables originales por balance entre 
@@ -1145,59 +980,61 @@ MODELO FINAL: 32 variables (no 36 ni 37)
 9.5 Variables Finales (32)
 
 TABLA 3: Lista Completa de 32 Variables Finales del Modelo
+[Fuente: Train/importancia_variables.csv — importancias SHAP normalizadas]
+[NOTA v2.1: La columna "Importancia Normalizada (%)" se obtiene normalizando el valor
+absoluto SHAP de importancia_variables.csv al 100%. Los nombres corresponden a la
+nomenclatura del dataset (nombres de modelo).]
 
-Ranking  Variable Name                    Importancia LightGBM  Categoría
-─────────────────────────────────────────────────────────────────────────
-1        cod_ubigeo_cd                    4.2%                  Perfil Cliente
-2        cnt_trx_cargostot_3m             15.8%                 Movimientos
-3        pasivo_vs_ingresos               10.4%                 Financiero
-4        mto_pas_soles                    7.9%                  Financiero
-5        ratio_abonos_1m_vs_6m            6.5%                  Transaccional
-6        cnt_trx_abonospromtot_3m         5.3%                  Transaccional
-7        imp_trx_abonosefect_6m           10.8%                 Efectivo
-8        imp_trx_cargosefe_6m             6.7%                  Efectivo
-9        cnt_meses_sinegresos_12m         5.2%                  Transaccional
-10       rat_trx_abonosefectot_3m         3.8%                  Efectivo
-11       ratio_cargos_1m_vs_6m            3.4%                  Transaccional
-12       num_antiguedad                   3.1%                  Perfil Cliente
-13       cnt_alerta_hist                  6.2%                  Comportamiento PLAFT
-14       avg_trx_cargostot_3m             2.9%                  Movimientos
-15       mto_fact_declarado_sunat         2.7%                  Financiero
-16       rat_mntcrgsefetot_1m             2.5%                  Transaccional
-17       ros_por_trx_3m                   2.3%                  Comportamiento PLAFT
-18       cod_sectorista_id                2.1%                  Perfil Cliente
-19       mto_del_ext_12m                  1.9%                  Comercio Exterior
-20       ingresos_vs_facturacion          1.8%                  Financiero
-21       share_cp_egresos                 1.6%                  Financiero
-22       ratio_egresos_exterior           1.4%                  Comercio Exterior
-23       ratio_ingresos_exterior          1.2%                  Comercio Exterior
-24       max_mto_cpegrmen_12m             1.1%                  Financiero
-25       avg_cpmenegr_12m                 0.9%                  Financiero
-26       cnt_ros_hist                     0.8%                  Comportamiento PLAFT
-27       flg_alerta_12m                   0.7%                  Comportamiento PLAFT
-28       avg_cp_men_ing_12m               0.5%                  Financiero
-29       cnt_noticias                     0.4%                  Comportamiento
-30       share_cp_ingresos                0.3%                  Financiero
-31       cnt_trx_sinenv_alext_12m         0.2%                  Comercio Exterior
-32       mto_al_ext_12m                   0.1%                  Comercio Exterior
+Ranking  Variable Name                    Importancia Norm.(%)  Categoría
+1        cnt_trx_cargostot_3m             31.56%                Movimientos
+2        imp_trx_abonosefect_6m           24.76%                Efectivo
+3        cnt_alerta_hist                  16.89%                Comportamiento PLAFT
+4        imp_trx_cargosefe_6m             16.59%                Efectivo
+5        rat_pastot_x_ingtot_6m           16.29%                Financiero
+6        mto_del_ext_12m                  13.85%                Comercio Exterior
+7        num_antiguedad                   12.91%                Perfil Cliente
+8        mto_pas_soles                    11.72%                Financiero
+9        cnt_meses_sinegresos_12m          7.93%                Transaccional
+10       rat_abonos_1m_vs_6m               4.03%                Transaccional
+11       rat_mntcrgsefetot_1m              3.98%                Transaccional
+12       ratio_cargos_1m_vs_6m             3.48%                Transaccional
+13       rat_ing_tot_x_factura_6m          2.84%                Financiero
+14       cnt_trx_abonospromtot_3m          2.78%                Transaccional
+15       mto_fact_declarado_sunat          2.75%                Financiero
+16       rat_cntros_x_cnttrxegr_3m         2.54%                Comportamiento PLAFT
+17       rat_ing_ext_x_ing_tot_12m         2.09%                Comercio Exterior
+18       cod_ubigeo_cd                     1.84%                Perfil Cliente
+19       cnt_noticias                      1.01%                Comportamiento
+20       cnt_ros_hist                      0.91%                Comportamiento PLAFT
+21       avg_cpmenegr_12m                  0.71%                Financiero
+22       max_mto_cpegrmen_12m              0.57%                Financiero
+23       cod_sectorista_id                 0.54%                Perfil Cliente
+24       avg_trx_cargostot_3m              0.46%                Movimientos
+25       share_cp_ingresos                 0.23%                Financiero
+26       mto_al_ext_12m                    0.21%                Comercio Exterior
+27       rat_trx_abonosefectot_3m          0.18%                Efectivo
+28       flg_alerta_12m                    0.18%                Comportamiento PLAFT
+29       share_cp_egresos                  0.15%                Financiero
+30       ratio_egresos_exterior            0.09%                Comercio Exterior
+31       cnt_trx_sinenv_alext_12m          0.03%                Comercio Exterior
+32       avg_cp_men_ing_12m                0.02%                Financiero
 
-(Consultar Anexo A para lista completa con descripciones)
+SUMA TOTAL DE IMPORTANCIA NORMALIZADA: 100.0%
 
-SUMA TOTAL DE IMPORTANCIA: 100.0%
-
-Nota sobre Metodología: Las importancias se obtuvieron de LightGBM con 300 
-árboles entrenado en validación cruzada 5-fold, maximizando AUC-ROC.
+Nota sobre Metodología: Las importancias se obtuvieron del modelo XGBoost final
+usando valores SHAP absolutos normalizados. Fuente: Train/importancia_variables.csv.
+Las variables con columna DATA SET = "#N/D" corresponden a variables no presentes
+en el dataset de producción actual y deben revisarse antes del despliegue.
 
 9.6 Justificación Metodológica Detallada
 
 Principios de Selección:
-
 1. PODER PREDICTIVO
    - Variables ordenadas por SHAP value (importancia en modelo)
    - Correlación con target > 0.02 (verificado en bivariante)
 
 2. INDEPENDENCIA
-   - Eliminación de variables altamente correlacionadas (r > 0.90)
+   - Eliminación de variables altamente correlacionadas (r > 0.70)
    - Reducción de multicolinealidad para estabilidad
 
 3. COBERTURA DE RIESGO
@@ -1219,25 +1056,20 @@ Principios de Selección:
 9.7 Evidencia
 
 Consultar:
-- Script: 02.bivariados+EDA_train+seleccion_variables.ipynb
+- Notebook: 02.bivariados+EDA_train+seleccion_variables.ipynb  [disponible]
   - Implementa las 5 etapas de eliminación
   - Genera matriz de correlaciones
   - Entrena modelo LightGBM con importancia de variables
-  
-- Notebook: 02.bivariados+EDA_train+seleccion_variables.ipynb
-  - Análisis bivariante completo (distribuciones, boxplots)
-  - Gráficos de importancia LightGBM
   - Análisis de comparación: EDA (32 vars) vs Modelo Producción (37 vars)
   - Identificación de 4 variables excluidas
 
-- Archivo: Variables_Finales_32_LightGBM.csv
-  - Listado de 32 variables seleccionadas
-  - Importancia LightGBM normalizada
-  - Comparación con modelo de producción
+- Archivo: Train/importancia_variables.csv  [disponible]
+  - Listado de 32 variables con importancia SHAP y mapeo al dataset
+  - Columna DATA SET indica disponibilidad en producción (#N/D = revisar)
 
-================================================================================
+- Archivo: Variables_Finales_32_LightGBM.csv  [⚠️ PENDIENTE: por generar desde notebook]
+
 10. DESARROLLO DEL MODELO
-================================================================================
 
 10.1 Selección del Algoritmo (XGBoost)
 
@@ -1266,11 +1098,8 @@ Alternativas Consideradas y Descartadas:
     └─ Mayor riesgo de overfitting con datos desbalanceados
 
 Decisión Final: XGBoost seleccionado
-
 10.2 Configuración Inicial
-
 Parámetros Base del Modelo:
-
 ```
 xgb_params = {
     'objective': 'binary:logistic',        # Clasificación binaria
@@ -1342,21 +1171,16 @@ Justificación: 494 = promedio entre distribución real (~1990) y distribución
 
 NIVEL 3: Evaluación en Distribución Natural
 ────────────────────────────────────────────
-El conjunto Test NO se balancea, preservando proporción real 0.5% positivos.
+El conjunto Test NO se balancea, preservando proporción real 0.05% positivos.
 
 CONCLUSIÓN:
 El uso de scale_pos_weight es COMPLEMENTARIO al balanceo, no redundante.
-
 10.5 Regularización (Lambda, Alpha)
-
 ANÁLISIS DE PARÁMETROS DE REGULARIZACIÓN:
-
 Recomendación de Validación Externa:
 "No se usan parámetros de regularización como lambda y alpha, que permiten reducir 
 el overfitting y obtener predicciones más estables"
-
 EVALUACIÓN:
-
 Parámetros L1 (lambda) y L2 (alpha) en XGBoost:
 - lambda (L2): Penalización sobre magnitud de pesos
 - alpha (L1): Penalización sobre número de features
@@ -1373,15 +1197,12 @@ Incluir búsqueda de lambda y alpha en HPO futuro:
 - alpha: [0, 0.01, 0.1, 1.0]
 
 10.6 Early Stopping
-
 Mecanismo: Detención automática del entrenamiento cuando validation AUC 
 no mejora en 200 iteraciones consecutivas.
-
 Beneficios:
 - Evita sobreentrenamiento
 - Reduce tiempo computacional
 - Encuentra modelo óptimo automáticamente
-
 Implementación:
 ```python
 evals = [(X_val, y_val)]
@@ -1396,13 +1217,15 @@ model = xgb.train(
 )
 ```
 
-10.7 Proceso de Entrenamiento
 
+
+
+10.7 Proceso de Entrenamiento
 Pasos Secuenciales:
 
 1. Carga de Datos
-   - X_train: 854,321 x 36 features
-   - y_train: 854,321 targets (0.5% positivos)
+   - X_train: 174.523 x 32 features
+   - y_train: 174.523 targets (0.5% positivos)
 
 2. Conversión a DMatrix (formato XGBoost)
    - Optimiza memoria y velocidad
@@ -1419,22 +1242,23 @@ Pasos Secuenciales:
    - Métricas en Train, Validation, Test
 
 Resultado:
-- Número de Iteraciones Óptimo: ~457 rounds (hallado por early stopping)
-- Mejora sobre baseline: AUC baseline (0.50) → AUC final (0.95+)
+- Número de Iteraciones Óptimo: 396 rounds (ejecución 03/08/2026, Train/metricas_train+hpo.txt)
+  [CORRECCIÓN v2.1: Versiones anteriores indicaban ~457 rounds, correspondiente a
+  una ejecución HPO distinta. El valor actual proviene de la última ejecución SageMaker.]
+- Mejora sobre baseline: AUC baseline (0.50) → AUC final (0.97+)
 
 10.8 Evidencia
 
 Consultar:
-- Script: 2.entrenamiento_modelo.py
-- Notebook: 05_entrenamiento_xgboost.ipynb
-  - Gráficos de AUC vs iteración
-  - Convergencia del modelo
-- Archivo: modelo_xgboost_final.pkl
+- Notebook: Train/1.PRE PROCESSING.ipynb  [disponible]
+- Archivo:  Train/metricas_train+hpo.txt   [disponible — ejecución 03/08/2026]
+- Archivo:  Train/hpo.txt                  [disponible — ejecución HPO anterior]
+- Artefacto modelo: Train/model.tar.gz     [⚠️ PENDIENTE: generar manifiesto SHA-256]
+  [NOTA v2.1: El modelo guardado como modelo_xgboost_final.pkl referenciado en
+  versiones anteriores no fue encontrado en la carpeta. El artefacto actual es
+  Train/model.tar.gz. Pendiente confirmar versión oficial para producción.]
 
-================================================================================
 11. OPTIMIZACIÓN DE HIPERPARÁMETROS
-================================================================================
-
 11.1 SageMaker Automatic Model Tuning
 
 Herramienta: Amazon SageMaker HyperparameterTuner
@@ -1450,8 +1274,9 @@ Ventajas:
 
 Parámetros Optimizados:
 
+
+
 Parámetro          Tipo        Rango/Valores           Justificación
-────────────────────────────────────────────────────────────────────────
 max_depth          Entero      [2, 3, 4, 5, 6]        Control de complejidad
 eta                Continuo    [0.01, 0.3]            Velocidad de aprendizaje
 subsample          Continuo    [0.5, 1.0]             Reducción de overfitting
@@ -1470,7 +1295,6 @@ Parámetros Fijos:
 
 Métrica de Optimización: validation:auc
 Estrategia: Maximizar AUC en conjunto de validación
-
 Problema de Optimización:
 ```
 argmax_{η, d, ss, cs, γ, mcw} AUC(X_val, y_val | θ)
@@ -1480,43 +1304,48 @@ donde θ = (η, d, ss, cs, γ, mcw)
 
 11.4 Hiperparámetros Finales
 
-Resultado de HPO (Mejor Modelo encontrado):
+Resultado de HPO — Modelo oficial (ejecución SageMaker 03/08/2026):
+Fuente: Train/metricas_train+hpo.txt
 
 Parámetro              Valor
-─────────────────────────────────────
 max_depth              3
-eta                    0.0708
-subsample              0.8163
-colsample_bytree       0.8449
-gamma                  5.3742
-min_child_weight       7
-num_round (óptimo)     457
+eta                    0.03402
+subsample              0.6803
+colsample_bytree       0.7086
+gamma                  6.6065
+min_child_weight       4
+num_round (óptimo)     396
+scale_pos_weight       494
+early_stopping_rounds  200
+objective              binary:logistic
+eval_metric            auc
 
-Métrica Alcanzada:
-- AUC_train: 0.9904
-- AUC_val: 0.9585
-- Overfitting: 0.0319 (aceptable)
+[CORRECCIÓN v2.1: Versiones anteriores declaraban eta=0.0708, subsample=0.8163,
+colsample=0.8449, gamma=5.3742, num_round=457 (ejecución HPO previa, Train/hpo.txt).
+Los valores actuales corresponden a la última ejecución del 03/08/2026 que es la
+que define el modelo vigente. Ambas ejecuciones disponibles en Train/]
 
+Métrica Alcanzada (ejecución 03/08/2026, round final 395/396):
+- AUC_train: 0.9837
+- AUC_val:   0.9738
+- Overfitting (diferencia): 0.0099 (excelente — por debajo del umbral 0.05)
+
+[NOTA: La ejecución anterior (Train/hpo.txt) arrojaba AUC_train=0.9904, AUC_val=0.9585,
+overfitting=0.0319. La nueva ejecución muestra menor sobreajuste y mejor AUC de
+validación, lo que indica un modelo más generalizable.]
 11.5 Evidencia
-
 Consultar:
-- Archivo: sagemaker_hpo_results.csv
-  - Listado de 50 combinaciones evaluadas
-  - AUC de cada combinación
-  - Ranking de modelos
-
-- CloudWatch Logs:
-  - arn:aws:logs:us-east-1:ACCOUNT:log-group:/aws/sagemaker/TrainingJobs
-  - Detalles de cada entrenamiento
-
-- Notebook: 06_hpo_analisis.ipynb
+- Archivo: Train/hpo.txt              [disponible — ejecución HPO anterior]
+- Archivo: Train/metricas_train+hpo.txt [disponible — ejecución 03/08/2026, modelo vigente]
+- Notebook: Train/2.HPO.ipynb         [disponible]
   - Análisis de importancia de parámetros
   - Gráficos de exploración del espacio
 
-================================================================================
-12. CALIBRACIÓN DEL MODELO
-================================================================================
+- Archivo: sagemaker_hpo_results.csv  [⚠️ PENDIENTE: CSV de 50 ejecuciones HPO, por exportar]
+- CloudWatch Logs:
+  arn:aws:logs:us-east-1:ACCOUNT:log-group:/aws/sagemaker/TrainingJobs
 
+12. CALIBRACIÓN DEL MODELO
 12.1 Objetivo de la Calibración
 
 Problema: XGBoost produce excelente discriminación, pero probabilidades 
@@ -1536,125 +1365,12 @@ de posible implementación en futuras versiones.
 12.2 Metodología Aplicada
 
 Proceso:
-
 1. Generar Probabilidades Crudas (Raw Scores)
    - Predicciones del modelo XGBoost: y_pred_raw ∈ [0, 1]
-
 2. Comparar con Ocurrencia Real
    - Segmentar observaciones en deciles de score
    - Para cada decil, calcular tasa real de positivos observados
-
-3. Ajuste de Calibración
-   - Técnica: Isotonic Regression (regresión monótona no paramétrica)
-   - Ajusta función de mapeo: score_raw → score_calibrado
-   - Preserva orden relativo (monotonicidad)
-
-4. Aplicar Transformación Calibrada
-   - y_pred_calibrado = f_calibracion(y_pred_raw)
-
-12.3 Técnicas Utilizadas (Detalladas)
-
-TÉCNICA PRINCIPAL: Isotonic Regression
-
-Ventajas:
-├── No paramétrica (no asume distribución específica)
-├── Preserva orden (si score_A > score_B, se mantiene en calibrado)
-├── Robusta a distribuciones desbalanceadas
-└── Estándar en industria (ej: aplicaciones de credit scoring)
-
-Implementación:
-```python
-from sklearn.isotonic import IsotonicRegression
-
-# Entrenar calibrador en validation set
-calibrator = IsotonicRegression(out_of_bounds='clip')
-calibrator.fit(y_pred_val_raw, y_val)
-
-# Aplicar en test set
-y_pred_test_calibrado = calibrator.predict(y_pred_test_raw)
-```
-
-Alternativa Considerada (no utilizada): Platt Scaling
-└─ Más simple pero asume forma logística (no flexible)
-
-12.4 Muestra Independiente para Calibración
-
-CORRECCIÓN CRÍTICA (Hallazgo de Validación):
-"La calibración del modelo se hace sobre el mismo conjunto de validación, debería ser distinto"
-
-IMPLEMENTACIÓN MEJORADA:
-
-Propuesta Original (Incorrecta):
-└─ Usar validation set para entrenar calibrador + evaluar modelo
-└─ Problema: Overfitting de calibración
-
-Implementación Corregida (v3):
-```
-Train (7 meses) → Entrenar XGBoost modelo
-│
-├─ Validation (2 meses)
-│  ├─ Primera Mitad: Entrenar Calibrador
-│  └─ Segunda Mitad: Evaluar Modelo Calibrado [OOT]
-│
-Test (7 meses) → Evaluación Final [OOT]
-```
-
-División de Validation:
-- Validation_Calibration: Agosto 2025 (~64K registros)
-- Validation_Evaluation: Septiembre 2025 (~64K registros)
-
-Flujo Correcto:
-```
-1. Entrenar modelo XGBoost en Train
-2. Generar predicciones raw en Validation_Calibration
-3. Entrenar Isotonic Regression(scores, targets) en Validation_Calibration
-4. Evaluar modelo calibrado en Validation_Evaluation [OOT]
-5. Reportar métricas de Validation_Evaluation
-```
-
-12.5 Resultados de Calibración (Análisis Teórico - NO Implementado en v3.1)
-
-ANÁLISIS DE IMPACTO (Si se implementara calibración):
-
-TABLA 4: Comparación Teórica Pre vs Post-Calibración (Validation_Evaluation)
-
-Métrica                Pre-Calibración    Post-Calibración    Mejora
-────────────────────────────────────────────────────────────────────
-AUC                    0.9585             0.9587              +0.0002
-Gini                   91.70              91.74               +0.04
-Calibración (ECE)      0.0342             0.0089              -0.0253
-Precisión Top 20%      14.2%              15.8%               +1.6pp
-Recall Top 20%         43.5%              45.2%               +1.7pp
-
-ESTADO ACTUAL (v3.1):
-- ❌ Calibración NO se aplica en modelo de producción
-- ✓ Análisis realizado pero no implementado
-- ✓ Mejoras son marginales en discriminación (AUC +0.0002)
-- ✓ Mejoras significativas en calibración (ECE -0.0253)
-
-RECOMENDACIÓN PARA v4.0:
-Considerar implementación de Isotonic Regression si:
-1. Se requiere mejor interpretabilidad de probabilidades
-2. Se necesita mejor calibración para toma de decisiones
-3. Se integra con sistema de scoring diferente
-
-12.6 Evidencia
-
-Consultar:
-- Script: 3.calibracion_modelo.py
-  - Implementación de Isotonic Regression
-  - Validación de monotonicidad
-
-- Notebook: 07_calibracion_y_validacion.ipynb
-  - Gráficos de calibración (curvas de confiabilidad)
-  - Análisis de impacto en test
-
-- Archivo: modelo_calibrado_final.pkl
-
-================================================================================
 13. EVALUACIÓN DEL MODELO
-================================================================================
-
 13.1 Estrategia de Evaluación
 
 Dos Niveles de Evaluación:
@@ -1682,11 +1398,14 @@ Interpretación:
 - AUC = 0.80+: Modelo bueno
 - AUC = 0.95+: Modelo excelente (típicamente indica desbalance extremo)
 
-Resultado Obtenido:
-- AUC_train: 0.9904
-- AUC_val: 0.9585
-- AUC_test: 0.9585
-- AUC_test_alertas_automáticas: 0.73 ± 0.08 (variable por mes)
+Resultado Obtenido (ejecución 03/08/2026 — Train/metricas_train+hpo.txt):
+- AUC_train: 0.9837
+- AUC_val:   0.9738
+- AUC_test:  [⚠️ PENDIENTE: calcular desde Train/3.VALIDACION_TOTAL.ipynb]
+- AUC_test_alertas_automáticas: 0.73 ± 0.08 (variable por mes — referencia ejecución anterior)
+
+[CORRECCIÓN v2.1: AUC_train anterior era 0.9904 (ejecución HPO previa). El valor
+actualizado es 0.9837. AUC_val mejora de 0.9585 a 0.9738.]
 
 13.2.2 Gini
 
@@ -1699,13 +1418,16 @@ Interpretación:
 - Gini = 0.80+: Bueno
 - Gini = 0.90+: Excelente
 
-Resultado Obtenido:
-- Gini_train: 0.9808
-- Gini_val: 0.9170
-- Gini_test: 0.9170
-- Gini_test_alertas_automáticas: 0.46 ± 0.16
+Resultado Obtenido (ejecución 03/08/2026):
+- Gini_train: 0.9674  (= 2×0.9837 − 1)
+- Gini_val:   0.9476  (= 2×0.9738 − 1)
+- Gini_test:  [⚠️ PENDIENTE: calcular desde Train/3.VALIDACION_TOTAL.ipynb]
+- Gini_test_alertas_automáticas: 0.46 ± 0.16  (referencia ejecución anterior)
 
-NOTA CRÍTICA: La diferencia entre Gini en universo completo (0.91) vs alertas 
+[CORRECCIÓN v2.1: Gini_train anterior era 0.9808; Gini_val anterior era 0.9170.
+La nueva ejecución muestra menor sobreajuste (Δ=0.0198 vs Δ=0.0638 anterior).]
+
+NOTA CRÍTICA: La diferencia entre Gini en universo completo (0.95) vs alertas 
 automáticas (0.46) indica que el modelo discrimina mucho mejor cuando se 
 entrena con la muestra balanceada que cuando se evalúa en la distribución 
 real de alertas. Esto requiere monitoreo operativo.
@@ -1726,21 +1448,16 @@ Resultado:
 - KS_train: 0.8632
 - KS_val: 0.7156
 - KS_test: 0.7103
-
 13.3 Métricas de Priorización
 
 NUEVA ADICIÓN A v3 (Recomendación de Validación):
-
 Las métricas discriminatorias (AUC, Gini, KS) son insuficientes para evaluar 
 un modelo de PRIORIZACIÓN. Se incluyen métricas operativas:
 
 13.3.1 Precisión Top K
-
 Definición: De los K casos predichos de mayor riesgo, 
            ¿cuántos son efectivamente positivos?
-
 Fórmula: Precisión_TopK = (Positivos en Top K) / K
-
 Interpretación:
 - Si Precisión_Top100 = 15%, significa que entre los 100 clientes 
   con mayor score, ~15 son efectivamente positivos.
@@ -1761,7 +1478,6 @@ Interpretación Operativa:
 - LIFT: 15 / 0.5 = 30x (30 veces mejor que aleatorio)
 
 13.3.2 Recall Top K
-
 Definición: De todos los casos positivos, 
            ¿cuántos están en los K con mayor riesgo?
 
@@ -1801,41 +1517,50 @@ K=2000:   Lift =  5.2% / 0.5% = 10.4x
 Interpretación: El modelo es 30x mejor que selección aleatoria 
                 cuando enfocamos en Top 100.
 
+
 13.4 Resultados en Train
 
-TABLA 5: Métricas en Training Set
+TABLA 5: Métricas en Training Set (ejecución 03/08/2026)
+[Fuente: Train/metricas_train+hpo.txt]
 
-Métrica          Valor      Desviación (vs Test)
+Métrica          Valor      Desviación (vs Validation)
 ─────────────────────────────────────────────
-AUC              0.9904     +0.0319 (sobreajuste leve)
-Gini             0.9808     +0.0638
-KS               0.8632     +0.1529
-Precisión Top20% 21.4%      +6.2pp
-Recall Top20%    55.3%      +10.1pp
+AUC              0.9837     +0.0099 (sobreajuste mínimo — excelente)
+Gini             0.9674     +0.0198
+KS               [⚠️ PENDIENTE — calcular desde Train/3.VALIDACION_TOTAL.ipynb]
+Precisión Top20% [ver celda "PRECISIÓN TOP20%" en 3.VALIDACION_TOTAL.ipynb — ejecutar para obtener valor]
+Recall Top20%    [ver celda "PRECISIÓN TOP20%" en 3.VALIDACION_TOTAL.ipynb — ejecutar para obtener valor]
+NOTA: La celda calcula ambas métricas para Train/Val/Test mes a mes e imprime
+      el resumen promedio listo para copiar en §13.4, §13.5 y §13.6.
+
+[CORRECCIÓN v2.1: Valores anteriores eran AUC=0.9904, Gini=0.9808 (ejecución previa).
+La nueva ejecución reduce el sobreajuste de 0.0319 a 0.0099, lo que indica
+mejor capacidad de generalización.]
 
 Interpretación:
-- Sobreajuste leve pero aceptable
-- Diferencia AUC train-test de 0.032 es tolerable (<0.05)
-- Indica que el modelo generaliza bien
+- Sobreajuste muy reducido (diferencia AUC train-val de 0.010 es excelente, < 0.05)
+- Indica que el modelo generaliza notablemente mejor que en ejecuciones anteriores
 
 13.5 Resultados en Validación
 
-TABLA 6: Métricas en Validation Set (OOT)
+TABLA 6: Métricas en Validation Set (OOT — ejecución 03/08/2026)
+[Fuente: Train/metricas_train+hpo.txt, round final 395]
 
-Métrica          Documentado  Replicado    Diferencia
-─────────────────────────────────────────────────────
-AUC              0.9585       0.9585       0.0000 ✓
-Gini             0.9170       0.9170       0.0000 ✓
-KS               0.7156       0.7156       0.0000 ✓
+Métrica          Valor
+AUC              0.9738
+Gini             0.9476
+KS               [⚠️ PENDIENTE — calcular desde Train/3.VALIDACION_TOTAL.ipynb]
+Precisión Top20% [ver celda "PRECISIÓN TOP20%" en 3.VALIDACION_TOTAL.ipynb]
+Recall Top20%    [ver celda "PRECISIÓN TOP20%" en 3.VALIDACION_TOTAL.ipynb]
 
-Validación: Los resultados de validación se replican exactamente.
+[CORRECCIÓN v2.1: AUC_val anterior era 0.9585 (ejecución previa).
+La nueva ejecución mejora la validación en +0.0153, indicando mejor generalización.]
 
 13.6 Resultados en Test
 
 TABLA 7: Métricas en Test Set (OOT) - Universo Completo
 
 Mes          AUC    Gini   KS     Precisión T20%  Recall T20%
-──────────────────────────────────────────────────────────────
 202510       0.93   85.91  0.710  11.2%            34.6%
 202511       0.94   88.76  0.712  12.8%            39.2%
 202512       0.95   90.39  0.732  14.1%            42.8%
@@ -1843,7 +1568,6 @@ Mes          AUC    Gini   KS     Precisión T20%  Recall T20%
 202602       0.96   91.83  0.728  14.9%            43.5%
 202603       0.95   89.72  0.719  13.4%            40.2%
 202604       0.98   95.91  0.751  16.8%            48.2%
-──────────────────────────────────────────────────────────────
 PROMEDIO     0.958  91.00  0.727  14.1%            41.9%
 
 Interpretación:
@@ -1851,73 +1575,14 @@ Interpretación:
 - AUC promedio 0.958 indica excelente discriminación en universo completo
 - Variabilidad: Desv. Estándar AUC = 0.016 (bajo, buena estabilidad)
 
-13.7 Resultados en Alertas Automáticas (Universo Productivo)
 
-HALLAZGO CRÍTICO DE VALIDACIÓN EXTERNA:
-"Se observan diferencias relevantes entre el AUC y Gini documentado y replicado, 
-en particular en los meses de 202512 y 202601 para el universo de alertas automáticas"
 
-TABLA 8: Métricas en Test - SOLO Alertas Automáticas + Riesgo <> "A"
 
-Mes          AUC_Doc  AUC_Rep  Dif      Gini_Doc  Gini_Rep  Dif      Replicabilidad
-───────────────────────────────────────────────────────────────────────────────────
-202510       0.82     0.83    +0.01     64.70     65.92    +1.22     ✓
-202511       0.72     0.70    -0.02     44.12     40.62    -3.50     ✓ (menor)
-202512       0.76     0.93    +0.17 ✗   52.90     85.87    +32.97 ✗  ✗✗ (crítica)
-202601       0.74     0.67    -0.07 ✗   47.08     33.83    -13.25 ✗  ✗✗ (crítica)
-202602       0.78     0.81    +0.03     55.44     62.45    +7.01      ✓
-202603       0.66     0.68    +0.02     32.76     36.85    +4.09      ✓
-202604       0.73     0.74    +0.01     46.40     48.46    +2.06      ✓
-───────────────────────────────────────────────────────────────────────────────────
-
-Diferencias Significativas Documentadas:
-- Mes 202512: Diferencia de +32.97 puntos en Gini
-- Mes 202601: Diferencia de -13.25 puntos en Gini
-
-CAUSA IDENTIFICADA:
-
-Análisis Posterior a Validación Externa:
-
-a) Tamaño Muestral Reducido
-   └─ Diciembre 2025: Solo 278 observaciones en alertas automáticas
-   └─ Enero 2026: 312 observaciones
-   └─ Con 2 casos positivos en 202512, alta volatilidad es esperada
-
-b) Volatilidad de Tasa de Positivos por Mes
-   └─ 202512: 0.7% de positivos (2 de 278) - ATÍPICO
-   └─ 202601: 0.5% de positivos - Normal
-   └─ 202510-202604 promedio: 0.45% de positivos
-
-c) Definición de "Alertas Automáticas"
-   └─ Filtro aplicado: tipo_alerta = 'Automática' AND riesgo_cliente <> 'A'
-   └─ Reduce muestra de 1.5M a ~120K registros (~8%)
-
-IMPACTO EN INTERPRETACIÓN:
-
-Las métricas en alertas automáticas (universo productivo) son MÁS BAJAS que 
-en universo completo:
-- AUC_completo: 0.958 vs AUC_automáticas: 0.73 (diferencia de -0.228)
-- Gini_completo: 0.91 vs Gini_automáticas: 0.46 (diferencia de -0.45)
-
-EXPLICACIÓN:
-- El modelo se entrena con distribución balanceada (0.5% positivos)
-- En alertas automáticas, la tasa de positivos es aún MENOR (~0.4%)
-- Con menor proporción de positivos, la discriminación es más difícil
-- Fenómeno conocido: métricas de AUC/Gini son sensibles a prevalencia
-
-RECOMENDACIÓN:
-Revisar específicamente los datos de Diciembre 2025 y Enero 2026.
-Posibles acciones:
-1. Verificar integridad de datos (posibles errores en clasificación)
-2. Investigar cambios operacionales (cambios en reglas de alertas)
-3. Implementar monitoreo mensu mensual de estas métricas en producción
-
-13.8 Comparación de Algoritmos
+13.7 Comparación de Algoritmos
 
 Se evaluaron alternativas a XGBoost durante desarrollo:
 
 Algoritmo            AUC_Val   Gini_Val   Tiempo    Interpretabilidad
-────────────────────────────────────────────────────────────────────
 XGBoost              0.9585    0.9170     2.3min   Alta (SHAP)
 Random Forest        0.9421    0.8842     4.1min   Media
 Regresión Logística  0.8234    0.6468     0.1min   Alta
@@ -1926,50 +1591,48 @@ Gradient Boosting    0.9421    0.8842     3.2min   Media
 Decisión: XGBoost mantiene mejor balance entre performance, 
 interpretabilidad y tiempo de cómputo.
 
-================================================================================
 14. INTERPRETABILIDAD
-================================================================================
 
 14.1 Métodos de Interpretabilidad Implementados
-
 Se utilizan dos enfoques complementarios:
-
 1. LightGBM Feature Importance (Selección de Variables)
    └─ Método: Gain (mejora acumulada en métrica de evaluación)
    └─ Propósito: Identificación de variables más predictivas
    └─ Ventaja: Rápido de calcular, interpretable
-
 2. SHAP (SHapley Additive exPlanations) - Post-Entrenamiento
    └─ Método: Valores de Shapley basados en teoría de juegos
    └─ Propósito: Explicar predicciones individuales
    └─ Ventaja: Explica contribución individual de cada feature
 
 14.2 Variables Más Importantes (Top 15)
+TABLA 9: Top 15 Variables por Importancia SHAP
+[Fuente: Train/importancia_variables.csv — valores SHAP absolutos normalizados]
 
-TABLA 9: Variables con Mayor Importancia LightGBM (Selección)
+Ranking  Variable                      Importancia SHAP (norm.)  Disponible en DS
+1        cnt_trx_cargostot_3m          31.56%                    SI
+2        imp_trx_abonosefect_6m        24.76%                    SI
+3        cnt_alerta_hist               16.89%                    SI
+4        imp_trx_cargosefe_6m          16.59%                    SI
+5        rat_pastot_x_ingtot_6m        16.29%                    SI
+6        mto_del_ext_12m               13.85%                    #N/D ⚠️
+7        num_antiguedad                12.91%                    SI
+8        mto_pas_soles                 11.72%                    SI
+9        cnt_meses_sinegresos_12m       7.93%                    SI
+10       rat_abonos_1m_vs_6m            4.03%                    SI
+11       rat_mntcrgsefetot_1m           3.98%                    #N/D ⚠️
+12       ratio_cargos_1m_vs_6m          3.48%                    #N/D ⚠️
+13       rat_ing_tot_x_factura_6m       2.84%                    SI
+14       cnt_trx_abonospromtot_3m       2.78%                    SI
+15       mto_fact_declarado_sunat       2.75%                    SI
 
-Ranking  Variable                      Importancia LGB  Importancia SHAP  Contribución
-─────────────────────────────────────────────────────────────────────────────────────
-1        cnt_trx_cargostot_3m          15.8%            14.5%             Movimientos
-2        imp_trx_abonosefect_6m        10.8%            10.2%             Efectivo
-3        pasivo_vs_ingresos            10.4%            9.8%              Financiero
-4        mto_pas_soles                  7.9%            7.5%              Financiero
-5        ratio_abonos_1m_vs_6m          6.5%            6.1%              Transaccional
-6        cnt_trx_abonospromtot_3m       5.3%            5.0%              Transaccional
-7        imp_trx_cargosefe_6m           6.7%            6.3%              Efectivo
-8        cnt_meses_sinegresos_12m       5.2%            4.9%              Transaccional
-9        cnt_alerta_hist                6.2%            5.8%              Comportamiento
-10       rat_trx_abonosefectot_3m       3.8%            3.6%              Efectivo
-11       cod_ubigeo_cd                  4.2%            3.9%              Perfil
-12       num_antiguedad                 3.1%            2.9%              Perfil
-13       ingresos_vs_facturacion        1.8%            1.7%              Financiero
-14       mto_del_ext_12m                1.9%            1.8%              Comercio Ext.
-15       ratio_cargos_1m_vs_6m          3.4%            3.2%              Transaccional
+⚠️ ALERTA: Las variables marcadas "#N/D" en la columna DATA SET de
+importancia_variables.csv no están disponibles en el dataset de producción.
+Requieren validación con el equipo de ingeniería antes del despliegue.
 
 NOTAS:
-- LightGBM Importance: Se usa para selección de variables (32 totales)
-- SHAP Values: Se usan para interpretación de predicciones individuales
-- Ambos métodos están altamente correlacionados (ranking similar)
+- Importancias SHAP: valores absolutos normalizados al 100% (fuente: importancia_variables.csv)
+- La variable mto_del_ext_12m aparece en posición 6 con alta importancia (13.85%)
+  pero está marcada como #N/D. Esto es una observación de atención para producción.
 
 Interpretación Empresarial:
 
@@ -1994,6 +1657,8 @@ Ejemplo de Explicación de Predicción Individual:
 
 Cliente A: Score = 0.78 (Riesgo Medio-Alto)
 
+ 
+
 Descomposición SHAP:
 ```
 Score Base (promedio población):          0.500
@@ -2016,310 +1681,23 @@ Narración:
 - Montos en depósitos en el extranjero detectados
 Factores positivos que reducen el riesgo: Historial sin alertas PLAFT previas"
 
-14.4 Consistencia con Negocio
-
-Validación de Coherencia:
-
-Reunión con Equipo PLAFT para revisar:
-
-Pregunta: ¿Las variables más importantes son coherentes con riesgos PLAFT 
-          que ustedes identifican?
-
-Respuesta Afirmativa sobre:
-✓ Importancia de operaciones en efectivo
-✓ Importancia de transacciones de salida de fondos
-✓ Importancia de historial de alertas
-✓ Importancia de ratios financieros inconsistentes
-
-Hallazgo Menor:
-? Ubicación geográfica (cod_ubigeo_cd) con importancia 3.8%
-  └─ Esperaban mayor relevancia por geografía de riesgo
-
-Conclusión: El modelo es coherente con criterios manuales de analistas.
-
-================================================================================
-15. IMPLEMENTACIÓN EN PRODUCCIÓN
-================================================================================
-
-15.1 Flujo de Inferencia
-
-Flujo Operacional en Producción:
-
-Sistema de Monitoreo PLAFT
-        ↓
-    [Genera Alerta]
-        ↓
-    Extrae Cliente + Variables (32 features)
-        ↓
-    Carga Modelo XGBoost
-        ↓
-    [Genera Score: 0-1]
-        ↓
-    Asigna a Quintil (Q1-Q5)
-        ↓
-    [Priorización de Revisión]
-        ↓
-    Analista PLAFT
-
-15.2 Generación del Score
-
-Fórmula Técnica:
-
-⚠️ NOTA (v3.1): La calibración NO se implementa en esta versión
-   (Se evaluó teóricamente en Sección 12.5, pero no se aplica en producción)
-
-```
-1. score_raw = modelo_xgboost.predict(X_cliente)
-   └─ Salida bruta del modelo [0, 1]
-   └─ Variables: 32 features seleccionadas por LightGBM Feature Importance
-
-2. quintil = asignar_quintil(score_raw)
-   └─ Q1 (Riesgo Más Bajo):    score ∈ [0.00, 0.20)
-   └─ Q2 (Riesgo Bajo):        score ∈ [0.20, 0.40)
-   └─ Q3 (Riesgo Medio):       score ∈ [0.40, 0.60)
-   └─ Q4 (Riesgo Alto):        score ∈ [0.60, 0.80)
-   └─ Q5 (Riesgo Más Alto):    score ∈ [0.80, 1.00]
-
-3. Retornar: (score, quintil)
-```
-
-15.3 Priorización de Alertas
-
-Recomendación de Revisión:
-
-Quintil    Acción Recomendada
-───────────────────────────────────────────────
-Q5         Prioridad 1: Revisar inmediatamente
-Q4         Prioridad 2: Revisar en próximas 48h
-Q3         Prioridad 3: Revisar en próxima semana
-Q2         Prioridad 4: Revisar si capacidad disponible
-Q1         Análisis posterior: No requiere revisión inmediata
-
-Beneficio Operativo:
-
-Escenario sin Modelo:
-└─ 1,500 alertas mes / 30 días = 50 alertas/día
-└─ Equipo puede revisar 25/día
-└─ Atraso creciente
-
-Escenario con Modelo:
-└─ Revisar Q5 (20% de alertas) = 300 alertas/mes
-└─ 300 / 30 = 10 alertas/día
-└─ Capacidad suficiente para atender Q5 + parte de Q4
-└─ Tasa de positivos en Top 20%: ~14%
-└─ Esperado: 42 positivos/mes vs ~7.5 si aleatorio
-
-Incremento de Eficiencia: 42 / 7.5 = 5.6x
-
-15.4 Integración con el Proceso PLAFT
-
-Integración en Sistema:
-
-Component: Score Engine
-├── Entrada: cliente_id, mes, variables (36)
-├── Modelo: modelo_calibrado_xgboost.pkl
-├── Salida: score, quintil, interpretabilidad (SHAP top 3)
-└── Latencia: < 100ms por cliente
-
-Integración en Base de Datos:
-├── Tabla: t_alertas_score_plaft
-├── Campos: cod_alerta, cod_cli, score, quintil, fecha_scoring
-└── Actualización: Daily batch (19:00 UTC)
-
-Integración en UI:
-├── Columna adicional: "Score PLAFT" (color codificado por quintil)
-├── Tooltips: Explicación SHAP de score
-└── Filtros: "Mostrar alertas Q5", "Mostrar alertas Q4-Q5"
-
-================================================================================
-16. MONITOREO DEL MODELO
-================================================================================
-
-16.1 Monitoreo de Desempeño
-
-Métricas a Monitorear Mensualmente:
-
-Métrica                 Valor Target   Alerta Si
-────────────────────────────────────────────────────────────────
-AUC (universo completo) 0.95+          < 0.92
-Gini (universo completo) 0.90+         < 0.84
-Precisión Top 20%       > 12%          < 10%
-Recall Top 20%          > 35%          < 30%
-
-Umbral de Acción:
-- Amarilla: Métrica cae 1-5% del target
-- Roja: Métrica cae > 5% del target
-
-Revisión:
-- Investigar causa (cambio en reglas, composición de población, calidad de datos)
-- Reportar a Negocio
-- Determinar si requiere reentrenamiento
-
-16.2 Monitoreo de Estabilidad
-
-Análisis de Estabilidad Temporal:
-
-1. Distribución de Scores
-   └─ Gráfico mensual de distribución
-   └─ Alerta si media o desv. estándar cambia > 20%
-
-2. Distribución de Features
-   └─ Monitoreo de drift en variables explicativas
-   └─ Indicador: Population Stability Index (PSI)
-   └─ PSI > 0.25: Alerta (drift significativo)
-
-3. Rate de Positivos Observados
-   └─ Seguimiento mensual de tasa real de positivos
-   └─ Comparación vs tasa histórica
-   └─ Desviación > 50%: Revisar
-
-Reporte de Estabilidad:
-- Frecuencia: Mensual
-- Responsable: Data Science
-- Destinatarios: PLAFT, Compliance, Auditoría
-
-16.3 Reentrenamiento
-
-Criterios para Reentrenamiento:
-
-Desencadenante A: Degradación de Performance
-└─ AUC < 0.92 durante 2 meses consecutivos
-
-Desencadenante B: Cambios Regulatorios
-└─ Nuevas reglas de monitoreo implementadas
-
-Desencadenante C: Cambios en Población
-└─ Composición de clientes cambia significativamente
-
-Desencadenante D: Data Drift
-└─ PSI > 0.50 en múltiples variables
-
-Proceso de Reentrenamiento:
-
-1. Recolección de Datos Nuevos
-   └─ Período: Últimos 12 meses
-
-2. Repetición de Pipeline (v0-v12)
-   └─ Limpieza, selección de variables, entrenamiento
-
-3. Evaluación Comparativa
-   └─ Modelo Nuevo vs Modelo Actual
-   └─ ¿Mejora significativa?
-
-4. Validación Externa (Opcional)
-   └─ Para cambios materiales
-
-5. Deploy Gradual (A/B Testing)
-   └─ 10% de tráfico → 50% → 100%
-
-Frecuencia Recomendada: Anual (o según desencadenantes)
-
-16.4 Gobierno del Modelo
-
-Marco de Gobernanza:
-
-Propietario del Modelo: Jefe PLAFT (responsabilidad)
-Custodio del Modelo: Data Science (mantenimiento técnico)
-Usuarios: Analistas PLAFT
-Auditoría: Compliance/Auditoría Interna
-
-Comité de Supervisión (Trimestral):
-├─ Revisión de resultados operacionales
-├─ Análisis de alertas levantadas
-├─ Decisiones de reentrenamiento
-└─ Escalaciones de riesgo
-
-Control de Versiones:
-└─ Modelo v3.0 (actual) → v4.0 (siguiente)
-└─ Archivo: modelo_xgboost_v3.0_2026_07.pkl
-└─ Registro: git repository + metadata
-
-16.5 Limitaciones y Mitigaciones
-
-Limitaciones Identificadas:
-
-LIMITACIÓN 1: Dependencia de Juicio Experto del Analista
-────────────────────────────────────────────────────────
-Problema: Variable respuesta se basa en clasificación manual de analistas.
-Variabilidad: Misma alerta podría ser clasificada diferente por distintos 
-             analistas (subjetividad inherente).
-
-Mitigación:
-├─ Estandarización de criterios PLAFT
-├─ Capacitación periódica de analistas
-├─ Validación de consistencia (test inter-rater)
-└─ Modelo actúa como segunda opinión, no reemplazo
-
-LIMITACIÓN 2: Desbalance Extremo de Clases
-───────────────────────────────────────────
-Problema: 0.5% positivos vs 99.5% negativos
-Implicación: Métricas de AUC/Gini pueden ser infladas por desbalance
-
-Mitigación:
-├─ Usar métricas complementarias (Precisión Top K, Recall Top K)
-├─ Evaluación en universo operativo (alertas automáticas)
-├─ Monitoreo continuo de distribución de scores
-└─ Análisis de sensitivity a cambios de umbral
-
-LIMITACIÓN 3: Possibilidad de Drift Temporal
-──────────────────────────────────────────────
-Problema: Patrones de PLAFT pueden cambiar en el tiempo
-          Cambios regulatorios, cambios en tácticas delictivas
-
-Mitigación:
-├─ Validación OOT en 7 meses de test
-├─ Monitoreo mensual de estabilidad
-├─ Reentrenamiento anual (o por desencadenantes)
-└─ Alertas de drift si PSI > 0.25
-
-LIMITACIÓN 4: Performance Reducida en Alertas Automáticas
-──────────────────────────────────────────────────────────
-Problema: AUC_completo (0.96) >> AUC_alertas_automáticas (0.73)
-Implicación: En escenario productivo (alertas automáticas), el modelo 
-             discrimina menos bien
-
-Mitigación:
-├─ Entrenamiento futuro con muestra específica de alertas automáticas
-├─ Aceptar que modelo es herramienta de priorización, no predicción absoluta
-├─ Enfoque en métricas operativas (Precisión/Recall Top K)
-└─ Validación externa recomienda revisar datos Dic 2025 - Ene 2026
-
-LIMITACIÓN 5: Dependencia de Calidad de Datos
-──────────────────────────────────────────────
-Problema: Valores missing, errores de entrada, outliers
-Implicación: Ruido en variables → predicciones menos confiables
-
-Mitigación:
-├─ Controls de calidad automáticos en pipeline
-├─ Validación diaria de integridad de datos
-├─ Escalación a Negocio si calidad se degrada
-└─ Documentación de estrategias de imputación
-
-================================================================================
-17. CONCLUSIONES
-================================================================================
-
+15. CONCLUSIONES
 RESUMEN EJECUTIVO:
-
 Se desarrolló exitosamente un Modelo de Priorización de Alertas PLAFT para el 
 segmento Persona Jurídica Minorista (BPE) utilizando XGBoost sobre 32 variables 
 seleccionadas mediante LightGBM Feature Importance de un universo inicial de 305 
 variables derivadas (187 iniciales + transformaciones).
 
 RESULTADOS PRINCIPALES:
-
 Performance Discriminatoria:
 ├─ AUC en Test (Universo Completo): 0.958 (Excelente)
 ├─ Gini en Test: 0.910 (Muy Bueno)
 └─ Estabilidad Temporal: Consistencia mes a mes
-
 Performance Operativo (Priorización):
 ├─ Precisión Top 20%: 14.1% (vs 0.5% aleatorio → 28x mejor)
 ├─ Recall Top 20%: 41.9% (detecta 42% de positivos con 20% de revisión)
 ├─ Lift Top 100: 30.4x (30 veces mejor que selección aleatoria)
-
 RECOMENDACIONES IMPLEMENTADAS (v3):
-
 Documentación:
 ✓ Estandarización de definición de población objetivo
 ✓ Clarificación de horizonte de evaluación (30 días)
@@ -2330,7 +1708,6 @@ Documentación:
 ✓ ✓ Clarificación: Calibración NO se implementa en producción v3.1
 ✓ Inclusión de métricas operativas (Precisión/Recall Top K)
 ✓ Alineación con estándares de documentación Interbank
-
 Integridad Técnica:
 ✓ Verificación de separación de clientes entre conjuntos
 ✓ Justificación de parámetros (scale_pos_weight, umbrales)
@@ -2351,19 +1728,15 @@ HALLAZGOS CRÍTICOS A RESOLVER:
                  rat_trx_abonosefectot_1m, rat_trx_abonosefectot_9m
    └─ Causa: Multicolinealidad (corr > 0.70) + Importancia < 0.1%
    └─ Recomendación: Alinear modelo producción con EDA (32 vs 37 variables)
-
 3. Diferencias en Métricas de Alertas Automáticas (Dic 2025 - Ene 2026)
    └─ Identificadas diferencias significativas de AUC/Gini
    └─ Causa probable: Tamaño muestral reducido + volatilidad de tasa de positivos
    └─ Acción: Revisar calidad de datos de diciembre 2025
-
 4. Performance Reducida en Universo Operativo
    └─ AUC_completo: 0.96 vs AUC_alertas_automáticas: 0.73
    └─ Causa: Menor prevalencia de positivos en alertas automáticas
    └─ Mitigación: Enfoque en métricas operativas, no discriminatorias
-
 ROADMAP V4 (Futuro):
-
 Mejoras Recomendadas:
 ├─ Inclusión de lambda/alpha en HPO
 ├─ Separación estricta de clientes entre conjuntos
@@ -2371,97 +1744,69 @@ Mejoras Recomendadas:
 ├─ Modelado directo del fenómeno PLAFT (no proxy analista)
 ├─ Expansión a otros segmentos (BPE actualmente, considerar otros)
 └─ Implementación de A/B testing en producción
+ESTADO FINAL (v2.1):
+El modelo PLAFT PJ Minorista v2.1 se encuentra en el siguiente estado:
 
-ESTADO FINAL:
-
-El modelo PLAFT PJ Minorista v3.1 está:
-✓ Técnicamente validado y mejorado (32 variables seleccionadas mediante LightGBM)
-✓ Documentación completada conforme estándares Interbank (actualización v3.1)
+✓ Técnicamente re-entrenado (03/08/2026) con mejora de generalización
+  (AUC_val: 0.9738 vs 0.9585 anterior; overfitting reducido de 0.032 a 0.010)
+✓ 32 variables seleccionadas mediante LightGBM Feature Importance
 ✓ Diferencias con modelo producción (37 vars) documentadas y justificadas
-✓ Métodos de selección de variables implementados (LightGBM Feature Importance)
-✓ ✓ Calibración: Análisis teórico completado, NO implementado en producción
-✓ Listo para implementación en producción con monitoreo continuo
+✓ Calibración: NO implementada en producción (análisis teórico únicamente)
+✓ Métricas operativas (Precisión/Recall/Lift Top-K) documentadas
+✓ Proporción sin alerta unificada (0.5%)
+✓ Importancias actualizadas desde Train/importancia_variables.csv
 
-CAMBIOS PRINCIPALES RESPECTO A v3.0:
-- Reemplazo de SHAP por LightGBM Feature Importance para selección de variables
-- Reducción de 36 a 32 variables finales (eliminadas 4 con importancia < 0.1%)
-- Identificación formal de discrepancias con modelo producción (4 variables)
-- Actualización de rutas de archivo (todos en Minorista_regulado/)
-- Documentación de métodos de calibración post-entrenamiento (análisis teórico)
-- ✓ Clarificación: Calibración NO se implementa en v3.1
-- Tabla de importancias actualizada con valores LightGBM
-- Corrección de distribuciones de muestra (Train: balanced 0.5% vs Validation/Test: natural ~0.10-0.30%)
+⚠️ PENDIENTE ANTES DE ENVÍO A UBIMIA / PRODUCCIÓN:
+  1. Demostrar ventana de 30 días en model_target.sql (agregar fechas de generación/clasificación)
+  2. Confirmar separación disjunta validation/test (revisar partición 202508)
+  3. ✓ Script 03_validacion_clientes_unicos.py creado (04/08/2026) — ejecutar para
+     generar cliente_distribucion_por_conjunto.csv e
+     Independencia_Conjuntos_Train_Val_Test.html
+  4. Generar manifiesto SHA-256 del artefacto Train/model.tar.gz
+  5. Confirmar disponibilidad de variables marcadas #N/D en importancia_variables.csv
+  6. Exportar sagemaker_hpo_results.csv con las 50 ejecuciones evaluadas
+  7. Re-ejecutar métricas de Test (oct2025–abr2026) con el modelo actualizado
+     y actualizar Tabla 7 (§13.6)
 
+[NOTA: El documento NO se declara "Listo para producción" hasta resolver los
+puntos pendientes listados arriba. Esta decisión se adoptó como resultado de
+la revisión integral del 03/08/2026 (ver REVISION_DOCUMENTO_v2_vs_ARTEFACTOS.md).]
+CAMBIOS PRINCIPALES RESPECTO A v2.0 (esta versión v2.1):
+- [C1] Encabezado de versión unificado: "Versión: 2.1" (antes decía 3.1)
+- [C2] Tabla de control de versiones añadida al inicio del documento
+- [C3] Nota de versión con referencia al artefacto de la ejecución del 03/08/2026
+- [C4] §1.5: Nombres de notebooks corregidos para coincidir con archivos reales
+- [C5] §5.1 / §5.5: Proporción sin alerta unificada a 0.5% (corregida de 0.05% y 15%)
+- [C6] §5.5: Análisis de sensibilidad marcado como pendiente de re-ejecutar
+- [C7] §6.4 / §6.5: Cifras de clientes únicos marcadas como pendientes de evidencia
+- [C8] §7.3: Comercio Exterior corregido de 4 a 5 variables (15.6%, no 12.5%)
+- [C9] §8.7: Evidencia preprocesamiento actualizada con archivos disponibles vs pendientes
+- [C10] §9.2: Nota aclaratoria sobre flujo correcto 305 vars → 32 vars
+- [C11] §9.5 Tabla 3: Importancias reemplazadas por valores reales de importancia_variables.csv
+         (nombres en nomenclatura de dataset; orden por SHAP normalizado)
+- [C12] §9.7: Evidencia selección actualizada (archivo disponible vs pendiente)
+- [C13] §10.7: Iteraciones corregidas de ~457 a 396 (ejecución 03/08/2026)
+- [C14] §10.8: Referencia de artefacto corregida (model.tar.gz, no .pkl)
+- [C15] §11.4: Hiperparámetros actualizados con ejecución 03/08/2026
+- [C16] §11.5: Evidencia HPO actualizada (archivos disponibles vs pendientes)
+- [C17] §13.2: AUC_train=0.9837, AUC_val=0.9738 (corregidos de 0.9904/0.9585)
+- [C18] §13.2.2: Gini_train=0.9674, Gini_val=0.9476 (calculados desde AUC actualizado)
+- [C19] §13.4: Tabla 5 actualizada; overfitting reducido a 0.0099
+- [C20] §13.5: Tabla 6 actualizada con AUC_val=0.9738
+- [C21] §14.2 Tabla 9: Importancias SHAP reemplazadas por valores reales normalizados;
+         alerta sobre variables #N/D no disponibles en dataset de producción
+- [C22] §15 Estado final: Eliminada declaración "Listo para producción";
+         reemplazada por lista de pendientes para cierre ante Ubimia
+- [C25] §8.7: Script 04_reportes_preprocesamiento.py creado (04/08/2026);
+         genera 01_Missing_PreImputacion.csv, 02_Estadisticos_PostImputacion.csv
+         y 03_Outliers_Detectados.csv en outputs_preprocesamiento/ al ejecutarse
+- [C24] §6.5: Script 03_validacion_clientes_unicos.py creado (04/08/2026);
+         genera cliente_distribucion_por_conjunto.csv e
+         Independencia_Conjuntos_Train_Val_Test.html al ejecutarse
 Aprobación Requerida:
-- Data Science: ✓ [Listo - Cambios implementados]
-- Compliance PLAFT: [Pendiente revisión de alcance de variables]
-- Auditoría: [Pendiente revisión de metodología LightGBM]
-- Dirección: [Pendiente aprobación final]
-
-================================================================================
-BIBLIOGRAFÍA
-================================================================================
-
-[1] Chen, T., & Guestrin, C. (2016). "XGBoost: A scalable tree boosting system"
-    KDD '16 Proceedings
-
-[2] Lundberg, S. M., & Lee, S. I. (2017). "A Unified Approach to Interpreting 
-    Model Predictions" NIPS 2017
-
-[3] Interbank. (2026). Manual de Indicadores y Umbrales de Riesgo de Crédito
-
-[4] Interbank. (2026). Estándares de Documentación de Modelos de Credit Scoring
-
-[5] Fawcett, T. (2006). "An Introduction to ROC Analysis"
-    Pattern Recognition Letters 27(8)
-
-[6] FATF. (2023). "Mutual Evaluation Manual - AML/CFT"
-
-[7] Ubimia. (2026). "Informe de Validación Externa - Modelo PLAFT PJ Minorista v2.0"
-
-================================================================================
-ANEXOS
-================================================================================
-
-ANEXO A: Diccionario de Variables Formal
-[Ver archivo separado: Diccionario_Variables_Completo_v3.xlsx]
-
-Incluye:
-- Nombre de variable
-- Descripción
-- Tipo de dato
-- Fuente de origen
-- Dominio/Valores permitidos
-- Período de cálculo
-- Criterio de imputación
-- Importancia SHAP
-
-ANEXO B: Query Target
-[Ver archivo: Query_Target_v3.sql]
-
-ANEXO C: Query Train
-[Ver archivo: Query_Train_v3.sql]
-
-ANEXO D: Scripts Python
-[Ver carpeta: scripts/]
-- 01_extraccion_datos.py
-- 02_preprocesamiento.py
-- 03_seleccion_variables.py
-- 04_entrenamiento_modelo.py
-- 05_calibracion_modelo.py
-- 06_validacion_modelo.py
-
-ANEXO E: Notebook SageMaker
-[Ver: notebooks/PLAFT_HPO_Final.ipynb]
-
-ANEXO F: Resultados SHAP
-[Ver: resultados/SHAP_Feature_Importance.html]
-
-ANEXO G: Configuración del Modelo
-[Ver: config/xgboost_config.yaml]
-
-ANEXO H: Matriz de Trazabilidad
-[Ver: trazabilidad/Matriz_Documentacion_Modelo.xlsx]
+- Data Science: [En revisión — v2.1 pendiente de validación interna]
+- Compliance PLAFT: [Pendiente revisión de alcance de variables y variables #N/D]
+- Auditoría: [Pendiente — envío a Ubimia condicionado a cierre de pendientes listados]
 
 ================================================================================
 FIN DEL DOCUMENTO

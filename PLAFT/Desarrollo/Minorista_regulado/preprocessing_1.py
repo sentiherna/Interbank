@@ -27,7 +27,7 @@ def process_data(df, target_1, sample=False, cols_Exclude=[]):
     return df
 
 def LecturaDatos(meses, cols_Exclude=[]):
-    df_path = '/opt/ml/processing/input/data_pn_total_expandido_new.parquet'
+    df_path = '/opt/ml/processing/input/data_pn_total_expandido_new_v1.parquet'
     print(f"Leyendo datos desde {df_path}")
     df = dd.read_parquet(df_path).compute()
 
@@ -46,25 +46,7 @@ def TratamientoDF(df, train=1):
     print("======Tratamiento")
     start_time = time.time()
 
-    df = df.fillna(0)
 
-    categorical_columns = [
-        "desc_provincia","cnt_ro_debajo_umbral","mto_fact_declarado_sunat","flg_activo_pep",
-               "desc_departamento", "cod_ubigeo_cd", "cod_sectorista_id", "cod_ciiu_v4","tipo_alerta_n2"]
-
-    for col in categorical_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-
-    df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mean())
-
- #   if train == 1:
-        # Solo eliminamos columnas que NO deben ir al modelo
-       # cols_drop = ["cod_mes", "key_value", "tipo_alerta_n2","cod_cli","codmes_lag1","max_trx_abonos_3m","trx_riesgo_cliente","flg_ros_12m",
-#"num_edad_constitucion","desc_nivel_rsg_lsb_tot","cod_ciiu_v4","flg_casos_hist","cnt_ro_debajo_umbral",
-#"flg_al_ext_12m","flg_pep","cod_rsg_pep","flg_activo_pep","flg_kyc_12m","flg_kyc_hist","cnt_kyc_hist",
-#"gap_riesgo_pep_lsb","desc_provincia","desc_departamento","max_mto_cpmening_12m","cnt_trx_al_ext_1000_12m","cnt_meses_siningresos_12m","alertas_por_antiguedad",
- #                   "flg_del_ext_12m",""]
- #       df = df.drop(columns=cols_drop, errors="ignore")
 
     DIR_COLUMNS = '/opt/ml/processing/input/Columns'
 
