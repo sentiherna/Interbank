@@ -1,0 +1,90 @@
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ── Entornos virtuales ───────────────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.*
+
+# ── Herramientas de calidad ──────────────────────────────────────────────────
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# ── Datos — NUNCA datos reales en el repositorio ────────────────────────────
+data/real/
+data/production/
+data/*.parquet
+data/*.csv
+data/*.json
+!data/synthetic/.gitkeep
+
+# ── Artefactos locales del grafo ─────────────────────────────────────────────
+runs/
+graph/
+variables/
+audit/
+
+# ── Secretos y credenciales ──────────────────────────────────────────────────
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+aws-credentials
+.aws/
+*credentials*
+*secret*
+
+# ── SageMaker / AWS local cache ──────────────────────────────────────────────
+.sagemaker/
+sagemaker_logs/
+
+# ── MLflow local ────────────────────────────────────────────────────────────
+mlruns/
+mlartifacts/
+
+# ── IDEs y editores ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/

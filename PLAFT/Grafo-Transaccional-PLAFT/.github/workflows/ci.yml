@@ -1,0 +1,40 @@
+name: CI — graph-plaft
+
+on:
+  push:
+    branches: ["main", "develop", "001-*"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  quality:
+    name: Calidad de código (ruff + mypy + pytest unitarios)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar dependencias de desarrollo
+        run: pip install -e ".[dev]"
+
+      - name: Verificar ausencia de secretos (check_secrets)
+        run: bash scripts/check_secrets.sh
+
+      - name: Linting con ruff
+        run: ruff check src tests
+
+      - name: Verificación de tipos con mypy
+        run: mypy src
+
+      - name: Pruebas unitarias
+        run: pytest tests/unit -m "not performance and not aws" --tb=short -q
+
+      - name: Pruebas de contrato
+        run: pytest tests/contract -m "not performance and not aws" --tb=short -q

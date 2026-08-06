@@ -1,0 +1,50 @@
+# Configuración para ejecución en AWS (producción)
+# Las rutas S3, roles IAM y nombres de recursos se leen desde
+# variables de entorno o AWS Secrets Manager — NUNCA en este archivo.
+
+environment: aws
+
+data_engine: spark         # pandas | spark
+graph_engine: graphframes  # networkx | graphframes
+log_level: INFO
+log_format: json
+
+storage:
+  # Reemplazar con bucket real via variable de entorno GRAPH_PLAFT_S3_BUCKET
+  base_path: s3://${GRAPH_PLAFT_S3_BUCKET}/graph-plaft
+  format: parquet
+
+mlflow:
+  enabled: true
+  # Reemplazar con URI del servidor MLflow interno vía variable de entorno
+  tracking_uri: ${MLFLOW_TRACKING_URI}
+  experiment_name: graph-plaft-prod
+
+feature_store:
+  enabled: true
+  # Nombre del Feature Group en SageMaker Feature Store
+  feature_group_name: plaft-graph-variables-v1
+  offline_store_s3_uri: s3://${GRAPH_PLAFT_S3_BUCKET}/feature-store
+
+glue:
+  enabled: true
+  database_name: graph_plaft_prod
+
+run_defaults:
+  expansion_depth: 1
+  date_cutoff: null        # null = usar fecha de corte del dataset
+  algorithm_seed: 42
+  observation_window_months: 12
+  signal_weights:
+    alerta: 0.7
+    ros: 1.0
+    pep: 0.3
+    caso: 0.9
+
+selection_criteria:
+  alerta: true
+  ros: true
+  pep: true
+  caso: true
+  lista_objetivo: true
+  regla: false

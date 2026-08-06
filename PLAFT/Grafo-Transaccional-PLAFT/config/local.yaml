@@ -1,0 +1,44 @@
+# Configuración para ejecución LOCAL (desarrollo y pruebas)
+# Usa pandas, NetworkX y almacenamiento en filesystem local.
+# NUNCA debe contener secretos ni datos reales.
+
+environment: local
+
+data_engine: pandas       # pandas | spark
+graph_engine: networkx    # networkx | graphframes
+log_level: DEBUG
+log_format: json          # json | text
+
+storage:
+  base_path: ./data/local
+  format: parquet
+
+mlflow:
+  enabled: true
+  tracking_uri: ./mlruns   # servidor local de MLflow
+  experiment_name: graph-plaft-local
+
+feature_store:
+  enabled: false           # Feature Store solo en AWS
+
+glue:
+  enabled: false
+
+run_defaults:
+  expansion_depth: 1
+  date_cutoff: null        # null = usar hoy
+  algorithm_seed: 42
+  observation_window_months: 12
+  signal_weights:
+    alerta: 0.7
+    ros: 1.0
+    pep: 0.3
+    caso: 0.9
+
+selection_criteria:
+  alerta: true
+  ros: true
+  pep: true
+  caso: true
+  lista_objetivo: false
+  regla: false
