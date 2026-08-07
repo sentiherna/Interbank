@@ -97,24 +97,24 @@ Cubre todos los patrones definidos en research.md y quickstart.md.
 **Entregable verificable**: Job de validación sobre datos sintéticos produce `quality_report.json` correcto;
 error crítico detiene el proceso con exit code ≠ 0.
 
-- [ ] T044 Implementar `src/graph_plaft/ingestion/data_engine.py` con interfaz abstracta `DataEngine` y métodos: `read_parquet`, `read_csv`, `write_parquet` (ADR-006)
-- [ ] T045 Implementar `src/graph_plaft/ingestion/pandas_engine.py` con `PandasEngine(DataEngine)` para modo local (pandas + pyarrow)
-- [ ] T046 Implementar `src/graph_plaft/ingestion/spark_engine.py` con `SparkEngine(DataEngine)` para modo PySpark; lectura/escritura S3
-- [ ] T047 Implementar `src/graph_plaft/ingestion/loaders.py` con función `load_dataset(source_name, engine, config, execution_id)` que registra versión y checksum del archivo fuente
-- [ ] T048 [P] Implementar `src/graph_plaft/ingestion/registry.py` con `DatasetRegistry` que registra nombre, ruta S3, versión, checksum y row_count por dataset por ejecución
-- [ ] T049 Implementar `src/graph_plaft/validation/rules.py` con reglas de validación para `clientes` (obligatorios, tipos, unicidad de clave primaria)
-- [ ] T050 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `cuentas`, `titularidades`, `productos`
-- [ ] T051 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `transferencias` (id_transaccion único en batch, estado en dominio, fecha ≤ fecha_corte, monto > 0 si EJECUTADA)
-- [ ] T052 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `alertas_plaft`, `ros`, `pep`, `casos_investigados`
-- [ ] T053 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `catalogo_documental`, `lista_objetivo`, `permisos_analistas`
-- [ ] T054 Implementar `src/graph_plaft/validation/quality.py` con `QualityChecker` que ejecuta todas las reglas, clasifica errores (CRITICAL/WARNING) y genera `ValidationReport`
-- [ ] T055 Implementar `src/graph_plaft/validation/temporal.py` con `apply_date_cutoff(df, date_col, date_cutoff)` que rechaza registros posteriores al corte
-- [ ] T056 [P] Implementar `src/graph_plaft/validation/deduplication.py` con `deduplicate_by_pk(df, pk_columns, source_name)` que retiene el primero y registra duplicados como advertencia
-- [ ] T057 Implementar lógica de detención controlada en `src/graph_plaft/validation/quality.py`: si `CriticalValidationError`, raise con mensaje estructurado y log completo del reporte
-- [ ] T058 [P] Crear `tests/unit/test_validation_rules.py` con pruebas de cada regla: fila válida pasa, fila inválida produce error con severidad correcta
-- [ ] T059 [P] Crear `tests/unit/test_temporal_cutoff.py` que verifica que transferencias posteriores al corte son rechazadas y anteriores son aceptadas
-- [ ] T060 [P] Crear `tests/integration/test_validation_pipeline.py` que ejecuta validación completa sobre datos sintéticos y verifica quality_report correcto
-- [ ] T061 Crear `tests/unit/test_critical_error_stops_pipeline.py` que verifica exit code ≠ 0 y log de error cuando hay error crítico
+- [X] T044 Implementar `src/graph_plaft/ingestion/data_engine.py` con interfaz abstracta `DataEngine` y métodos: `read_parquet`, `read_csv`, `write_parquet` (ADR-006)
+- [X] T045 Implementar `src/graph_plaft/ingestion/pandas_engine.py` con `PandasEngine(DataEngine)` para modo local (pandas + pyarrow)
+- [X] T046 Implementar `src/graph_plaft/ingestion/spark_engine.py` con `SparkEngine(DataEngine)` para modo PySpark; lectura/escritura S3
+- [X] T047 Implementar `src/graph_plaft/ingestion/loaders.py` con función `load_dataset(source_name, engine, config, execution_id)` que registra versión y checksum del archivo fuente
+- [X] T048 [P] Implementar `src/graph_plaft/ingestion/registry.py` con `DatasetRegistry` que registra nombre, ruta S3, versión, checksum y row_count por dataset por ejecución
+- [X] T049 Implementar `src/graph_plaft/validation/rules.py` con reglas de validación para `clientes` (obligatorios, tipos, unicidad de clave primaria)
+- [X] T050 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `cuentas`, `titularidades`, `productos`
+- [X] T051 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `transferencias` (id_transaccion único en batch, estado en dominio, fecha ≤ fecha_corte, monto > 0 si EJECUTADA)
+- [X] T052 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `alertas_plaft`, `ros`, `pep`, `casos_investigados`
+- [X] T053 [P] Implementar en `src/graph_plaft/validation/rules.py` reglas para `catalogo_documental`, `lista_objetivo`, `permisos_analistas`
+- [X] T054 Implementar `src/graph_plaft/validation/quality.py` con `QualityChecker` que ejecuta todas las reglas, clasifica errores (CRITICAL/WARNING) y genera `ValidationReport`
+- [X] T055 Implementar `src/graph_plaft/validation/temporal.py` con `apply_date_cutoff(df, date_col, date_cutoff)` que rechaza registros posteriores al corte
+- [X] T056 [P] Implementar `src/graph_plaft/validation/deduplication.py` con `deduplicate_by_pk(df, pk_columns, source_name)` que retiene el primero y registra duplicados como advertencia
+- [X] T057 Implementar lógica de detención controlada en `src/graph_plaft/validation/quality.py`: si `CriticalValidationError`, raise con mensaje estructurado y log completo del reporte
+- [X] T058 [P] Crear `tests/unit/test_validation_rules.py` con pruebas de cada regla: fila válida pasa, fila inválida produce error con severidad correcta
+- [X] T059 [P] Crear `tests/unit/test_temporal_cutoff.py` que verifica que transferencias posteriores al corte son rechazadas y anteriores son aceptadas
+- [X] T060 [P] Crear `tests/integration/test_validation_pipeline.py` que ejecuta validación completa sobre datos sintéticos y verifica quality_report correcto
+- [X] T061 Crear `tests/unit/test_critical_error_stops_pipeline.py` que verifica exit code ≠ 0 y log de error cuando hay error crítico
 
 ---
 
