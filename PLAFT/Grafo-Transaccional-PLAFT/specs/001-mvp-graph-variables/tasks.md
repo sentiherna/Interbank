@@ -51,21 +51,21 @@ Toda fase posterior depende de estos contratos.
 
 **Entregable verificable**: `pytest tests/contract/ -v` pasa para todos los esquemas con datos sintéticos mínimos.
 
-- [ ] T018 Implementar `src/graph_plaft/config/column_mapping.py` con capa de mapeo configurable entre nombres conceptuales y nombres físicos (a mapear en Fase 3 con datos reales)
-- [ ] T019 Implementar `src/graph_plaft/validation/schemas.py` con esquemas PySpark y pandas/PyArrow para: `clientes`, `cuentas`, `titularidades`, `productos`, `transferencias`
-- [ ] T020 [P] Implementar en `src/graph_plaft/validation/schemas.py` esquemas para: `alertas_plaft`, `ros`, `pep`, `casos_investigados`, `catalogo_documental`, `lista_objetivo`, `permisos_analistas`
-- [ ] T021 [P] Implementar `src/graph_plaft/graph/node_schemas.py` con esquemas para nodos: `Cliente`, `Cuenta`, `Producto`, `AlertaPLAFT`, `ROS`, `CondicionPEP`, `CasoInvestigado`, `Documento`
-- [ ] T022 [P] Implementar `src/graph_plaft/graph/edge_schemas.py` con esquemas para relaciones: `ES_TITULAR_DE`, `POSEE`, `TRANSFIERE_A`, `TIENE_ALERTA`, `TIENE_ROS`, `TIENE_CONDICION_PEP`, `TIENE_CASO`, `TIENE_DOCUMENTO`
-- [ ] T023 [P] Implementar `src/graph_plaft/analytics/result_schemas.py` con esquemas de salida para: `analytics_degree`, `analytics_pagerank`, `analytics_components`, `analytics_communities`, `analytics_risk_distance`
-- [ ] T024 [P] Implementar `src/graph_plaft/features/variable_schema.py` con esquema `variables_estructurales` (cliente_id, variable_nombre, categoria, valor, valor_nulo_razon, insumos, algoritmo, senales_origen, ventana_inicio, ventana_fin, fecha_calculo, graph_version, run_id)
-- [ ] T025 [P] Implementar `src/graph_plaft/observability/run_manifest.py` con dataclass `RunManifest` y serialización JSON según `data-model.md`
-- [ ] T026 [P] Implementar `src/graph_plaft/audit/audit_schema.py` con esquema del log de auditoría (audit_id, timestamp, usuario_id, accion, cliente_id, graph_version, datos_version, filtros_aplicados, documentos_consultados, exportacion_realizada, resultado, session_id)
-- [ ] T027 Implementar `src/graph_plaft/validation/contracts.py` con función `validate_schema(df, schema, source_name, execution_id)` que retorna `ValidationReport` con errores críticos y advertencias
-- [ ] T028 [P] Crear `tests/contract/test_input_schemas.py` con pruebas de validación de cada esquema de entrada contra datasets sintéticos mínimos (una fila válida + una inválida por regla)
-- [ ] T029 [P] Crear `tests/contract/test_node_schemas.py` con pruebas de validación de esquemas de nodos
-- [ ] T030 [P] Crear `tests/contract/test_edge_schemas.py` con pruebas de validación de esquemas de relaciones
-- [ ] T031 [P] Crear `tests/contract/test_variable_schema.py` con pruebas de esquema de variables (incluyendo nulos documentados)
-- [ ] T032 [P] Crear `contracts/mapeo_fisico_conceptual.md` como plantilla de mapeo con instrucciones para completar en Fase 3
+- [X] T018 Implementar `src/graph_plaft/config/column_mapping.py` con capa de mapeo configurable entre nombres conceptuales y nombres físicos (a mapear en Fase 3 con datos reales)
+- [X] T019 Implementar `src/graph_plaft/validation/schemas.py` con esquemas PySpark y pandas/PyArrow para: `clientes`, `cuentas`, `titularidades`, `productos`, `transferencias`
+- [X] T020 [P] Implementar en `src/graph_plaft/validation/schemas.py` esquemas para: `alertas_plaft`, `ros`, `pep`, `casos_investigados`, `catalogo_documental`, `lista_objetivo`, `permisos_analistas`
+- [X] T021 [P] Implementar `src/graph_plaft/graph/node_schemas.py` con esquemas para nodos: `Cliente`, `Cuenta`, `Producto`, `AlertaPLAFT`, `ROS`, `CondicionPEP`, `CasoInvestigado`, `Documento`
+- [X] T022 [P] Implementar `src/graph_plaft/graph/edge_schemas.py` con esquemas para relaciones: `ES_TITULAR_DE`, `POSEE`, `TRANSFIERE_A`, `TIENE_ALERTA`, `TIENE_ROS`, `TIENE_CONDICION_PEP`, `TIENE_CASO`, `TIENE_DOCUMENTO`
+- [X] T023 [P] Implementar `src/graph_plaft/analytics/result_schemas.py` con esquemas de salida para: `analytics_degree`, `analytics_pagerank`, `analytics_components`, `analytics_communities`, `analytics_risk_distance`
+- [X] T024 [P] Implementar `src/graph_plaft/features/variable_schema.py` con esquema `variables_estructurales` (cliente_id, variable_nombre, categoria, valor, valor_nulo_razon, insumos, algoritmo, senales_origen, ventana_inicio, ventana_fin, fecha_calculo, graph_version, run_id)
+- [X] T025 [P] Implementar `src/graph_plaft/observability/run_manifest.py` con dataclass `RunManifest` y serialización JSON según `data-model.md`
+- [X] T026 [P] Implementar `src/graph_plaft/audit/audit_schema.py` con esquema del log de auditoría (audit_id, timestamp, usuario_id, accion, cliente_id, graph_version, datos_version, filtros_aplicados, documentos_consultados, exportacion_realizada, resultado, session_id)
+- [X] T027 Implementar `src/graph_plaft/validation/contracts.py` con función `validate_schema(df, schema, source_name, execution_id)` que retorna `ValidationReport` con errores críticos y advertencias
+- [X] T028 [P] Crear `tests/contract/test_input_schemas.py` con pruebas de validación de cada esquema de entrada contra datasets sintéticos mínimos (una fila válida + una inválida por regla)
+- [X] T029 [P] Crear `tests/contract/test_node_schemas.py` con pruebas de validación de esquemas de nodos
+- [X] T030 [P] Crear `tests/contract/test_edge_schemas.py` con pruebas de validación de esquemas de relaciones
+- [X] T031 [P] Crear `tests/contract/test_variable_schema.py` con pruebas de esquema de variables (incluyendo nulos documentados)
+- [X] T032 [P] Crear `contracts/mapeo_fisico_conceptual.md` como plantilla de mapeo con instrucciones para completar en Fase 3
 
 ---
 
