@@ -44,6 +44,8 @@ data/production/
 data/*.parquet
 data/*.csv
 data/*.json
+data/synthetic/*.parquet
+data/synthetic/*.csv
 !data/synthetic/.gitkeep
 
 # ── Artefactos locales del grafo ─────────────────────────────────────────────

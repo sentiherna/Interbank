@@ -1,0 +1,146 @@
+{
+  "_description": "Expected analytics_degree values per client for the active transaction set (TX-001..TX-014).",
+  "_note": "Degree is computed at client level by aggregating over all accounts. Only EJECUTADA transactions within FECHA_CORTE are counted.",
+  "_active_tx": ["TX-001","TX-002","TX-003","TX-004","TX-005","TX-006",
+                 "TX-007","TX-008","TX-009","TX-010","TX-011",
+                 "TX-012","TX-013","TX-014"],
+  "clients": {
+    "CLI-001": {
+      "accounts": ["CTA-001","CTA-002"],
+      "out_degree": 6,
+      "in_degree": 0,
+      "total_degree": 6,
+      "tx_enviadas": 9,
+      "tx_recibidas": 0,
+      "monto_enviado_PEN": 26500.00,
+      "monto_enviado_USD": 3000.00,
+      "monto_recibido": 0,
+      "contrapartes_unicas": 6,
+      "counterparties": ["CLI-002","CLI-003","CLI-004","CLI-005","CLI-006","CLI-007"],
+      "patterns": ["P1_STAR","P2_CHAIN","P4_HUB_IN","P5_INTERMEDIARY","P6_MULTI_TX"]
+    },
+    "CLI-002": {
+      "accounts": ["CTA-003"],
+      "out_degree": 2,
+      "in_degree": 3,
+      "total_degree": 4,
+      "tx_enviadas": 2,
+      "tx_recibidas": 6,
+      "monto_enviado_PEN": 5500.00,
+      "monto_recibido_PEN": 14500.00,
+      "monto_recibido_USD": 3000.00,
+      "contrapartes_unicas": 4,
+      "counterparties_out": ["CLI-003","CLI-006"],
+      "counterparties_in": ["CLI-001","CLI-003","CLI-007"],
+      "patterns": ["P2_CHAIN","P3_CYCLE","P4_HUB_IN","P5_INTERMEDIARY","P6_MULTI_TX"]
+    },
+    "CLI-003": {
+      "accounts": ["CTA-004"],
+      "out_degree": 2,
+      "in_degree": 2,
+      "total_degree": 3,
+      "tx_enviadas": 2,
+      "tx_recibidas": 2,
+      "monto_enviado_PEN": 4000.00,
+      "monto_recibido_PEN": 5500.00,
+      "contrapartes_unicas": 3,
+      "counterparties_out": ["CLI-002","CLI-006"],
+      "counterparties_in": ["CLI-001","CLI-002"],
+      "patterns": ["P2_CHAIN","P3_CYCLE","P4_HUB_IN"]
+    },
+    "CLI-004": {
+      "accounts": ["CTA-005"],
+      "out_degree": 0,
+      "in_degree": 1,
+      "total_degree": 1,
+      "tx_enviadas": 0,
+      "tx_recibidas": 1,
+      "monto_enviado": 0,
+      "monto_recibido_PEN": 2000.00,
+      "contrapartes_unicas": 1,
+      "counterparties_in": ["CLI-001"],
+      "patterns": ["P1_STAR"]
+    },
+    "CLI-005": {
+      "accounts": ["CTA-006"],
+      "out_degree": 0,
+      "in_degree": 1,
+      "total_degree": 1,
+      "tx_enviadas": 0,
+      "tx_recibidas": 1,
+      "monto_enviado": 0,
+      "monto_recibido_PEN": 1500.00,
+      "contrapartes_unicas": 1,
+      "counterparties_in": ["CLI-001"],
+      "patterns": ["P1_STAR"]
+    },
+    "CLI-006": {
+      "accounts": ["CTA-007"],
+      "out_degree": 0,
+      "in_degree": 3,
+      "total_degree": 3,
+      "tx_enviadas": 0,
+      "tx_recibidas": 3,
+      "monto_enviado": 0,
+      "monto_recibido_PEN": 9000.00,
+      "contrapartes_unicas": 3,
+      "counterparties_in": ["CLI-001","CLI-002","CLI-003"],
+      "patterns": ["P4_HUB_IN"],
+      "note": "High in-degree hub; high PageRank expected"
+    },
+    "CLI-007": {
+      "accounts": ["CTA-008","CTA-009"],
+      "out_degree": 1,
+      "in_degree": 1,
+      "total_degree": 2,
+      "tx_enviadas": 1,
+      "tx_recibidas": 1,
+      "monto_enviado_PEN": 7500.00,
+      "monto_recibido_PEN": 8000.00,
+      "contrapartes_unicas": 2,
+      "counterparties_out": ["CLI-002"],
+      "counterparties_in": ["CLI-001"],
+      "patterns": ["P5_INTERMEDIARY"],
+      "note": "Bridge node; betweenness centrality > 0 expected"
+    },
+    "CLI-008": {
+      "accounts": ["CTA-009"],
+      "out_degree": 0,
+      "in_degree": 0,
+      "total_degree": 0,
+      "tx_enviadas": 0,
+      "tx_recibidas": 0,
+      "monto_enviado": 0,
+      "monto_recibido": 0,
+      "contrapartes_unicas": 0,
+      "note": "Isolated node — cotitular of CTA-009 (shared with CLI-007) but no transactions"
+    },
+    "CLI-009": {
+      "accounts": ["CTA-010"],
+      "out_degree": 0,
+      "in_degree": 0,
+      "total_degree": 0,
+      "tx_enviadas": 0,
+      "tx_recibidas": 0,
+      "note": "Isolated contraparte — no transactions in synthetic dataset"
+    },
+    "CLI-010": {
+      "accounts": ["CTA-011"],
+      "out_degree": 0,
+      "in_degree": 0,
+      "total_degree": 0,
+      "tx_enviadas": 0,
+      "tx_recibidas": 0,
+      "note": "Isolated contraparte — excluded from ANA-001 permissions (access rejection test)"
+    }
+  },
+  "connected_components": {
+    "component_1": {
+      "clients": ["CLI-001","CLI-002","CLI-003","CLI-004","CLI-005","CLI-006","CLI-007"],
+      "size": 7,
+      "note": "All connected via active transactions"
+    },
+    "component_2_isolated": ["CLI-008","CLI-009","CLI-010"],
+    "note": "CLI-008, CLI-009, CLI-010 form singleton components (no transactions)"
+  }
+}

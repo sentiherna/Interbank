@@ -1,0 +1,146 @@
+{
+  "_description": "Expected signal flags and counts per client in the synthetic dataset.",
+  "clients": {
+    "CLI-001": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": true,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "alertas": [
+        {"alerta_id": "ALT-001", "tipo": "LAVADO",         "estado": "ACTIVA"},
+        {"alerta_id": "ALT-002", "tipo": "ESTRATIFICACION","estado": "CERRADA"}
+      ],
+      "n_alertas": 2,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0
+    },
+    "CLI-002": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": true,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "alertas": [{"alerta_id": "ALT-003", "tipo": "LAVADO", "estado": "ACTIVA"}],
+      "n_alertas": 1,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0
+    },
+    "CLI-003": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": false,
+      "tiene_ros": true,
+      "es_pep": false,
+      "tiene_caso": false,
+      "ros": [{"ros_id": "ROS-001", "estado": "PRESENTADO"}],
+      "n_alertas": 0,
+      "n_ros": 1,
+      "n_pep": 0,
+      "n_casos": 0
+    },
+    "CLI-004": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": true,
+      "tiene_caso": false,
+      "pep": [{"pep_id": "PEP-001", "categoria": "NACIONAL", "vigente": true}],
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 1,
+      "n_casos": 0,
+      "note": "PEP is due-diligence factor only, not automatic suspicion indicator"
+    },
+    "CLI-005": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": true,
+      "casos": [{"caso_id": "CAS-001", "estado": "ABIERTO"}],
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 1
+    },
+    "CLI-006": {
+      "es_cliente_objetivo": true,
+      "tiene_alerta": true,
+      "tiene_ros": true,
+      "es_pep": true,
+      "tiene_caso": true,
+      "alertas": [{"alerta_id": "ALT-004", "tipo": "LAVADO", "estado": "ACTIVA"}],
+      "ros": [{"ros_id": "ROS-002", "estado": "EN_REVISION"}],
+      "pep": [{"pep_id": "PEP-002", "categoria": "FAMILIAR", "vigente": true}],
+      "casos": [{"caso_id": "CAS-002", "estado": "CERRADO", "resultado": "CONFIRMADO"}],
+      "n_alertas": 1,
+      "n_ros": 1,
+      "n_pep": 1,
+      "n_casos": 1,
+      "note": "Maximum signal density client — tests multi-signal variable differentiation"
+    },
+    "CLI-007": {
+      "es_cliente_objetivo": false,
+      "es_contraparte": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0
+    },
+    "CLI-008": {
+      "es_cliente_objetivo": false,
+      "es_contraparte": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0,
+      "note": "Cotitular of CTA-009 (shared with CLI-007)"
+    },
+    "CLI-009": {
+      "es_cliente_objetivo": false,
+      "es_contraparte": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0
+    },
+    "CLI-010": {
+      "es_cliente_objetivo": false,
+      "es_contraparte": true,
+      "tiene_alerta": false,
+      "tiene_ros": false,
+      "es_pep": false,
+      "tiene_caso": false,
+      "n_alertas": 0,
+      "n_ros": 0,
+      "n_pep": 0,
+      "n_casos": 0,
+      "note": "Excluded from ANA-001 permissions — access rejection test"
+    }
+  },
+  "summary": {
+    "total_clients": 10,
+    "objetivo_clients": 6,
+    "contraparte_clients": 4,
+    "clients_with_alerta": ["CLI-001","CLI-002","CLI-006"],
+    "clients_with_ros": ["CLI-003","CLI-006"],
+    "clients_with_pep": ["CLI-004","CLI-006"],
+    "clients_with_caso": ["CLI-005","CLI-006"],
+    "clients_with_multiple_signals": ["CLI-006"],
+    "clients_no_signals": ["CLI-007","CLI-008","CLI-009","CLI-010"]
+  }
+}

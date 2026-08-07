@@ -76,17 +76,17 @@ Cubre todos los patrones definidos en research.md y quickstart.md.
 
 **Entregable verificable**: `python scripts/generate_synthetic.py --seed 42` produce los mismos archivos Parquet en toda ejecución; checksums idénticos.
 
-- [ ] T033 Implementar `scripts/generate_synthetic.py` con argumento `--seed` y generación de todos los datasets sintéticos con pandas; salida en `data/synthetic/`
-- [ ] T034 [P] Crear `data/synthetic/generators/base.py` con `SyntheticDataGenerator` base que acepta semilla y garantiza reproducibilidad
-- [ ] T035 [P] Crear `data/synthetic/generators/clientes.py`: 10 clientes (2 con alerta, 1 con ROS, 1 PEP, 1 con caso, 1 con múltiples señales, 4 sin señales)
-- [ ] T036 [P] Crear `data/synthetic/generators/cuentas.py`: cuentas incluyendo cuenta compartida entre 2 titulares
-- [ ] T037 [P] Crear `data/synthetic/generators/transferencias.py`: patrones estrella, cadena, ciclo, hub, intermediario, múltiples TX entre mismas cuentas, anuladas, posteriores al corte
-- [ ] T038 [P] Crear `data/synthetic/generators/senales.py`: alertas, ROS, PEP, casos para clientes de `clientes.py`
-- [ ] T039 [P] Crear `data/synthetic/generators/documentos.py`: documentos válidos, documentos sin `referencia_s3`, documentos posteriores al corte
-- [ ] T040 [P] Crear `data/synthetic/generators/permisos.py`: analista con acceso a subconjunto de clientes (excluye al menos 1 cliente para pruebas de rechazo)
-- [ ] T041 Crear `data/synthetic/expected_outputs/` con archivos JSON que documentan valores esperados de variables para cada patrón sintético (grado, componente, PageRank, etc.)
-- [ ] T042 [P] Crear `tests/unit/test_synthetic_generators.py` que verifica reproducibilidad: dos generaciones con misma semilla producen checksums idénticos
-- [ ] T043 [P] Crear `data/synthetic/README.md` que documenta cada dataset sintético, patron incluido y valores esperados
+- [X] T033 Implementar `scripts/generate_synthetic.py` con argumento `--seed` y generación de todos los datasets sintéticos con pandas; salida en `data/synthetic/`
+- [X] T034 [P] Crear `data/synthetic/generators/base.py` con `SyntheticDataGenerator` base que acepta semilla y garantiza reproducibilidad
+- [X] T035 [P] Crear `data/synthetic/generators/clientes.py`: 10 clientes (2 con alerta, 1 con ROS, 1 PEP, 1 con caso, 1 con múltiples señales, 4 sin señales)
+- [X] T036 [P] Crear `data/synthetic/generators/cuentas.py`: cuentas incluyendo cuenta compartida entre 2 titulares
+- [X] T037 [P] Crear `data/synthetic/generators/transferencias.py`: patrones estrella, cadena, ciclo, hub, intermediario, múltiples TX entre mismas cuentas, anuladas, posteriores al corte
+- [X] T038 [P] Crear `data/synthetic/generators/senales.py`: alertas, ROS, PEP, casos para clientes de `clientes.py`
+- [X] T039 [P] Crear `data/synthetic/generators/documentos.py`: documentos válidos, documentos sin `referencia_s3`, documentos posteriores al corte
+- [X] T040 [P] Crear `data/synthetic/generators/permisos.py`: analista con acceso a subconjunto de clientes (excluye al menos 1 cliente para pruebas de rechazo)
+- [X] T041 Crear `data/synthetic/expected_outputs/` con archivos JSON que documentan valores esperados de variables para cada patrón sintético (grado, componente, PageRank, etc.)
+- [X] T042 [P] Crear `tests/unit/test_synthetic_generators.py` que verifica reproducibilidad: dos generaciones con misma semilla producen checksums idénticos
+- [X] T043 [P] Crear `data/synthetic/README.md` que documenta cada dataset sintético, patron incluido y valores esperados
 
 ---
 

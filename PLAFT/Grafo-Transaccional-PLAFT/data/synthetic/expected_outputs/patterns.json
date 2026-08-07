@@ -1,0 +1,53 @@
+{
+  "_description": "Transfer patterns in the synthetic dataset and their graph-analytics implications.",
+  "_fecha_corte": "2026-06-30",
+  "_active_transactions": ["TX-001","TX-002","TX-003","TX-004","TX-005","TX-006",
+                            "TX-007","TX-008","TX-009","TX-010","TX-011",
+                            "TX-012","TX-013","TX-014"],
+  "_excluded_transactions": {
+    "cancelled": ["TX-015","TX-016"],
+    "post_cutoff": ["TX-017"]
+  },
+  "patterns": {
+    "P1_STAR": {
+      "description": "CLI-001 (CTA-001) fans out to CLI-002, CLI-003, CLI-004, CLI-005, CLI-006",
+      "transactions": ["TX-001","TX-002","TX-003","TX-004"],
+      "expected_property": "CLI-001 has high out_degree; these 4 clients become immediate counterparties"
+    },
+    "P2_CHAIN": {
+      "description": "CLI-001 → CLI-002 → CLI-003 sequential relay",
+      "transactions": ["TX-001","TX-005"],
+      "expected_property": "CLI-002 acts as relay node with both in-edge (from C01) and out-edge (to C03)"
+    },
+    "P3_CYCLE": {
+      "description": "CLI-002 ↔ CLI-003 bidirectional cycle",
+      "transactions": ["TX-005","TX-006"],
+      "expected_property": "Cycle detection algorithm should flag this pair"
+    },
+    "P4_HUB_IN": {
+      "description": "CLI-001, CLI-002, CLI-003 all send to CLI-006",
+      "transactions": ["TX-007","TX-008","TX-009"],
+      "expected_property": "CLI-006 has in_degree=3 from hub pattern; high PageRank expected"
+    },
+    "P5_INTERMEDIARY": {
+      "description": "CLI-001 → CLI-007 → CLI-002 (bridge node)",
+      "transactions": ["TX-010","TX-011"],
+      "expected_property": "CLI-007 is an intermediary: betweenness centrality > 0"
+    },
+    "P6_MULTI_TX": {
+      "description": "Three separate CTA-002 → CTA-003 transfers (same account pair)",
+      "transactions": ["TX-012","TX-013","TX-014"],
+      "expected_property": "Transfers are NOT deduplicated; all three appear as distinct TRANSFIERE_A edges"
+    },
+    "P7_CANCELLED": {
+      "description": "ANULADA (TX-015) and REVERTIDA (TX-016) transactions",
+      "transactions": ["TX-015","TX-016"],
+      "expected_property": "Must not produce active TRANSFIERE_A edges in the graph"
+    },
+    "P8_POST_CUTOFF": {
+      "description": "One EJECUTADA transaction dated 2026-07-15 (after FECHA_CORTE)",
+      "transactions": ["TX-017"],
+      "expected_property": "Must be rejected by the temporal validation rule (TRF-Q05)"
+    }
+  }
+}
