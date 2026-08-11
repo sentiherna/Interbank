@@ -70,6 +70,92 @@ Las `12` normas no detectadas se explican principalmente por:
 - mezcla entre la fecha de publicacion y una fecha mencionada dentro del texto;
 - descarte por identidad inconsistente cuando el texto parecia una cita interna y no la norma publicada.
 
+### Plan de remediacion para llevar el recall a 95%
+
+El objetivo operativo acordado es llevar el recall del piloto desde `68.4%` a aproximadamente `95%`. Para eso no hace falta resolver 12 problemas distintos: los `12 FN` del piloto se agrupan en `4` causas raiz.
+
+Situacion base del piloto:
+
+- `TP = 26`
+- `FN = 12`
+- Recall actual: `26 / 38 = 68.4%`
+
+Meta de remediacion:
+
+- recuperar al menos `10` de los `12 FN`
+- recall esperado: `36 / 38 = 94.7%`
+
+#### Bloques de solucion
+
+1. Rescate desde manifiesto oficial de El Peruano
+
+   Impacto esperado: `+8 FN recuperados`
+
+   Problema que resuelve:
+   - normas publicadas en la fuente oficial, pero sin registro usable por falla de extraccion de numero o encabezado.
+
+   Casos del piloto que caen en este grupo:
+   - `Nº 000125-2026/SUNAT`
+   - `N° 009-2026/MDLM`
+   - `Nº 32716`
+   - `N° 00115-2026-SUNARP/SN`
+   - `N° 32732`
+   - `Nº 01889-2026`
+   - `N° 01923-2026`
+   - `N° 000141-2026/SUNAT`
+
+   Solucion:
+   - si la norma existe en el manifiesto oficial del dia pero el parser no arma una fila usable, la identidad se reconstruye desde el manifiesto (`NUMERO`, `TIPO_NORMA`, `EMISOR`, `DESCRIPCION`).
+
+2. Reglas de clasificacion para patrones ya validados por analista
+
+   Impacto esperado: `+2 FN recuperados`
+
+   Casos:
+   - `N° 0018-2026-BCRP`
+   - `N° 183-2026-TR`
+
+   Solucion:
+   - agregar reglas explicitas para que este tipo de normas se clasifiquen como `SI / INFORMATIVA` cuando el analista historicamente las considera de seguimiento.
+
+3. Reglas para ordenanzas/decretos municipales de interes validado
+
+   Impacto esperado: `+1 FN recuperado`
+
+   Caso:
+   - `N° 397-MDL`
+
+   Solucion:
+   - ampliar la regla para ordenanzas municipales vinculadas a discriminacion, atencion al publico, establecimientos o sanciones locales, para que se clasifiquen como `SI / BAJO` cuando corresponda.
+
+4. Reglas para normas laborales transversales aplicables al banco
+
+   Impacto esperado: `+1 FN recuperado`
+
+   Caso:
+   - `Nº 009-2026-TR`
+
+   Solucion:
+   - si la norma modifica teletrabajo, SST o regimen laboral privado aplicable al empleador, clasificarla como norma de interes para el banco.
+
+#### Resultado esperado
+
+Escenario conservador:
+
+- rescate por manifiesto: `+8`
+- reglas especificas BCRP / TR: `+2`
+
+Resultado:
+
+- `10` FN recuperados de `12`
+- recall esperado: `36 / 38 = 94.7%`
+
+Escenario extendido:
+
+- si tambien se incorporan las reglas municipal y laboral transversal, el potencial teorico es `12 / 12`, con recall cercano a `100%`.
+
+La recomendacion de presentacion ejecutiva es comprometer formalmente el escenario conservador (`10/12`), porque ya tiene causas raiz claras, solucion tecnicamente definida y menor riesgo de sobrepromesa.
+
 ### Mejoras implementadas a partir del piloto
 
 Los cambios incorporados despues de revisar el piloto fueron estos:
