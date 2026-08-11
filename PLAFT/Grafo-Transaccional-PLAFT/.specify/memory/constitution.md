@@ -1,36 +1,43 @@
-<!-- Sync Impact Report
-Version change: 2.0.0 → 3.0.0
-Motivo del bump MAJOR: cambio de enfoque conceptual del proyecto. El objetivo ya no es
-construir un grafo transaccional como producto final, sino una plataforma para generar
-variables estructurales basadas en grafos que enriquezcan los modelos de riesgo PLAFT.
-El grafo pasa a ser un medio analítico, no el fin del proyecto.
-Principios modificados: todos reemplazados (reestructuración completa, 13 → 16 principios).
-Secciones añadidas: IV. Datos de Entrada, VIII. Variables Analíticas, XIV. Métricas del
-Proyecto.
-Secciones eliminadas: ninguna (reestructuración y expansión integral).
+﻿<!-- Sync Impact Report
+Version change: 3.0.1 → 4.0.0
+Motivo del bump MAJOR: redefinición material del propósito y entregable principal del
+proyecto. El foco cambia de "plataforma centrada en variables" a "grafo transaccional
+para investigación PLAFT con evidencia trazable".
+Principios modificados: I, III, IV, V, VIII, IX, X, XIII, XV, XVI, XVIII.
+Secciones añadidas: XI. Casos Investigados.
+Secciones eliminadas: ninguna.
 Cambios materiales:
-  - Propósito reorientado hacia generación de variables estructurales para modelos PLAFT.
-  - Plataforma tecnológica ampliada: SageMaker Feature Store, AWS Glue Data Catalog,
-    Amazon Athena, Spark SQL.
-  - Modelo del grafo expandido con nodos y relaciones adicionales planificados.
-  - Variables analíticas clasificadas en 8 categorías explícitas.
-  - Hoja de ruta de 7 fases incorporada al principio de Evolución.
-  - Métricas del proyecto formalizadas como principio propio.
+  - El propósito principal pasa a ser la investigación PLAFT soportada por un grafo
+    transaccional integrado.
+  - El entregable de negocio principal pasa a ser "caso investigado con evidencia trazable".
+  - Las variables estructurales se mantienen como capacidad analítica secundaria y
+    reutilizable, no como fin primario.
+  - Se redefine la arquitectura por capas para incluir normalización/mapeo,
+    investigación de casos y gestión de evidencia.
+  - Se incorpora un principio explícito de Investigación PLAFT y Evidencia verificable.
+  - Se reformula la hoja de ruta a 8 fases + capacidad transversal de variables para ML.
 Follow-up TODOs: Ninguno.
 -->
 
-# Constitución — Plataforma de Variables Estructurales PLAFT basada en Grafos
+# Constitución — Grafo Transaccional para Investigación PLAFT
 
 ## I. Propósito del Proyecto
 
-El propósito del proyecto es construir una plataforma para generar variables estructurales
-mediante análisis de grafos sobre clientes, cuentas, productos y transacciones financieras,
-con el fin de enriquecer los modelos de riesgo PLAFT del banco.
+El propósito principal del proyecto es construir un grafo transaccional para la
+investigación PLAFT, que permita a los analistas investigar clientes, cuentas,
+transacciones, contrapartes y otras entidades relacionadas, comprender conexiones y
+patrones de movimiento de dinero, identificar estructuras relevantes y documentar
+evidencia trazable que sustente cada investigación.
 
-El grafo es un medio analítico para derivar variables de alto valor predictivo, no el
-producto final del proyecto. Las variables obtenidas DEBERÁN complementar los modelos PLAFT
-existentes y servirán como base para futuras capacidades de Graph Analytics, GraphRAG y
-asistentes inteligentes para analistas PLAFT.
+El grafo DEBERÁ funcionar como representación analítica integrada de relaciones financieras
+y transaccionales relevantes para PLAFT. El flujo conceptual principal DEBERÁ ser:
+
+Fuentes de datos → validación → construcción del grafo → análisis de relaciones y patrones
+→ investigación PLAFT → evidencia → caso investigado.
+
+La generación de variables estructurales DEBERÁ mantenerse como capacidad analítica
+secundaria y reutilizable. Puede enriquecer investigaciones y modelos, pero NO define por
+sí sola el objetivo del proyecto.
 
 Toda decisión técnica DEBERÁ alinearse con este propósito. Las decisiones que lo contradigan
 o desvíen DEBERÁN justificarse explícitamente mediante un ADR.
@@ -65,18 +72,28 @@ la aprobación del responsable técnico del proyecto.
 El sistema DEBERÁ mantener separación estricta entre las siguientes capas, cada una con
 responsabilidades claramente definidas e interfaz explícita:
 
-- **Ingesta**: carga y recepción de fuentes primarias de datos.
-- **Validación**: verificación de calidad, esquemas e integridad referencial.
-- **Construcción del grafo**: creación de nodos y aristas a partir de datos validados.
-- **Persistencia**: almacenamiento y versionado del grafo y sus artefactos.
-- **Cálculo de métricas**: cómputo de indicadores estructurales sobre el grafo.
-- **Generación de variables**: derivación y registro de features para modelos ML.
-- **Visualización**: exploración gráfica del grafo y sus métricas.
-- **Consultas**: acceso analítico estructurado al grafo y a las variables generadas.
-- **Integraciones futuras**: conectores para sistemas externos (KYC, alertas, GraphRAG).
+- **Ingesta de fuentes**: carga y recepción de fuentes primarias.
+- **Validación y calidad**: verificación de esquemas, reglas de calidad e integridad.
+- **Normalización y mapeo físico-conceptual**: estandarización semántica de datos.
+- **Construcción del grafo transaccional**: creación de nodos, relaciones y atributos.
+- **Persistencia y versionado**: almacenamiento reproducible del grafo y artefactos.
+- **Graph Analytics**: cómputo de métricas, conectividad y estructuras.
+- **Detección de patrones y señales**: identificación de ciclos, cadenas, hubs,
+  intermediarios, concentraciones y otras señales.
+- **Investigación de casos**: análisis guiado por caso y sujeto investigado.
+- **Gestión y trazabilidad de evidencia**: vinculación de hallazgos con soporte verificable.
+- **Visualización y exploración**: navegación funcional para investigación.
+- **Consultas analíticas**: acceso estructurado y reproducible para analistas.
+- **Generación opcional de variables para ML**: publicación selectiva y reutilizable.
+- **Integraciones futuras con GraphRAG y asistentes PLAFT**: capacidades avanzadas con
+  controles de evidencia y acceso.
 
 Cada capa DEBERÁ tener responsabilidades claramente definidas. Una capa NO DEBERÁ depender
 directamente de componentes internos de una capa distinta de su dependencia inmediata.
+
+La incorporación de entidades, relaciones o atributos NO DEBERÁ justificarse únicamente por
+generación de variables. También puede justificarse por utilidad para investigación,
+trazabilidad, evidencia, explicabilidad, navegación o consultas futuras (incluyendo GraphRAG).
 
 ## IV. Datos de Entrada
 
@@ -97,6 +114,8 @@ La plataforma DEBERÁ admitir múltiples datasets como fuentes de datos de entra
 - Empresas y personas relacionadas
 - Beneficiarios finales
 - Listas restrictivas
+- PEP, ROS y fuentes regulatorias complementarias
+- Dispositivos, canales, IP, comercios y otras trazas transaccionales
 - Resultados de modelos ML
 
 La incorporación de nuevas fuentes de datos NO DEBERÁ requerir rediseñar la arquitectura.
@@ -107,34 +126,36 @@ Todo nuevo dataset DEBERÁ cumplir los estándares de calidad definidos en el Pr
 El grafo representa entidades financieras y sus relaciones. Toda entidad y relación
 DEBERÁ conservar trazabilidad hasta el registro de origen que la generó.
 
-**Nodos iniciales**:
+El modelo conceptual DEBERÁ estar centrado en investigación y soportar progresivamente,
+como mínimo, las siguientes entidades:
 
 - Cliente
 - Cuenta
-- Transferencia
-- Producto
 - Persona
 - Empresa
-
-**Nodos planificados para fases posteriores**:
-
-- Beneficiario Final
+- Producto
+- Transacción
+- Caso
+- Alerta
+- ROS
+- PEP
+- Documento
+- Beneficiario final
 - Apoderado
-- Canal
 - Dispositivo
 - Dirección IP
-- Sucursal
+- Canal
 - Comercio
 - País
+- Otras entidades relevantes para PLAFT.
 
-**Relaciones iniciales**:
+Las relaciones DEBERÁN representar hechos del negocio y conservar procedencia,
+temporalidad y contexto de cálculo e investigación.
 
-- Transferencia
-- Titularidad
-- Beneficiario
-- Apoderado
-- Representación
-- Relación Comercial
+Una transferencia PUEDE representarse como relación o entidad según necesidades de
+trazabilidad, atributos y análisis, respetando ADR vigentes. Ninguna reinterpretación de
+modelado DEBERÁ invalidar decisiones arquitectónicas aprobadas sin evaluación formal de
+impacto en ADR.
 
 La incorporación de nuevos tipos de nodos o relaciones DEBERÁ documentarse y evaluarse en
 función de su alineación con el propósito del proyecto (Principio I).
@@ -163,39 +184,94 @@ Toda ejecución del sistema DEBERÁ registrar:
 - parámetros de configuración empleados;
 - timestamp de ejecución;
 - versión del grafo generado;
-- versión de las variables producidas.
+- versión de las variables producidas (si aplica);
+- versión del caso y evidencia generada (si aplica).
 
 Todo resultado DEBERÁ ser completamente reproducible a partir de los insumos y parámetros
 registrados. Todo nodo y relación DEBERÁ mantener referencia directa al dato de origen.
 
 ## VIII. Variables Analíticas
 
-La finalidad principal del proyecto es generar variables estructurales reutilizables para
-modelos PLAFT. Las variables DEBERÁN clasificarse al menos en las siguientes categorías:
+Las variables estructurales se mantienen como instrumentos analíticos derivados del grafo.
+NO constituyen el entregable principal del negocio. Las variables DEBERÁN clasificarse al
+menos en las siguientes categorías:
 
-- **Centralidad**: grado de entrada/salida, PageRank, betweenness, eigenvector centrality.
+- **Centralidad**: grado de entrada y salida, PageRank, betweenness, eigenvector centrality.
 - **Conectividad**: cantidad de contrapartes, profundidad de red, componentes conectados.
 - **Comunidades**: membresía, tamaño de comunidad, modularidad local.
-- **Flujo de dinero**: monto recibido/enviado, velocidad de circulación, concentración.
+- **Flujo de dinero**: monto recibido y enviado, velocidad de circulación, concentración.
+- **Exposición a nodos con señales PLAFT**: cercanía y dependencia respecto a nodos
+  alertados, PEP, ROS o investigados.
 - **Riesgo de vecinos**: exposición directa a nodos de riesgo conocido.
 - **Riesgo propagado**: exposición indirecta a nodos de riesgo en niveles superiores.
 - **Anomalías estructurales**: patrones atípicos respecto al comportamiento esperado.
-- **Patrones transaccionales**: frecuencia, regularidad, estacionalidad, dispersión.
+- **Patrones transaccionales**: frecuencia, regularidad, estacionalidad, dispersión,
+  ciclos, cadenas, hubs e intermediarios.
 
-Todas las variables DEBERÁN ser completamente reproducibles, trazables y registradas en
-SageMaker Feature Store para su reutilización por múltiples modelos.
+Las variables DEBERÁN ser reproducibles y trazables. Solo las variables con caso de uso
+explícito para modelamiento DEBERÁN publicarse en SageMaker Feature Store. NO todas las
+métricas del grafo DEBERÁN convertirse obligatoriamente en features.
 
 ## IX. Machine Learning
 
-El grafo y las variables estructurales complementan los modelos PLAFT existentes. El grafo
-NO constituye un motor autónomo de decisión.
+Machine Learning es una capacidad complementaria. El proyecto NO DEBERÁ diseñarse
+exclusivamente alrededor de Feature Store ni del entrenamiento de modelos.
 
 Las variables DEBERÁN poder utilizarse como features reutilizables para modelos supervisados
 y no supervisados. Las decisiones de riesgo DEBERÁN considerar múltiples fuentes de
 información. Ningún sistema descendente DEBERÁ depender exclusivamente de las variables del
 grafo para emitir alertas o decisiones de riesgo.
 
-## X. Explicabilidad
+Los resultados de modelos ML PUEDEN incorporarse como señales o atributos del grafo cuando
+mejoren la investigación y mantengan trazabilidad.
+
+## X. Investigación PLAFT y Evidencia
+
+El entregable principal de negocio DEBERÁ ser un caso investigado con evidencia trazable,
+no un conjunto de variables aisladas.
+
+Todo hallazgo relevante producido por Graph Analytics DEBERÁ vincularse con evidencia
+verificable. La evidencia DEBERÁ conservar, cuando corresponda:
+
+- cliente o entidad investigada;
+- nodos involucrados;
+- relaciones involucradas;
+- transacciones relacionadas;
+- período analizado y fecha de corte;
+- algoritmo o regla aplicada;
+- parámetros utilizados;
+- datasets fuente;
+- versión del grafo;
+- timestamp de ejecución.
+
+El sistema DEBERÁ distinguir explícitamente:
+
+dato fuente → hecho representado en el grafo → métrica o patrón o señal → evidencia →
+interpretación del analista → resultado del caso.
+
+Una señal analítica NUNCA DEBERÁ confundirse con una conclusión PLAFT definitiva.
+
+## XI. Casos Investigados
+
+La entidad de investigación y caso NO DEBERÁ tratarse únicamente como fuente histórica.
+DEBERÁ poder agrupar, como mínimo:
+
+- sujeto investigado;
+- motivo de investigación;
+- fecha de apertura;
+- período analizado;
+- hallazgos;
+- señales;
+- evidencia;
+- entidades relacionadas;
+- estado de investigación;
+- observaciones del analista;
+- resultado o conclusión;
+- trazabilidad de acciones por usuario.
+
+Los casos históricos PUEDEN reutilizarse para enriquecer nuevas investigaciones.
+
+## XII. Explicabilidad
 
 Toda variable generada por el sistema DEBERÁ poder explicar:
 
@@ -208,7 +284,10 @@ La explicabilidad constituye un requisito funcional obligatorio, no una caracter
 opcional. Todo componente que produzca variables DEBERÁ exponer su trazabilidad de forma
 que sea comprensible para un analista PLAFT o auditor.
 
-## XI. Seguridad
+La explicabilidad DEBERÁ extenderse también a hallazgos de investigación y evidencia,
+incluyendo el vínculo entre patrones detectados y transacciones fuente.
+
+## XIII. Seguridad
 
 Los datos productivos ÚNICAMENTE PODRÁN procesarse dentro de la infraestructura autorizada
 por el banco. El repositorio NO DEBERÁ contener credenciales, secretos, tokens ni información
@@ -219,7 +298,7 @@ totalidad. El repositorio DEBERÁ incluir un `.gitignore` que excluya explícita
 sensibles, credenciales y entornos locales. El incumplimiento de este principio invalida la
 contribución afectada.
 
-## XII. Calidad del Software
+## XIV. Calidad del Software
 
 Todo componente del sistema DEBERÁ cumplir como mínimo los siguientes estándares:
 
@@ -234,44 +313,50 @@ Todo componente del sistema DEBERÁ cumplir como mínimo los siguientes estánda
 
 El código sin pruebas unitarias NO DEBERÁ integrarse a la rama principal.
 
-## XIII. Evolución
+## XV. Evolución
 
 La hoja de ruta del proyecto contempla las siguientes fases. La arquitectura DEBERÁ
 soportar todas estas etapas sin requerir rediseño:
 
 | Fase | Objetivo |
 |------|----------|
-| 1 | Grafo transaccional: nodos, relaciones y persistencia. |
-| 2 | Variables estructurales: cálculo, clasificación y registro en Feature Store. |
-| 3 | Integración con modelos PLAFT: features disponibles para scoring. |
-| 4 | Explicabilidad: trazabilidad completa de variables para analistas y auditores. |
-| 5 | Integración con documentación KYC: enriquecimiento del grafo con información documental. |
-| 6 | GraphRAG: recuperación aumentada por grafo para análisis de riesgo. |
-| 7 | Asistente inteligente PLAFT: interfaz conversacional para analistas. |
+| 1 | Base de datos e ingesta: contratos, calidad, temporalidad y trazabilidad de fuentes reales. |
+| 2 | Grafo transaccional: construcción, persistencia y reproducción del grafo base. |
+| 3 | Graph Analytics: métricas, comunidades, ciclos, cadenas, hubs, intermediarios y patrones. |
+| 4 | Investigación PLAFT: casos, expansión de redes, filtros temporales y priorización de hallazgos. |
+| 5 | Evidencia y explicabilidad: vínculo reproducible entre hallazgos, grafo y registros fuente. |
+| 6 | Enriquecimiento: KYC, documentos, beneficiarios finales, PEP, ROS, listas y otras fuentes. |
+| 7 | GraphRAG: consultas sobre grafo, evidencia y documentación autorizada. |
+| 8 | Asistente inteligente PLAFT: asistencia conversacional con evidencia y controles de acceso. |
+
+Capacidad transversal: Variables para ML. Las métricas y señales reutilizables podrán
+publicarse para modelos PLAFT cuando exista un caso de uso que lo justifique.
 
 Ninguna decisión técnica en la fase actual DEBERÁ impedir la incorporación de fases
 posteriores. Toda decisión que limite la extensibilidad DEBERÁ justificarse mediante un ADR.
 
-## XIV. Métricas del Proyecto
+## XVI. Métricas del Proyecto
 
 Como mínimo, cada ejecución del sistema DEBERÁ registrar las siguientes métricas
-operacionales del grafo:
+operacionales del grafo y de investigación:
 
-- Número de nodos totales y por tipo.
-- Número de relaciones totales y por tipo.
-- Densidad del grafo.
-- Modularidad global.
-- Número de comunidades detectadas.
-- Distribución de grados (entrada y salida).
-- Tiempo de construcción del grafo.
-- Tiempo de generación de variables.
-- Tiempo de respuesta a consultas.
-- Cantidad de variables generadas por categoría.
+- número de nodos totales y por tipo;
+- número de relaciones totales y por tipo;
+- densidad del grafo;
+- modularidad global;
+- número de comunidades detectadas;
+- distribución de grados (entrada y salida);
+- tiempo de construcción del grafo;
+- tiempo de detección de patrones y señales;
+- tiempo de respuesta a consultas;
+- número de hallazgos por caso y por tipología de patrón;
+- cobertura de hallazgos con evidencia trazable;
+- cantidad de variables generadas por categoría (cuando aplique).
 
 Estas métricas DEBERÁN almacenarse junto a los artefactos del grafo y estar disponibles
 para monitoreo y comparación entre ejecuciones.
 
-## XV. Gobernanza
+## XVII. Gobernanza
 
 Esta constitución rige todas las decisiones de diseño, desarrollo y operación de la
 plataforma. En caso de conflicto entre esta constitución y cualquier otro documento del
@@ -292,10 +377,14 @@ correspondiente. Los cambios MINOR y PATCH pueden ser aprobados por el responsab
 **Revisión de cumplimiento**: cada iteración DEBERÁ incluir verificación de cumplimiento de
 esta constitución para las contribuciones realizadas en ese período.
 
-## XVI. Principios de Diseño
+## XVIII. Principios de Diseño
 
 El proyecto se regirá por los siguientes principios rectores:
 
+- **El grafo sirve a la investigación PLAFT**: toda decisión sobre nodos, relaciones,
+  métricas, persistencia, visualización, variables o integraciones DEBERÁ evaluarse primero
+  por su capacidad de mejorar investigación, trazabilidad, evidencia o comprensión de
+  relaciones relevantes para PLAFT.
 - **El negocio guía la arquitectura**: toda decisión técnica parte de una necesidad del
   negocio PLAFT.
 - **La trazabilidad prevalece sobre la complejidad**: ante la duda, se prioriza la
@@ -304,13 +393,16 @@ El proyecto se regirá por los siguientes principios rectores:
   mismos insumos y producir los mismos resultados.
 - **La simplicidad tiene prioridad sobre la optimización prematura**: no se optimizará lo
   que no ha demostrado ser un cuello de botella.
-- **La explicabilidad es un requisito funcional**: toda variable DEBE poder justificarse
-  ante un analista o auditor.
+- **La explicabilidad es un requisito funcional**: toda variable y hallazgo DEBEN poder
+  justificarse ante un analista o auditor.
 - **Escala desde el diseño**: toda funcionalidad DEBERÁ diseñarse para operar correctamente
   a escala de millones de transacciones.
 - **Sin bloqueos para GraphRAG**: ninguna decisión técnica DEBERÁ impedir la futura
   incorporación de capacidades de GraphRAG o asistentes inteligentes.
 
+Las respuestas futuras generadas mediante GraphRAG DEBERÁN citar o identificar evidencia
+trazable y DEBERÁN abstenerse cuando no exista evidencia suficiente.
+
 ---
 
-**Versión**: 3.0.0 | **Ratificada**: 2026-08-05 | **Última enmienda**: 2026-08-06
+**Versión**: 4.0.0 | **Ratificada**: 2026-08-05 | **Última enmienda**: 2026-08-10

@@ -206,18 +206,173 @@ class ColumnMappingRegistry:
 
 
 def identity_mapping(source_name: str, columns: list[str]) -> SourceMapping:
-    """Crea un mapeo identidad donde nombres conceptuales = nombres físicos.
-
-    Útil para pruebas o cuando los datasets ya usan nombres conceptuales.
-
-    Args:
-        source_name: Nombre de la fuente.
-        columns: Lista de nombres de columnas (conceptual = físico).
-
-    Returns:
-        ``SourceMapping`` con mapeo identidad para todas las columnas.
-    """
+    """Crea un mapeo identidad donde nombres conceptuales = nombres físicos."""
     mappings = [
-        ColumnMapping(conceptual=col, physical=col, required=True) for col in columns
+        ColumnMapping(conceptual=col, physical=col, required=True)
+        for col in columns
     ]
     return SourceMapping(source_name=source_name, mappings=mappings)
+
+
+def build_default_registry() -> ColumnMappingRegistry:
+    """Construye el registro de mapeos físicos reales conocidos."""
+
+    registry = ColumnMappingRegistry()
+
+    registry.register(
+        SourceMapping(
+            source_name="clientes",
+            mappings=[
+                ColumnMapping(
+                    conceptual="cliente_id",
+                    physical="cod_cli",
+                    required=True,
+                    description="Código único de cliente.",
+                ),
+                ColumnMapping(
+                    conceptual="desc_subsegmento",
+                    physical="desc_subsegmento",
+                    required=False,
+                    description="Subsegmento comercial del cliente.",
+                ),
+            ],
+        )
+    )
+
+    registry.register(
+        SourceMapping(
+            source_name="cuentas",
+            mappings=[
+                ColumnMapping(
+                    conceptual="cuenta_id",
+                    physical="cuenta_id",
+                    required=True,
+                    description="Identificador unico de cuenta.",
+                ),
+                ColumnMapping(
+                    conceptual="cliente_id",
+                    physical="cliente_id",
+                    required=True,
+                    description="Cliente titular principal o asociado.",
+                ),
+            ],
+        )
+    )
+
+    registry.register(
+        SourceMapping(
+            source_name="titularidades",
+            mappings=[
+                ColumnMapping(
+                    conceptual="cliente_id",
+                    physical="cliente_id",
+                    required=True,
+                    description="Cliente asociado a la titularidad.",
+                ),
+                ColumnMapping(
+                    conceptual="cuenta_id",
+                    physical="cuenta_id",
+                    required=True,
+                    description="Cuenta asociada a la titularidad.",
+                ),
+                ColumnMapping(
+                    conceptual="tipo_titularidad",
+                    physical="tipo_titularidad",
+                    required=False,
+                    description="Tipo de relacion titular-cuenta.",
+                ),
+            ],
+        )
+    )
+
+    registry.register(
+        SourceMapping(
+            source_name="transferencias",
+            mappings=[
+                ColumnMapping(
+                    conceptual="id_transaccion",
+                    physical="id_transaccion",
+                    required=True,
+                    description="Identificador unico de transaccion.",
+                ),
+                ColumnMapping(
+                    conceptual="cuenta_origen",
+                    physical="cuenta_origen",
+                    required=True,
+                    description="Cuenta de origen de la transferencia.",
+                ),
+                ColumnMapping(
+                    conceptual="cuenta_destino",
+                    physical="cuenta_destino",
+                    required=True,
+                    description="Cuenta de destino de la transferencia.",
+                ),
+                ColumnMapping(
+                    conceptual="fecha_hora",
+                    physical="fecha_hora",
+                    required=True,
+                    description="Fecha y hora de la transferencia.",
+                ),
+                ColumnMapping(
+                    conceptual="monto",
+                    physical="monto",
+                    required=True,
+                    description="Monto de la transferencia.",
+                ),
+            ],
+        )
+    )
+
+    registry.register(
+        SourceMapping(
+            source_name="alertas_plaft",
+            mappings=[
+                ColumnMapping(
+                    conceptual="alerta_id",
+                    physical="alerta_id",
+                    required=True,
+                    description="Identificador unico de alerta PLAFT.",
+                ),
+                ColumnMapping(
+                    conceptual="cliente_id",
+                    physical="cliente_id",
+                    required=True,
+                    description="Cliente asociado a la alerta.",
+                ),
+                ColumnMapping(
+                    conceptual="fecha_alerta",
+                    physical="fecha_alerta",
+                    required=True,
+                    description="Fecha de generacion de la alerta.",
+                ),
+            ],
+        )
+    )
+
+    registry.register(
+        SourceMapping(
+            source_name="casos_historicos",
+            mappings=[
+                ColumnMapping(
+                    conceptual="caso_historico_id",
+                    physical="caso_historico_id",
+                    required=True,
+                    description="Identificador de caso historico fuente.",
+                ),
+                ColumnMapping(
+                    conceptual="sujeto_id",
+                    physical="sujeto_id",
+                    required=True,
+                    description="Sujeto asociado al caso historico.",
+                ),
+                ColumnMapping(
+                    conceptual="fecha_apertura",
+                    physical="fecha_apertura",
+                    required=True,
+                    description="Fecha de apertura del caso historico.",
+                ),
+            ],
+        )
+    )
+
+    return registry

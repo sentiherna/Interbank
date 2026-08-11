@@ -54,3 +54,7 @@ env/
 *.log
 *.tmp
 Thumbs.db
+# Archivos de datos y comprimidos
+*.zip
+*.7z
+*.tar.gz

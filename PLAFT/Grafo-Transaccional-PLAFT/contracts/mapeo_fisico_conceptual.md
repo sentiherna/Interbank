@@ -30,10 +30,21 @@ SourceMapping(
 
 ## 1. Clientes
 
+**Fuente física**: `data/real/clientes.csv`  
+**Formato**: CSV  
+**Cantidad observada**: 529 registros  
+**Clave primaria candidata**: `cod_cli`
+
 | Nombre Conceptual | Nombre Físico | Obligatorio | Notas |
-|-------------------|---------------|-------------|-------|
-| `cliente_id`      | _POR COMPLETAR_ | Sí | Clave primaria del cliente |
-| `tipo_persona`    | _POR COMPLETAR_ | No | NATURAL / JURIDICA |
+| ----------------- | ------------- | ----------- | ----- |
+| `cliente_id` | `cod_cli` | Sí | Convertir a string |
+| `tipo_persona` | No disponible | No | La fuente actual no contiene esta información |
+
+**Columnas adicionales disponibles**:
+
+| Nombre Físico | Uso propuesto |
+| ------------- | ------------- |
+| `desc_subsegmento` | Conservar como atributo adicional del cliente o incorporar al contrato más adelante |
 
 ---
 

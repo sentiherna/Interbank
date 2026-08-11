@@ -42,3 +42,38 @@ selection_criteria:
   caso: true
   lista_objetivo: false
   regla: false
+
+# Integracion progresiva de fuentes reales (Phase 1, feature 002)
+# Solo referencias de rutas; los datos reales permanecen fuera de Git por .gitignore.
+sources:
+  priority_initial:
+    clientes:
+      enabled: true
+      format: csv
+      path: ./data/real/clientes.csv
+      mapping_source: clientes
+    cuentas:
+      enabled: false
+      format: csv
+      path: ./data/real/cuentas.csv
+      mapping_source: cuentas
+    titularidades:
+      enabled: false
+      format: csv
+      path: ./data/real/titularidades.csv
+      mapping_source: titularidades
+    transferencias:
+      enabled: false
+      format: csv
+      path: ./data/real/transferencias.csv
+      mapping_source: transferencias
+    alertas_plaft:
+      enabled: false
+      format: csv
+      path: ./data/real/alertas_plaft.csv
+      mapping_source: alertas_plaft
+    casos_historicos:
+      enabled: false
+      format: csv
+      path: ./data/real/casos_historicos.csv
+      mapping_source: casos_historicos
