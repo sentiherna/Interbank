@@ -19,6 +19,85 @@ El proceso corre todos los dias a las 10 AM y procesa las normas publicadas en l
 
 La corrida diaria descarga/revisa las normas del dia, usa la historia del analista en el Excel como memoria de clasificacion y envia un mail con las normas de interes para el banco, mas CSV y Excel adjuntos. La comparativa contra el Excel del analista se calcula con el dia anterior, porque la revision del analista llega con rezago. Antes de esa comparativa, el proceso vuelve a consultar El Peruano para el dia anterior y reprocesa ese dia si detecta publicaciones extraordinarias nuevas.
 
+## Piloto julio 2026
+
+Como referencia del piloto ya validado contra el Excel del analista, en `reportes_diarios/metricas_julio_2026.xlsx` y `reportes_diarios/metricas_julio_2026_indicadores.xlsx` quedaron consolidadas las metricas del periodo `2026-07-01` a `2026-07-30`.
+
+Resumen del piloto:
+
+- Dias con reporte y validacion en Excel: `18`
+- Dias sin validacion en Excel: `12`
+- Dias sin reporte: `0`
+- Normas positivas del analista: `38`
+- Alertas positivas LexIA: `81`
+- `TP`: `26`
+- `FP`: `55`
+- `FN`: `12`
+- Micro precision: `32.1%`
+- Micro recall: `68.4%`
+- Micro F1: `43.7%`
+
+Indicadores operativos:
+
+- Cobertura de dias validados: `60%`
+- Promedio de `TP` por dia validado: `1.44`
+- Promedio de `FP` por dia validado: `3.06`
+- Promedio de `FN` por dia validado: `0.67`
+- Dia con mayor `FP`: `2026-07-15`
+- Dia con mayor `FN`: `2026-07-16`
+
+Importante: en este piloto **no hubo 12 FP**. Lo que hubo fueron **55 FP** y **12 FN**. Las `12` normas corresponden a `FN`, es decir, casos donde el analista marco una norma positiva y LexIA no la detecto o no la clasifico como relevante.
+
+### Por que hubo 55 FP
+
+Del analisis `norma_por_norma` surgieron cuatro grupos principales:
+
+1. Embanderamiento, ornato y decretos/ordenanzas municipales de alcance local:
+   LexIA los tomo como `BAJO` por criterio operativo general, pero el analista no los considero positivos en el piloto. Este grupo explica al menos `18` FP.
+2. Consultas publicas o proyectos normativos SBS:
+   LexIA los tomo como `INFORMATIVA` por seguimiento regulatorio, pero el analista no siempre los considero positivos. Este patron aparece, por ejemplo, en `2026-07-08` y `2026-07-22`.
+3. Parseo incorrecto de numero/tipo/descripcion:
+   Hubo normas donde el OCR o el corte por secciones mezclo sumarios, citas internas o encabezados de otras publicaciones. El caso mas claro fue `2026-07-15`, con `25` FP concentrados en identidades mal reconstruidas.
+4. Normas sectoriales con impacto indirecto:
+   Algunas resoluciones de `SUNARP`, `SBS`, `SMV`, `SUNAT`, `INEI` o `MTC` fueron tomadas por LexIA como seguimiento informativo o impacto medio, pero el analista no las considero positivas en ese dia.
+
+### Por que hubo 12 FN
+
+Las `12` normas no detectadas se explican principalmente por:
+
+- numero o encabezado no extraido de forma confiable desde el PDF;
+- norma embebida dentro de un cuadernillo grande y no separada correctamente por el parser;
+- mezcla entre la fecha de publicacion y una fecha mencionada dentro del texto;
+- descarte por identidad inconsistente cuando el texto parecia una cita interna y no la norma publicada.
+
+### Mejoras implementadas a partir del piloto
+
+Los cambios incorporados despues de revisar el piloto fueron estos:
+
+1. Respaldo con manifiesto oficial de El Peruano:
+   cada publicacion se cruza con el listado oficial para rescatar `NUMERO`, `TIPO_NORMA`, `EMISOR` y `DESCRIPCION` cuando el OCR mezcla el contenido.
+2. Dedupe por contenido de PDF:
+   cuando El Peruano publica multiples links que en realidad apuntan al mismo cuadernillo, el pipeline procesa una sola copia y evita sobrecarga y duplicados.
+3. Extraccion mas liviana y estable:
+   se usa `pdftotext` como camino principal y `pdfplumber` como fallback, reduciendo cuelgues y consumo de memoria en cuadernillos grandes.
+4. Filtro de identidad:
+   se incorporaron `IDENTIDAD_CONFIABLE` y `OBS_IDENTIDAD` para degradar o descartar filas donde el numero/tipo parecia provenir de una cita interna o de un sumario.
+5. Exclusion de normas sin respaldo suficiente de fecha/identidad:
+   se redujo el arrastre de normas de otra fecha o de otras secciones del cuadernillo.
+6. Rescate selectivo desde manifiesto para patrones recurrentes:
+   se agregaron reglas especificas para `Estado de Emergencia`, resoluciones `SBS`, circulares `BCRP`, normas sobre `Fondo de Seguro de Depositos` y otros casos observados en validacion.
+7. Eliminacion de la inyeccion directa desde el Excel historico:
+   el Excel del analista quedo como referencia de calibracion y comparativa, pero ya no agrega normas “faltantes” al reporte diario, porque eso contaminaba la salida con normas no publicadas en el dia procesado.
+8. Operacion diaria mas estable:
+   la corrida diaria de cron quedo ajustada al modo liviano, sin priorizacion semantica pesada ni backfill automatico, para privilegiar continuidad operativa.
+
+### Archivos de referencia del piloto
+
+- `reportes_diarios/metricas_julio_2026.xlsx`
+- `reportes_diarios/metricas_julio_2026_indicadores.xlsx`
+
+La hoja mas util para auditoria es `norma_por_norma`, porque muestra para cada caso si fue `TP`, `FP` o `FN`, junto con la descripcion IA, la descripcion del analista y una explicacion corta del desvio.
+
 ## Contenido
 
 - `rag_pipeline_s3_diario_job_10.py`: pipeline principal de descarga, extraccion y clasificacion.
