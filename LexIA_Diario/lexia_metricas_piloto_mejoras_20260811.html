@@ -1,0 +1,196 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LexIA - Metricas del piloto</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#ffffff;color:#173b84}
+  .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px 34px;box-sizing:border-box}
+  .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;color:#214a99;font-size:56px;line-height:1.02;font-weight:800}
+  .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+  .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+  .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+  .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+  .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+  .band-note{font-size:12px;color:#8998b2;margin-top:6px}
+  .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+  .story-wrap{display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:start;margin-top:14px}
+  .arrow-col{display:flex;flex-direction:column;gap:120px;padding-top:190px}
+  .arrow-tag{display:flex;align-items:center;gap:10px;color:#274c99;font-weight:800;font-size:28px;line-height:1.1}
+  .arrow{width:92px;height:92px;position:relative;flex:0 0 92px}
+  .arrow:before{content:"";position:absolute;left:0;top:0;width:34px;height:92px;background:#35559d}
+  .arrow:after{content:"";position:absolute;left:32px;top:32px;border-top:30px solid transparent;border-bottom:30px solid transparent;border-left:30px solid #35559d}
+  .cards{display:flex;flex-direction:column;gap:16px}
+  .card{background:#fff;border-radius:24px;padding:18px 22px;display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:center;box-shadow:0 0 0 1px #edf1f8 inset}
+  .card.blue{border-left:7px solid #2f5ba8}
+  .card.purple{border-left:7px solid #7d33cb;background:#fbf9fe}
+  .card.green{border-left:7px solid #1cc85c;background:#f5fcf7}
+  .card.black{border-left:7px solid #1d273b}
+  .statbox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#214a99}
+  .statbox .approx{font-size:54px;font-weight:800;line-height:0.9}
+  .statbox .label{font-size:15px;color:#667796;margin-top:6px}
+  .ring{width:118px;height:118px;border-radius:50%;background:conic-gradient(#17c45a 0 10%, #5f7fc1 10% 100%);display:flex;align-items:center;justify-content:center;margin:auto}
+  .ring .inner{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:800;color:#214a99;font-size:16px;text-align:center}
+  .content h3{margin:0;font-size:22px;letter-spacing:1px;font-weight:900}
+  .content p{margin:6px 0 0 0;font-size:15px;color:#556786;line-height:1.35}
+  .bar{margin-top:14px;height:18px;background:#d8e0ef;border-radius:999px;overflow:hidden;display:flex}
+  .bar .bluefill{background:#6d87bf}
+  .bar .greenfill{background:#17c45a}
+  .bar .darkfill{background:#35559d}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:14px;color:#556786}
+  .legend span:before{content:"";display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:7px;vertical-align:-2px}
+  .legend .lg-blue:before{background:#6d87bf}
+  .legend .lg-green:before{background:#17c45a}
+  .legend .lg-dark:before{background:#35559d}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+  .mini .num{font-size:44px;font-weight:800;color:#214a99;line-height:1}
+  .mini .txt{font-size:14px;color:#637392;margin-top:6px}
+  .foot{margin-top:18px;font-size:14px;color:#5a6d8b;line-height:1.45}
+  @media (max-width:1100px){
+    .story-wrap{grid-template-columns:1fr}
+    .arrow-col{display:none}
+    .card{grid-template-columns:1fr}
+    .grid4{grid-template-columns:repeat(2,1fr)}
+    h1{font-size:40px}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topline"></div>
+    <div class="topbar">
+      <div>
+        <h1>Piloto 2026 - LexIA Normativo Diario</h1>
+        <div class="subtitle">Julio 2026 · historia del piloto -> deteccion -> brechas -> recuperacion esperada</div>
+      </div>
+      <div>
+        <div class="pill">Piloto julio 2026 · 18 dias validados</div>
+        <div class="pill-sub">metricas calculadas sobre reportes enviados y validados</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div>
+          <div class="band-kicker">HISTORIA DEL PILOTO</div>
+          <div class="band-note">orden sugerido para contar el resultado</div>
+        </div>
+        <div class="band-title">Muestra de 2026-07-01 a 2026-07-30 · 38 normas positivas validadas</div>
+      </div>
+
+      <div class="story-wrap">
+        <div class="arrow-col">
+          <div class="arrow-tag"><div class="arrow"></div><div>Interes<br>banco</div></div>
+          <div class="arrow-tag"><div class="arrow"></div><div>Recall</div></div>
+        </div>
+
+        <div class="cards">
+          <div class="card blue">
+            <div class="statbox">
+              <div class="approx">38</div>
+              <div class="label">normas positivas del analista</div>
+            </div>
+            <div class="content">
+              <h3>1) UNIVERSO REVISADO</h3>
+              <p>Base validada por negocio para medir desempeno real del piloto en julio de 2026.</p>
+            </div>
+          </div>
+
+          <div class="card purple">
+            <div class="statbox">
+              <div class="ring">
+                <div class="inner">81<br>alertas</div>
+              </div>
+            </div>
+            <div class="content">
+              <h3>2) APERTURA DE ALERTAS</h3>
+              <p>LexIA marco 81 normas como positivas. De ese total, una parte coincidio con el analista y otra parte quedo sobre-detectada.</p>
+              <div class="bar">
+                <div class="greenfill" style="width:32.1%"></div>
+                <div class="bluefill" style="width:67.9%"></div>
+              </div>
+              <div class="legend">
+                <span class="lg-green">32.1% TP (26)</span>
+                <span class="lg-blue">67.9% FP (55)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card green">
+            <div class="statbox">
+              <div class="ring" style="background:conic-gradient(#17c45a 0 68.4%, #35559d 68.4% 100%)">
+                <div class="inner">68.4%<br>recall</div>
+              </div>
+            </div>
+            <div class="content">
+              <h3>3) DESEMPENO ACTUAL</h3>
+              <p>Sobre las 38 normas positivas del analista, LexIA detecto 26 y dejo 12 sin capturar.</p>
+              <div class="bar">
+                <div class="greenfill" style="width:68.4%"></div>
+                <div class="darkfill" style="width:31.6%"></div>
+              </div>
+              <div class="legend">
+                <span class="lg-green">26 TP</span>
+                <span class="lg-dark">12 FN</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card black">
+            <div class="statbox">
+              <div class="approx">94.7%</div>
+              <div class="label">recall objetivo</div>
+            </div>
+            <div class="content">
+              <h3>4) RECALL REESTRUCTURADO</h3>
+              <p>Con los ajustes de extraccion y clasificacion, LexIA apunta a recuperar 10 de los 12 FN. En los casos de parseo dudoso, la norma quedara visible para validacion puntual del analista en lugar de perderse en el proceso.</p>
+              <div class="bar">
+                <div class="greenfill" style="width:94.7%"></div>
+                <div class="darkfill" style="width:5.3%"></div>
+              </div>
+              <div class="legend">
+                <span class="lg-green">36 TP esperados</span>
+                <span class="lg-dark">2 FN residuales</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="band" style="margin-top:18px">
+      <div class="band-head">
+        <div class="band-kicker">LECTURA GENERAL DE LOS FP</div>
+        <div class="band-title">Las 55 FP no responden a un solo error</div>
+      </div>
+      <div class="grid4">
+        <div class="mini">
+          <div class="num">55</div>
+          <div class="txt">falsos positivos totales del piloto</div>
+        </div>
+        <div class="mini">
+          <div class="num">18</div>
+          <div class="txt">embanderamientos y ornato municipal que LexIA levanto por sensibilidad operativa</div>
+        </div>
+        <div class="mini">
+          <div class="num">25</div>
+          <div class="txt">casos concentrados por parseo e identidad mal reconstruida, sobre todo el 2026-07-15</div>
+        </div>
+        <div class="mini">
+          <div class="num">12+</div>
+          <div class="txt">normas de criterio amplio o seguimiento indirecto que negocio no conto como positivas</div>
+        </div>
+      </div>
+      <div class="foot">
+        En forma muy general, las FP surgieron por dos familias de causas: <b>sensibilidad alta</b> de LexIA para levantar normas con posible impacto operativo o regulatorio indirecto, y <b>errores puntuales de parseo</b> que mezclaron encabezados, sumarios o identidades de normas dentro del cuadernillo. La conclusion importante es que no hubo una falla unica del modelo, sino un conjunto acotado de patrones corregibles.
+      </div>
+      <div class="foot" style="margin-top:10px">
+        Con este cambio, el flujo tambien se vuelve mas simple: cuando la extraccion sea clara, LexIA clasifica de forma automatica; cuando detecte un <b>parseo incompleto o ambiguo</b>, la norma quedara marcada para <b>revision breve del analista</b>. Asi evitamos que una norma relevante quede afuera solo por un problema de lectura del documento.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
