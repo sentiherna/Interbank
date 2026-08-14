@@ -1,0 +1,174 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LexIA - Metricas finales del piloto</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#fff;color:#173b84}
+  .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px;box-sizing:border-box}
+  .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;color:#214a99;font-size:54px;line-height:1.02;font-weight:800}
+  .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+  .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+  .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+  .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+  .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+  .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;margin-top:18px}
+  .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+  .mini .num{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+  .mini .txt{font-size:14px;color:#637392;margin-top:6px}
+  .metric-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .metric-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .metric-box{border-radius:18px;padding:18px;background:#f8fbff;text-align:center}
+  .metric-box .value{font-size:52px;font-weight:800;color:#214a99;line-height:1}
+  .metric-box .label{font-size:15px;color:#637392;margin-top:6px}
+  .metric-box .sub{font-size:13px;color:#7b89a4;margin-top:8px}
+  .confusion{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .confusion h3,.metric-card h3{margin:0 0 14px 0;font-size:24px;color:#214a99}
+  table{border-collapse:separate;border-spacing:10px;width:100%}
+  .cm th,.cm td{border-radius:18px;padding:18px 16px;text-align:center}
+  .cm th{background:#eef3fb;color:#214a99;font-size:16px}
+  .cm .axis{background:#eef3fb;font-weight:700;color:#214a99}
+  .cm .tp{background:#e7f8ee}
+  .cm .fp{background:#fff2e8}
+  .cm .fn{background:#eef3fb}
+  .cm .tn{background:#f7f8fc}
+  .cm .n{display:block;font-size:42px;font-weight:800;color:#214a99;line-height:1}
+  .cm .l{display:block;font-size:14px;color:#5f6f8e;margin-top:6px}
+  .foot{margin-top:16px;font-size:14px;color:#5a6d8b;line-height:1.45}
+  @media (max-width:1100px){
+    .grid4{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    h1{font-size:40px}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topline"></div>
+    <div class="topbar">
+      <div>
+        <h1>Piloto 2026 - LexIA Normativo Diario</h1>
+        <div class="subtitle">Metricas finales reestructuradas del piloto de julio 2026</div>
+      </div>
+      <div>
+        <div class="pill">Periodo 2026-07-01 a 2026-07-30</div>
+        <div class="pill-sub">18 dias con reporte y validacion en Excel</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">VOLUMEN DEL PERIODO</div>
+        <div class="band-title">Resumen ejecutivo del universo revisado</div>
+      </div>
+      <div class="grid4">
+        <div class="mini">
+          <div class="num">1750</div>
+          <div class="txt">publicaciones totales vistas en los reportes diarios de julio</div>
+        </div>
+        <div class="mini">
+          <div class="num">38</div>
+          <div class="txt">normas de interes validadas por el analista</div>
+        </div>
+        <div class="mini">
+          <div class="num">81</div>
+          <div class="txt">alertas positivas emitidas por LexIA en el mes validado</div>
+        </div>
+        <div class="mini">
+          <div class="num">18</div>
+          <div class="txt">dias del mes con reporte y validacion disponible</div>
+        </div>
+      </div>
+      <div class="foot">
+        El total de <b>1750</b> corresponde a todas las publicaciones incluidas en los reportes diarios de julio 2026. Sobre ese universo, LexIA emitio <b>81 alertas positivas</b> y el analista valido <b>38 normas de interes</b>.
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">METRICAS FINALES</div>
+        <div class="band-title">Solo precision y recall sobre el escenario reestructurado</div>
+      </div>
+      <div class="grid2">
+        <div class="metric-card">
+          <h3>Metricas clave</h3>
+          <div class="metric-row">
+            <div class="metric-box">
+              <div class="value">94.7%</div>
+              <div class="label">Recall final</div>
+              <div class="sub">36 de 38 normas de interes capturadas</div>
+            </div>
+            <div class="metric-box">
+              <div class="value">39.6%</div>
+              <div class="label">Precision final</div>
+              <div class="sub">36 TP sobre 91 alertas totales esperadas</div>
+            </div>
+          </div>
+          <div class="foot">
+            El recall final refleja la recuperacion proyectada de 10 de los 12 FN del piloto. La precision se muestra solo como lectura de control del escenario final, manteniendo sensibilidad alta para no perder normas relevantes.
+          </div>
+        </div>
+
+        <div class="confusion">
+          <h3>Matriz de confusion final</h3>
+          <table class="cm">
+            <tr>
+              <th></th>
+              <th>Analista SI</th>
+              <th>Analista NO</th>
+            </tr>
+            <tr>
+              <td class="axis">LexIA SI</td>
+              <td class="tp"><span class="n">36</span><span class="l">TP</span></td>
+              <td class="fp"><span class="n">55</span><span class="l">FP</span></td>
+            </tr>
+            <tr>
+              <td class="axis">LexIA NO</td>
+              <td class="fn"><span class="n">2</span><span class="l">FN</span></td>
+              <td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td>
+            </tr>
+          </table>
+          <div class="foot">
+            Para este piloto se siguio el foco operativo del negocio: captura de normas de interes. Por eso la matriz prioriza `TP`, `FP` y `FN`; los `TN` no fueron medidos en esta presentacion.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">LECTURA DEL CAMBIO</div>
+        <div class="band-title">Que cambia con el esquema reestructurado</div>
+      </div>
+      <div class="grid4">
+        <div class="mini">
+          <div class="num">55</div>
+          <div class="txt">falsos positivos del piloto original</div>
+        </div>
+        <div class="mini">
+          <div class="num">18</div>
+          <div class="txt">casos de embanderamiento u ornato municipal levantados por criterio operativo amplio</div>
+        </div>
+        <div class="mini">
+          <div class="num">Parseo</div>
+          <div class="txt">grupo de casos con identidad dudosa por mezcla de encabezados, fechas internas y numeros mal reconstruidos</div>
+        </div>
+        <div class="mini">
+          <div class="num">12</div>
+          <div class="txt">casos restantes por criterio amplio o seguimiento indirecto no marcado por el analista</div>
+        </div>
+      </div>
+      <div class="foot">
+        Las <b>55 FP</b> deben leerse de forma conservadora. Primero, <b>18</b> normas municipales de embanderamiento u ornato que LexIA levanto por sensibilidad operativa, pero que el analista no conto como positivas. Segundo, hubo un <b>grupo de casos de parseo e identidad dudosa</b>, concentrado principalmente el <b>2026-07-15</b>, donde el parser mezclo texto, fechas internas y encabezados de otras normas; este bloque <b>no se presenta como mejora comprometida ni como recuperacion garantizada</b>. Tercero, el resto responde a criterio amplio o seguimiento indirecto.
+      </div>
+      <div class="foot">
+        Si la identidad de una norma queda dudosa por parseo, el flujo reestructurado la deja visible para revision del analista. Eso ayuda a no perder una norma relevante, pero no implica sumar automaticamente todos los errores de parseo como mejora confirmada del recall.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
