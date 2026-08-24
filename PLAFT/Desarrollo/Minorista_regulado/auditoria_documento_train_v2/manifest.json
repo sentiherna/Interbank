@@ -1,0 +1,28 @@
+{
+  "document": "Documentacion/Documento_Metodologico_PLAFT_PJ_Minorista_Formato_Modelo_v2.pdf",
+  "document_absolute_path": "C:\\Users\\b46637\\OneDrive - Interbank\\PLAFT\\Interbank\\PLAFT\\Desarrollo\\Minorista_regulado\\Documentacion\\Documento_Metodologico_PLAFT_PJ_Minorista_Formato_Modelo_v2.pdf",
+  "document_pages": 55,
+  "document_text_extractable": true,
+  "train_dir": "Train",
+  "train_absolute_path": "C:\\Users\\b46637\\OneDrive - Interbank\\PLAFT\\Interbank\\PLAFT\\Desarrollo\\Minorista_regulado\\Train",
+  "artifacts": [
+    "0.limpieza_datos.ipynb",
+    "01.genera_base_train.ipynb",
+    "02.bivariados+EDA_train+seleccion_variables.ipynb",
+    "03.bivariados+EDA_test.ipynb",
+    "03_validacion_clientes_unicos.py",
+    "04_reportes_preprocesamiento.py",
+    "1.PRE PROCESSING.ipynb",
+    "2.HPO.ipynb",
+    "3.VALIDACION_TOTAL.ipynb",
+    "preprocessing_1.py"
+  ],
+  "outputs": [
+    "01_requisitos_documento.md",
+    "02_arqueologia/",
+    "03_comparacion_documento_vs_train.md",
+    "manifest.json"
+  ],
+  "method": "Auditoria local por extraccion PDF y lectura directa de codigo/notebooks; la ejecucion automatica con GitHub Models devolvio HTTP 410 por retirement brownout.",
+  "source_files_untouched": true
+}

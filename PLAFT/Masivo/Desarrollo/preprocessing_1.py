@@ -95,21 +95,21 @@ def TratamientoDF(df, train=1):
     print("======Tratamiento")
     start_time = time.time()
 
-    #df = df.fillna(0)
+    df = df.fillna(0)
 
-   # categorical_columns = [
-   #     "desc_provincia","cnt_ro_debajo_umbral","mto_fact_declarado_sunat","flg_activo_pep",
-   #            "desc_departamento", "cod_ubigeo_cd", "cod_sectorista_id", "cod_ciiu_v4","tipo_alerta_n2"]
+ #   categorical_columns = [
+  #      "cnt_ro_debajo_umbral","flg_activo_pep",
+  #             "desc_departamento", "cod_ubigeo_cd", "cod_sectorista_id", "cod_ciiu_v4","tipo_alerta_n2"]
 
-   # for col in categorical_columns:
-   #    df[col] = pd.to_numeric(df[col], errors='coerce')
+  #  for col in categorical_columns:
+  #     df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    #df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mean())
+  #  df[categorical_columns] = df[categorical_columns].fillna(df[categorical_columns].mean())
 
-    #if train == 1:
+   # if train == 1:
         # Solo eliminamos columnas que NO deben ir al modelo
-    #    cols_drop = ["cod_mes", "key_value", "tipo_alerta_n2","cod_cli","codmes_lag1","max_trx_abonos_3m","trx_riesgo_cliente","flg_ros_12m"]
-      #  df = df.drop(columns=cols_drop, errors="ignore")
+   #     cols_drop = ["cod_mes", "key_value", "tipo_alerta_n2","cod_cli","codmes_lag1","max_trx_abonos_3m","trx_riesgo_cliente","flg_ros_12m"]
+    #    df = df.drop(columns=cols_drop, errors="ignore")
 
     DIR_COLUMNS = '/opt/ml/processing/input/Columns'
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     # =============================================================
     # 3) Test
     # =============================================================
-    test_meses = ['202508','202509','202510','202511','202512','202601','202602','202603','202604']
+    test_meses = ['202607']
     df_test_raw = LecturaDatos(test_meses, cols_Exclude=[])
 
     extras_test = df_test_raw[['cod_mes','key_value','cuc_num']].copy()
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     headers_path = '/opt/ml/processing/headers/headers_total.csv'
     train_path = '/opt/ml/processing/train/train_total.csv'
     val_path = '/opt/ml/processing/val/validation_total.csv'
-    test_path = '/opt/ml/processing/test/test_total.csv'
+    test_path = '/opt/ml/processing/test/test_total_1.csv'
 
     df_train.to_csv(train_path, header=False, index=False)
     df_val.to_csv(val_path, header=False, index=False)
