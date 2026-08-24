@@ -1,0 +1,40 @@
+proyect:
+    vertical: "riesgo"
+    name: "mora_avanzada"
+    version: "2"
+    description: "Modelo de mora avanzada"
+iteration:
+    version: "1.1"
+    description:  "Segunda iteracion de version dos COMPLETAR"
+
+periods:
+    train: 
+    - '202303'
+    - '202304'
+    - '202305'
+    - '202306'
+    - '202307'
+    - '202308'
+    - '202309'
+    - '202310'
+    - '202311'
+    - '202312'
+    - '202402'
+    - '202403'
+    val: 
+    - '202404'
+    - '202405'
+    test: 
+    - '202406'
+    - '202407'
+    - '202408'
+    
+target_col: "TARGET"
+id_col: "DOCUMENTO"
+date_col: "PERIODO"
+model_description: "modelo de Mora Avanzada v1_0_0"
+tags: 
+    - Key: "vertical"
+      Value: "riesgo"
+    - Key: "negocio"
+      Value: "MoraAvanzada"
