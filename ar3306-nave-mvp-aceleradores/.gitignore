@@ -1,0 +1,51 @@
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+# terraform/.terraform.lock.hcl  # debe commitearse — ver https://developer.hashicorp.com/terraform/language/files/dependency-lock
+terraform/terraform.tfvars
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Datos — nunca commitear datos reales
+*.csv
+*.parquet
+*.json.gz
+data/
+
+# Artefactos de modelo
+*.pkl
+*.joblib
+*.pt
+*.h5
+model-artifacts/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archivos de presentación (binarios, no van en el repo de código)
+*.pptx
+*.ppt
+*.pdf

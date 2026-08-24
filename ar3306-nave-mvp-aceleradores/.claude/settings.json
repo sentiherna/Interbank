@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruff format --quiet \"$CLAUDE_TOOL_INPUT_PATH\" 2>/dev/null || true",
+            "description": "Auto-format Python files after edits"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "block",
+            "pattern": "terraform apply(?!.*(--auto-approve.*-target|sandbox))",
+            "message": "Revisar el plan antes de aplicar. Confirmar que es la cuenta sandbox (015319782619)."
+          }
+        ]
+      }
+    ]
+  }
+}

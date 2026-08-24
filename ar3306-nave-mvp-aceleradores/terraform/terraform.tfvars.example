@@ -1,0 +1,8 @@
+# Copiar este archivo a terraform.tfvars y completar los valores
+# terraform.tfvars está en .gitignore — NO commitear
+
+owner       = "santiago.castro@nubiral.com"
+project     = "ar3306-nave-aceleradores"
+created_by  = "santiago.castro@nubiral.com"
+team        = "pod7"
+deadline    = "2026-12-31"
