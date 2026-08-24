@@ -75,7 +75,7 @@
           <div class="txt">normas de interes validadas por el analista</div>
         </div>
         <div class="mini">
-          <div class="num">81</div>
+          <div class="num">66</div>
           <div class="txt">alertas positivas emitidas por LexIA en el mes validado</div>
         </div>
         <div class="mini">
@@ -84,7 +84,7 @@
         </div>
       </div>
       <div class="foot">
-        El total de <b>1750</b> corresponde a todas las publicaciones incluidas en los reportes diarios de julio 2026. Sobre ese universo, LexIA emitio <b>81 alertas positivas</b> y el analista valido <b>38 normas de interes</b>.
+        El total de <b>1750</b> corresponde a todas las publicaciones incluidas en los reportes diarios de julio 2026. Sobre ese universo, LexIA emitio <b>66 alertas positivas</b> y el analista valido <b>38 normas de interes</b>.
       </div>
     </div>
 
@@ -103,9 +103,9 @@
               <div class="sub">36 de 38 normas de interes capturadas</div>
             </div>
             <div class="metric-box">
-              <div class="value">39.6%</div>
+              <div class="value">54.6%</div>
               <div class="label">Precision final</div>
-              <div class="sub">36 TP sobre 91 alertas totales esperadas</div>
+              <div class="sub">36 TP sobre 66 alertas totales esperadas</div>
             </div>
           </div>
           <div class="foot">
@@ -124,7 +124,7 @@
             <tr>
               <td class="axis">LexIA SI</td>
               <td class="tp"><span class="n">36</span><span class="l">TP</span></td>
-              <td class="fp"><span class="n">55</span><span class="l">FP</span></td>
+              <td class="fp"><span class="n">30</span><span class="l">FP</span></td>
             </tr>
             <tr>
               <td class="axis">LexIA NO</td>
@@ -146,7 +146,7 @@
       </div>
       <div class="grid4">
         <div class="mini">
-          <div class="num">55</div>
+          <div class="num">30</div>
           <div class="txt">falsos positivos del piloto original</div>
         </div>
         <div class="mini">
@@ -163,7 +163,7 @@
         </div>
       </div>
       <div class="foot">
-        Las <b>55 FP</b> deben leerse de forma conservadora. Primero, <b>18</b> normas municipales de embanderamiento u ornato que LexIA levanto por sensibilidad operativa, pero que el analista no conto como positivas. Segundo, hubo un <b>grupo de casos de parseo e identidad dudosa</b>, concentrado principalmente el <b>2026-07-15</b>, donde el parser mezclo texto, fechas internas y encabezados de otras normas; este bloque <b>no se presenta como mejora comprometida ni como recuperacion garantizada</b>. Tercero, el resto responde a criterio amplio o seguimiento indirecto.
+        Las <b>30 FP</b> deben leerse de forma conservadora. Primero, <b>18</b> normas municipales de embanderamiento u ornato que LexIA levanto por sensibilidad operativa, pero que el analista no conto como positivas. Segundo, hubo un <b>grupo de casos de parseo e identidad dudosa</b>, concentrado principalmente el <b>2026-07-15</b>, donde el parser mezclo texto, fechas internas y encabezados de otras normas; este bloque <b>no se presenta como mejora comprometida ni como recuperacion garantizada</b>. Tercero, el resto responde a criterio amplio o seguimiento indirecto.
       </div>
       <div class="foot">
         Si la identidad de una norma queda dudosa por parseo, el flujo reestructurado la deja visible para revision del analista. Eso ayuda a no perder una norma relevante, pero no implica sumar automaticamente todos los errores de parseo como mejora confirmada del recall.

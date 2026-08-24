@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grafo Transaccional para Investigación PLAFT</title>
+  <style>
+    :root {
+      --ink: #102d3a;
+      --muted: #58727a;
+      --paper: #f4f0e8;
+      --white: #fffdf8;
+      --teal: #0d7470;
+      --teal-dark: #075451;
+      --coral: #e36d52;
+      --gold: #e6b84e;
+      --line: #d8e1dc;
+      --shadow: 0 24px 70px rgba(16, 45, 58, .13);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    button { font: inherit; }
+    .deck { min-height: 100vh; overflow: hidden; }
+    .slide {
+      display: none;
+      min-height: 100vh;
+      padding: 7vh 8vw 11vh;
+      position: relative;
+      isolation: isolate;
+    }
+    .slide.active { display: flex; animation: appear .45s ease both; }
+    .slide::before {
+      content: "";
+      position: absolute;
+      width: 34vw;
+      height: 34vw;
+      right: -14vw;
+      top: -16vw;
+      border: 1px solid rgba(13, 116, 112, .18);
+      border-radius: 50%;
+      z-index: -1;
+    }
+    .slide-content { width: min(1100px, 100%); margin: auto; }
+    .kicker {
+      color: var(--coral);
+      font: 700 .76rem/1.2 Arial, sans-serif;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      font-size: clamp(3rem, 8vw, 7.3rem);
+      line-height: .92;
+      letter-spacing: -.045em;
+      max-width: 850px;
+      margin-bottom: 2rem;
+    }
+    h2 {
+      font-size: clamp(2.3rem, 5vw, 5rem);
+      line-height: .98;
+      letter-spacing: -.04em;
+      max-width: 850px;
+      margin-bottom: 2rem;
+    }
+    h3 { font-size: 1.3rem; margin-bottom: .7rem; }
+    .lead { color: var(--muted); font-size: clamp(1.15rem, 2vw, 1.55rem); line-height: 1.45; max-width: 700px; }
+    .small { color: var(--muted); font: .86rem/1.5 Arial, sans-serif; }
+    .hero { background: var(--teal-dark); color: var(--white); }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 9vh 8vw auto auto;
+      width: 35vw;
+      height: 65vh;
+      background: repeating-linear-gradient(60deg, transparent 0 45px, rgba(230, 184, 78, .18) 46px 47px);
+      clip-path: polygon(50% 0, 100% 25%, 85% 100%, 15% 88%, 0 28%);
+      z-index: -1;
+    }
+    .hero .lead { color: #d8ece8; }
+    .hero .kicker { color: var(--gold); }
+    .hero-mark { color: var(--gold); font: 700 1rem Arial, sans-serif; letter-spacing: .08em; }
+    .grid { display: grid; gap: 1rem; }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      background: rgba(255, 253, 248, .78);
+      border: 1px solid var(--line);
+      padding: 1.35rem;
+      min-height: 150px;
+      box-shadow: 0 8px 24px rgba(16, 45, 58, .05);
+    }
+    .card strong { display: block; color: var(--teal); font: 700 1.9rem Arial, sans-serif; margin-bottom: .8rem; }
+    .card p { color: var(--muted); line-height: 1.45; margin-bottom: 0; }
+    .flow { display: flex; align-items: stretch; gap: .5rem; flex-wrap: wrap; margin: 2rem 0; }
+    .flow span { flex: 1 1 125px; padding: 1rem .8rem; background: var(--white); border-top: 4px solid var(--teal); font: 700 .88rem/1.2 Arial, sans-serif; }
+    .flow i { align-self: center; color: var(--coral); font-style: normal; font-size: 1.5rem; }
+    .evidence { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+    .evidence-list { border-left: 3px solid var(--coral); padding-left: 1.3rem; }
+    .evidence-list p { margin-bottom: 1rem; font-size: 1.1rem; }
+    .evidence-list b { color: var(--teal); }
+    .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; counter-reset: phase; }
+    .phase { border-top: 5px solid var(--teal); padding: 1rem 0; counter-increment: phase; }
+    .phase::before { content: "0" counter(phase); color: var(--coral); font: 700 .8rem Arial, sans-serif; }
+    .phase h3 { margin: .6rem 0; }
+    .phase p { color: var(--muted); line-height: 1.35; margin: 0; }
+    .closing { background: var(--coral); color: var(--white); }
+    .closing .lead { color: #fff1e8; }
+    .closing .kicker { color: var(--ink); }
+    .closing h2 { max-width: 780px; }
+    .quote { border-left: 4px solid var(--gold); padding-left: 1.2rem; font-size: 1.35rem; line-height: 1.4; max-width: 700px; }
+    .controls {
+      position: fixed; z-index: 5; left: 0; right: 0; bottom: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .8rem 2rem; background: rgba(255, 253, 248, .93); border-top: 1px solid var(--line);
+      font: .75rem Arial, sans-serif;
+    }
+    .controls button { border: 0; background: transparent; color: var(--teal-dark); cursor: pointer; padding: .45rem .7rem; }
+    .controls button:hover, .controls button:focus-visible { color: var(--coral); outline: 2px solid var(--gold); outline-offset: 2px; }
+    .counter { color: var(--muted); min-width: 70px; text-align: center; }
+    @keyframes appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 720px) {
+      .slide { padding: 9vh 7vw 13vh; }
+      .grid-3, .grid-4, .roadmap, .evidence { grid-template-columns: 1fr; }
+      .slide::before { width: 60vw; height: 60vw; }
+      .flow { display: grid; grid-template-columns: 1fr; }
+      .flow i { display: none; }
+      .flow span { min-height: auto; }
+      .controls { padding: .7rem 1rem; }
+    }
+    @media print {
+      .slide, .slide.active { display: block; min-height: 100vh; page-break-after: always; }
+      .controls { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide hero active" data-title="Inicio">
+      <div class="slide-content">
+        <div class="kicker">Presentación del proyecto · 2026</div>
+        <div class="hero-mark">GRAFO PLAFT</div>
+        <h1>Investigar mejor empieza por conectar los hechos.</h1>
+        <p class="lead">Un grafo transaccional para comprender relaciones financieras, detectar patrones y construir casos PLAFT con evidencia trazable.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="El desafío">
+      <div class="slide-content">
+        <div class="kicker">01 · El desafío</div>
+        <h2>De datos dispersos a una historia investigable.</h2>
+        <div class="grid grid-3">
+          <article class="card"><strong>01</strong><h3>Muchas fuentes</h3><p>Clientes, cuentas, transferencias, alertas y casos contienen piezas del mismo comportamiento.</p></article>
+          <article class="card"><strong>02</strong><h3>Relaciones ocultas</h3><p>Las conexiones indirectas pueden revelar cadenas, intermediarios, hubs y concentraciones.</p></article>
+          <article class="card"><strong>03</strong><h3>Evidencia fragmentada</h3><p>Un hallazgo solo es útil si puede explicarse y reconstruirse desde sus datos de origen.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Propósito">
+      <div class="slide-content">
+        <div class="kicker">02 · Propósito</div>
+        <h2>El entregable no es una métrica. Es un caso investigado.</h2>
+        <p class="lead">El proyecto pone la investigación PLAFT en el centro. Las variables estructurales son una capacidad reutilizable para enriquecer el análisis y los modelos, no el fin principal.</p>
+        <div class="flow" aria-label="Flujo conceptual del proyecto">
+          <span>Fuentes de datos</span><i>→</i><span>Validación</span><i>→</i><span>Grafo transaccional</span><i>→</i><span>Analytics y señales</span><i>→</i><span>Investigación</span><i>→</i><span>Evidencia</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Arquitectura">
+      <div class="slide-content">
+        <div class="kicker">03 · Arquitectura</div>
+        <h2>Una base preparada para crecer.</h2>
+        <div class="grid grid-4">
+          <article class="card"><strong>01</strong><h3>Calidad</h3><p>Esquemas, tipos, duplicados, dominios e integridad referencial.</p></article>
+          <article class="card"><strong>02</strong><h3>Modelo común</h3><p>Entidades y relaciones con temporalidad, contexto y procedencia.</p></article>
+          <article class="card"><strong>03</strong><h3>Análisis</h3><p>Conectividad, comunidades, flujos y patrones transaccionales.</p></article>
+          <article class="card"><strong>04</strong><h3>Investigación</h3><p>Casos, hallazgos, evidencia, interpretación y resultado.</p></article>
+        </div>
+        <p class="small" style="margin-top:1.5rem">Diseñada para desarrollo local y ejecución productiva sobre AWS, con Python, PySpark, S3, SageMaker, Glue y Athena.</p>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Cómo investiga">
+      <div class="slide-content">
+        <div class="kicker">04 · Experiencia del analista</div>
+        <h2>La red se convierte en contexto.</h2>
+        <div class="grid grid-3">
+          <article class="card"><strong>Explorar</strong><h3>Seguir conexiones</h3><p>Recorrer entidades y relaciones directas e indirectas dentro de una ventana temporal.</p></article>
+          <article class="card"><strong>Detectar</strong><h3>Priorizar señales</h3><p>Identificar ciclos, cadenas, hubs, intermediarios y concentraciones relevantes.</p></article>
+          <article class="card"><strong>Documentar</strong><h3>Consolidar el caso</h3><p>Registrar hipótesis, observaciones, evidencia y conclusión sin perder el contexto.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Evidencia">
+      <div class="slide-content">
+        <div class="kicker">05 · Trazabilidad</div>
+        <div class="evidence">
+          <div><h2>Cada hallazgo debe poder defenderse.</h2><p class="lead">El sistema separa la señal analítica de la conclusión del analista y conserva el camino completo hasta la fuente.</p></div>
+          <div class="evidence-list">
+            <p><b>Dato fuente</b> → registro recibido</p>
+            <p><b>Hecho</b> → relación representada</p>
+            <p><b>Señal</b> → patrón o métrica calculada</p>
+            <p><b>Evidencia</b> → soporte verificable</p>
+            <p><b>Caso</b> → interpretación y resultado</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Roadmap">
+      <div class="slide-content">
+        <div class="kicker">06 · Evolución</div>
+        <h2>Un camino incremental, con visión completa.</h2>
+        <div class="roadmap">
+          <article class="phase"><h3>Base e ingesta</h3><p>Contratos, calidad y fuentes trazables.</p></article>
+          <article class="phase"><h3>Grafo base</h3><p>Construcción, persistencia y reproducción.</p></article>
+          <article class="phase"><h3>Analytics</h3><p>Métricas, comunidades y patrones.</p></article>
+          <article class="phase"><h3>Investigación</h3><p>Casos, expansión y priorización.</p></article>
+          <article class="phase"><h3>Evidencia</h3><p>Explicabilidad de hallazgos.</p></article>
+          <article class="phase"><h3>Enriquecimiento</h3><p>KYC, documentos, PEP y ROS.</p></article>
+          <article class="phase"><h3>GraphRAG</h3><p>Consultas con evidencia autorizada.</p></article>
+          <article class="phase"><h3>Asistente PLAFT</h3><p>Asistencia con controles de acceso.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide closing" data-title="Cierre">
+      <div class="slide-content">
+        <div class="kicker">07 · Cierre</div>
+        <h2>Conectar transacciones es el comienzo. Explicar el caso es el objetivo.</h2>
+        <p class="quote">Grafo PLAFT: una representación integrada para investigar relaciones, encontrar señales y sostener decisiones con evidencia.</p>
+        <p class="small" style="color:#fff1e8; margin-top:2.5rem">Plataforma analítica para investigación PLAFT · Versión de constitución 4.0.0</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="controls" aria-label="Controles de presentación">
+    <button id="previous" type="button" aria-label="Diapositiva anterior">← Anterior</button>
+    <div class="counter"><span id="current">1</span> / <span id="total">8</span></div>
+    <button id="next" type="button" aria-label="Siguiente diapositiva">Siguiente →</button>
+  </nav>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const current = document.querySelector('#current');
+    const total = document.querySelector('#total');
+    let activeIndex = 0;
+
+    total.textContent = slides.length;
+
+    function showSlide(index) {
+      activeIndex = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => slide.classList.toggle('active', slideIndex === activeIndex));
+      current.textContent = activeIndex + 1;
+      document.title = `${slides[activeIndex].dataset.title} · Grafo PLAFT`;
+    }
+
+    document.querySelector('#previous').addEventListener('click', () => showSlide(activeIndex - 1));
+    document.querySelector('#next').addEventListener('click', () => showSlide(activeIndex + 1));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') showSlide(activeIndex - 1);
+      if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') showSlide(activeIndex + 1);
+      if (event.key === 'Home') showSlide(0);
+      if (event.key === 'End') showSlide(slides.length - 1);
+    });
+  </script>
+</body>
+</html>

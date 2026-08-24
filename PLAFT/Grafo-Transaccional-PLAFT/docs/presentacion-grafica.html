@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grafo PLAFT - Láminas gráficas</title>
+    <style>
+      body{font-family:Arial,sans-serif;margin:0;background:#fff;color:#173b84}
+      .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px;box-sizing:border-box}
+      .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+      .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+      h1{margin:0;color:#214a99;font-size:54px;line-height:1.02;font-weight:800}
+      .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+      .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+      .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+      .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+      .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+      .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+      .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+      .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+      .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;margin-top:18px}
+      .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+      .mini .num{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+      .mini .txt{font-size:14px;color:#637392;margin-top:6px;line-height:1.35}
+      .network{height:310px;position:relative;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px #edf1f8 inset}
+      .network:before,.network:after{content:"";position:absolute;left:13%;right:13%;top:50%;height:3px;background:#dbe5f3;transform:rotate(28deg);transform-origin:center}
+      .network:after{transform:rotate(-28deg)}
+      .node{position:absolute;display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:#214a99;color:#fff;border:7px solid #e6edfa;background-clip:padding-box;font-size:11px;font-weight:800;text-align:center;z-index:1}
+      .node.hot{background:#f16d5b;border-color:#fff0ed}.node.green{background:#16c35b;border-color:#e7f8ee;color:#173b84}.node.gold{background:#f6c84f;border-color:#fff7dd;color:#173b84}
+      .node-a{left:11%;top:17%}.node-b{right:12%;top:17%}.node-c{left:43%;top:39%;width:82px;height:82px}.node-d{left:12%;bottom:14%}.node-e{right:11%;bottom:14%}.node-f{left:48%;bottom:8%;width:52px;height:52px}
+      .network-label{position:absolute;left:18px;bottom:15px;color:#7b89a4;font-size:12px}
+      .metric-card,.case-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+      .metric-card h3,.case-card h3{margin:0 0 14px 0;font-size:24px;color:#214a99}
+      .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+      .metric-box{border-radius:18px;padding:18px;background:#f8fbff;text-align:center}
+      .metric-box .value{font-size:42px;font-weight:800;color:#214a99;line-height:1}
+      .metric-box .label{font-size:14px;color:#637392;margin-top:7px}
+      .case-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+      .case-step{background:#fff;border-radius:20px;padding:18px;min-height:150px;box-shadow:0 0 0 1px #edf1f8 inset;position:relative}
+      .case-step:nth-child(2){border-top:5px solid #f16d5b}.case-step:nth-child(3){border-top:5px solid #f6c84f}.case-step:first-child{border-top:5px solid #16c35b}
+      .case-step span{font-size:12px;letter-spacing:1px;font-weight:800;color:#214a99}.case-step p{font-size:14px;color:#637392;line-height:1.4;margin:0}.case-step:after{content:"→";position:absolute;right:-13px;top:45%;font-size:25px;color:#f16d5b}.case-step:last-child:after{display:none}
+      .evidence-list{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+      .evidence-item{background:#fff;border-radius:20px;padding:18px 14px;min-height:110px;box-shadow:0 0 0 1px #edf1f8 inset}.evidence-item b{display:block;color:#f16d5b;font-size:28px}.evidence-item span{display:block;color:#637392;font-size:13px;line-height:1.35;margin-top:8px}
+      .foot{margin-top:16px;font-size:14px;color:#5a6d8b;line-height:1.45}
+      @media (max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.evidence-list{grid-template-columns:repeat(2,1fr)}h1{font-size:40px}}
+      @media (max-width:650px){.page{padding:20px 16px 28px}.topbar,.band-head{display:block}.pill{display:inline-block;margin-top:18px}.pill-sub{text-align:left}.grid4,.case-flow,.metric-row,.evidence-list{grid-template-columns:1fr}.band-title{text-align:left;margin-top:12px}.network{height:270px}.case-step:after{content:"↓";right:50%;top:auto;bottom:-22px}.case-step:last-child:after{display:none}}
+    </style>
+    </head>
+    <body>
+      <div class="page">
+        <div class="topline"></div>
+        <div class="topbar">
+          <div>
+            <h1>Grafo Transaccional para Investigación PLAFT</h1>
+            <div class="subtitle">Tres láminas gráficas para explicar la red, la investigación y la evidencia</div>
+          </div>
+          <div>
+            <div class="pill">MVP 2026 · Versión 4.0.0</div>
+            <div class="pill-sub">Formato ejecutivo para presentación al banco</div>
+          </div>
+        </div>
+        <div class="band">
+          <div class="band-head"><div class="band-kicker">01 · RED TRANSACCIONAL</div><div class="band-title">La relación revela lo que el dato aislado oculta</div></div>
+          <div class="grid2">
+            <div class="network" aria-label="Mapa conceptual de entidades conectadas">
+              <div class="node node-a">CLIENTE</div><div class="node node-b hot">SEÑAL</div><div class="node node-c gold">CUENTA</div><div class="node node-d">ORIGEN</div><div class="node node-e hot">DESTINO</div><div class="node node-f green">CASO</div>
+              <div class="network-label">Vista de conexiones · ventana temporal definida</div>
+            </div>
+            <div class="metric-card"><h3>Qué integra el grafo</h3><div class="metric-row"><div class="metric-box"><div class="value">01</div><div class="label">Entidades conectadas</div></div><div class="metric-box"><div class="value">02</div><div class="label">Relaciones trazables</div></div><div class="metric-box"><div class="value">03</div><div class="label">Señales priorizadas</div></div></div><div class="foot">Clientes, cuentas, transferencias y alertas se convierten en una red navegable para encontrar conexiones relevantes.</div></div>
+          </div>
+        </div>
+        <div class="band">
+          <div class="band-head"><div class="band-kicker">02 · EXPERIENCIA DEL ANALISTA</div><div class="band-title">De una señal a una decisión defendible</div></div>
+          <div class="case-flow"><div class="case-step"><span>01 · EXPLORAR</span><h3>Seguir la red</h3><p>Expandir conexiones directas e indirectas y acotar el período bajo análisis.</p></div><div class="case-step"><span>02 · INTERPRETAR</span><h3>Entender el patrón</h3><p>Contrastar ciclos, concentración, intermediarios y contexto de las transacciones.</p></div><div class="case-step"><span>03 · DOCUMENTAR</span><h3>Construir el caso</h3><p>Vincular hallazgos, evidencia, observaciones y conclusión con trazabilidad.</p></div></div>
+          <div class="foot">La plataforma ordena el trabajo del analista sin sustituir su criterio: explorar, interpretar y documentar.</div>
+        </div>
+        <div class="band">
+          <div class="band-head"><div class="band-kicker">03 · EVIDENCIA Y CONTROL</div><div class="band-title">La evidencia convierte el análisis en un activo auditable</div></div>
+          <div class="evidence-list"><div class="evidence-item"><b>01</b><span>Dato fuente y versión del dataset</span></div><div class="evidence-item"><b>02</b><span>Hecho representado en el grafo</span></div><div class="evidence-item"><b>03</b><span>Regla, algoritmo y parámetros</span></div><div class="evidence-item"><b>04</b><span>Evidencia asociada al caso</span></div><div class="evidence-item"><b>05</b><span>Interpretación y resultado del analista</span></div></div>
+          <div class="foot">Cada hallazgo conserva el camino desde el registro de origen hasta la conclusión del caso. La señal analítica se mantiene separada de la decisión PLAFT.</div>
+        </div>
+      </div>
+    </body>
+    </html>
+  <style>
+    :root {
+      --ink: #102d3a;
+      --muted: #58727a;
+      --paper: #f4f0e8;
+      --white: #fffdf8;
+      --teal: #0d7470;
+      --teal-dark: #075451;
+      --coral: #e36d52;
+      --gold: #e6b84e;
+      --line: #d8e1dc;
+      --shadow: 0 24px 70px rgba(16, 45, 58, .13);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    button { font: inherit; }
+    .deck { min-height: 100vh; overflow: hidden; }
+    .slide {
+      display: none;
+      min-height: 100vh;
+      padding: 7vh 8vw 11vh;
+      position: relative;
+      isolation: isolate;
+    }
+    .slide.active { display: flex; animation: appear .45s ease both; }
+    .slide::before {
+      content: "";
+      position: absolute;
+      width: 34vw;
+      height: 34vw;
+      right: -14vw;
+      top: -16vw;
+      border: 1px solid rgba(13, 116, 112, .18);
+      border-radius: 50%;
+      z-index: -1;
+    }
+    .slide-content { width: min(1120px, 100%); margin: auto; }
+    .kicker {
+      color: var(--coral);
+      font: 700 .76rem/1.2 Arial, sans-serif;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { letter-spacing: -.045em; line-height: .98; }
+    h1 { font-size: clamp(3rem, 8vw, 7rem); max-width: 850px; margin-bottom: 1.5rem; }
+    h2 { font-size: clamp(2.3rem, 5vw, 5rem); max-width: 850px; margin-bottom: 2rem; }
+    h3 { font-size: 1.1rem; margin-bottom: .55rem; }
+    .lead { color: var(--muted); font-size: clamp(1.1rem, 2vw, 1.45rem); line-height: 1.45; max-width: 700px; }
+    .small { color: var(--muted); font: .8rem/1.5 Arial, sans-serif; }
+    .hero { background: var(--teal-dark); color: var(--white); }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 9vh 8vw auto auto;
+      width: 35vw;
+      height: 65vh;
+      background: repeating-linear-gradient(60deg, transparent 0 45px, rgba(230, 184, 78, .18) 46px 47px);
+      clip-path: polygon(50% 0, 100% 25%, 85% 100%, 15% 88%, 0 28%);
+      z-index: -1;
+    }
+    .hero .lead { color: #d8ece8; }
+    .hero .kicker { color: var(--gold); }
+    .hero-mark { color: var(--gold); font: 700 1rem Arial, sans-serif; letter-spacing: .08em; }
+    .graphic-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 4vw; align-items: center; }
+    .network {
+      min-height: 390px;
+      position: relative;
+      border: 1px solid var(--line);
+      background: radial-gradient(circle at 50% 48%, rgba(230, 184, 78, .22), transparent 28%), var(--white);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .network::before, .network::after {
+      content: "";
+      position: absolute;
+      inset: 50% 11% auto;
+      height: 1px;
+      background: var(--line);
+      transform: rotate(29deg);
+      transform-origin: center;
+    }
+    .network::after { transform: rotate(-29deg); }
+    .node {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 76px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--teal);
+      color: var(--white);
+      border: 7px solid rgba(13, 116, 112, .18);
+      background-clip: padding-box;
+      font: 700 .65rem Arial, sans-serif;
+      text-align: center;
+      z-index: 1;
+    }
+    .node::after { content: ""; position: absolute; inset: -12px; border: 1px solid var(--teal); border-radius: 50%; opacity: .25; }
+    .node.hot { background: var(--coral); border-color: rgba(227, 109, 82, .2); }
+    .node.gold { background: var(--gold); color: var(--ink); border-color: rgba(230, 184, 78, .2); }
+    .node-a { left: 12%; top: 18%; }
+    .node-b { right: 13%; top: 17%; }
+    .node-c { left: 42%; top: 40%; width: 100px; }
+    .node-d { left: 13%; bottom: 16%; }
+    .node-e { right: 12%; bottom: 15%; }
+    .node-f { left: 48%; bottom: 9%; width: 58px; }
+    .network-label { position: absolute; left: 1rem; bottom: 1rem; color: var(--muted); font: .72rem Arial, sans-serif; }
+    .insight { border-left: 4px solid var(--coral); padding-left: 1.4rem; }
+    .insight strong { display: block; color: var(--teal); font: 700 1.8rem Arial, sans-serif; margin-bottom: .5rem; }
+    .insight p { color: var(--muted); line-height: 1.45; }
+    .case-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+    .case-step { position: relative; min-height: 190px; padding: 1.35rem; background: var(--white); border-top: 5px solid var(--teal); box-shadow: 0 8px 24px rgba(16, 45, 58, .05); }
+    .case-step:nth-child(2) { border-top-color: var(--coral); transform: translateY(1.5rem); }
+    .case-step:nth-child(3) { border-top-color: var(--gold); transform: translateY(3rem); }
+    .case-step span { color: var(--coral); font: 700 .72rem Arial, sans-serif; letter-spacing: .1em; }
+    .case-step p { color: var(--muted); line-height: 1.4; margin-bottom: 0; }
+    .case-step::after { content: "→"; position: absolute; right: -1.05rem; top: 46%; color: var(--coral); font: 1.5rem Arial, sans-serif; }
+    .case-step:last-child::after { display: none; }
+    .evidence-board { display: grid; grid-template-columns: 1.1fr .9fr; gap: 1rem; margin-top: 2rem; }
+    .evidence-panel { background: var(--white); border: 1px solid var(--line); padding: 1.35rem; box-shadow: 0 8px 24px rgba(16, 45, 58, .05); }
+    .evidence-panel h3 { color: var(--teal); }
+    .bar { display: grid; grid-template-columns: 110px 1fr 48px; gap: .7rem; align-items: center; margin: 1rem 0; font: .76rem Arial, sans-serif; }
+    .bar-track { height: 10px; background: #e7eeea; }
+    .bar-fill { height: 100%; background: var(--teal); }
+    .bar:nth-child(3) .bar-fill { background: var(--coral); }
+    .bar:nth-child(4) .bar-fill { background: var(--gold); }
+    .bar em { color: var(--muted); font-style: normal; text-align: right; }
+    .audit-list { display: grid; gap: .8rem; margin: 0; padding: 0; list-style: none; }
+    .audit-list li { display: flex; gap: .7rem; align-items: flex-start; color: var(--muted); font: .86rem/1.4 Arial, sans-serif; }
+    .audit-list b { color: var(--coral); font-size: 1rem; }
+    .controls { position: fixed; z-index: 5; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center; padding: .8rem 2rem; background: rgba(255, 253, 248, .93); border-top: 1px solid var(--line); font: .75rem Arial, sans-serif; }
+    .controls button { border: 0; background: transparent; color: var(--teal-dark); cursor: pointer; padding: .45rem .7rem; }
+    .controls button:hover, .controls button:focus-visible { color: var(--coral); outline: 2px solid var(--gold); outline-offset: 2px; }
+    .counter { color: var(--muted); min-width: 70px; text-align: center; }
+    @keyframes appear { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 760px) {
+      .slide { padding: 9vh 7vw 14vh; }
+      .graphic-layout, .evidence-board { grid-template-columns: 1fr; }
+      .network { min-height: 300px; }
+      .case-board { grid-template-columns: 1fr; }
+      .case-step:nth-child(2), .case-step:nth-child(3) { transform: none; }
+      .case-step::after { content: "↓"; right: 50%; top: auto; bottom: -1.8rem; }
+      .case-step:last-child::after { display: none; }
+      .controls { padding: .7rem 1rem; }
+    }
+    @media print {
+      .slide, .slide.active { display: block; min-height: 100vh; page-break-after: always; }
+      .controls { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide hero active" data-title="Mapa de red">
+      <div class="slide-content graphic-layout">
+        <div>
+          <div class="kicker">Lámina gráfica 01 · Red transaccional</div>
+          <div class="hero-mark">GRAFO PLAFT</div>
+          <h1>La relación revela lo que el dato aislado oculta.</h1>
+          <p class="lead">Clientes, cuentas, transferencias y señales se convierten en una red navegable para encontrar conexiones relevantes.</p>
+        </div>
+        <div class="network" aria-label="Mapa conceptual de entidades conectadas">
+          <div class="node node-a">CLIENTE</div>
+          <div class="node node-b hot">SEÑAL</div>
+          <div class="node node-c gold">CUENTA</div>
+          <div class="node node-d">ORIGEN</div>
+          <div class="node node-e hot">DESTINO</div>
+          <div class="node node-f">CASO</div>
+          <div class="network-label">Vista de conexiones · ventana temporal definida</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="De señal a caso">
+      <div class="slide-content">
+        <div class="kicker">Lámina gráfica 02 · Experiencia del analista</div>
+        <h2>De una señal a una decisión defendible.</h2>
+        <p class="lead">La plataforma ordena el trabajo del analista sin sustituir su criterio: explorar, interpretar y documentar.</p>
+        <div class="case-board">
+          <article class="case-step"><span>01 · EXPLORAR</span><h3>Seguir la red</h3><p>Expandir conexiones directas e indirectas y acotar el período bajo análisis.</p></article>
+          <article class="case-step"><span>02 · INTERPRETAR</span><h3>Entender el patrón</h3><p>Contrastar ciclos, concentración, intermediarios y contexto de las transacciones.</p></article>
+          <article class="case-step"><span>03 · DOCUMENTAR</span><h3>Construir el caso</h3><p>Vincular hallazgos, evidencia, observaciones y conclusión con trazabilidad.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Evidencia trazable">
+      <div class="slide-content">
+        <div class="kicker">Lámina gráfica 03 · Evidencia y control</div>
+        <h2>La evidencia convierte el análisis en un activo auditable.</h2>
+        <div class="evidence-board">
+          <article class="evidence-panel">
+            <h3>Cobertura del caso</h3>
+            <div class="bar"><span>Fuente</span><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div><em>96%</em></div>
+            <div class="bar"><span>Relaciones</span><div class="bar-track"><div class="bar-fill" style="width:84%"></div></div><em>84%</em></div>
+            <div class="bar"><span>Hallazgos</span><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><em>72%</em></div>
+            <p class="small">Indicadores de cobertura para comparar ejecuciones y detectar vacíos de soporte.</p>
+          </article>
+          <article class="evidence-panel">
+            <h3>Cadena verificable</h3>
+            <ul class="audit-list">
+              <li><b>01</b><span>Dato fuente y versión del dataset</span></li>
+              <li><b>02</b><span>Hecho representado en el grafo</span></li>
+              <li><b>03</b><span>Regla, algoritmo y parámetros</span></li>
+              <li><b>04</b><span>Evidencia asociada al caso</span></li>
+              <li><b>05</b><span>Interpretación y resultado del analista</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="controls" aria-label="Controles de presentación">
+    <button id="previous" type="button" aria-label="Diapositiva anterior">← Anterior</button>
+    <div class="counter"><span id="current">1</span> / <span id="total">3</span></div>
+    <button id="next" type="button" aria-label="Siguiente diapositiva">Siguiente →</button>
+  </nav>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const current = document.querySelector('#current');
+    const total = document.querySelector('#total');
+    let activeIndex = 0;
+
+    total.textContent = slides.length;
+
+    function showSlide(index) {
+      activeIndex = (index + slides.length) % slides.length;
+      slides.forEach((slide, slideIndex) => slide.classList.toggle('active', slideIndex === activeIndex));
+      current.textContent = activeIndex + 1;
+      document.title = `${slides[activeIndex].dataset.title} · Grafo PLAFT`;
+    }
+
+    document.querySelector('#previous').addEventListener('click', () => showSlide(activeIndex - 1));
+    document.querySelector('#next').addEventListener('click', () => showSlide(activeIndex + 1));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') showSlide(activeIndex - 1);
+      if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') showSlide(activeIndex + 1);
+      if (event.key === 'Home') showSlide(0);
+      if (event.key === 'End') showSlide(slides.length - 1);
+    });
+  </script>
+</body>
+</html>
