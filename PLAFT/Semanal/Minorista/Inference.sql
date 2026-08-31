@@ -1,6 +1,4 @@
--- CTAS de inferencia para PLAFT PJ Minorista (universo BPE)
--- Actualizar PERIODO_INFERENCIA cuando corresponda.
-CREATE TABLE "disc_comercial"."plaft_pj_minorista_202607" WITH (
+CREATE TABLE "disc_comercial"."plaft_pj_minorista_0726" WITH (
      format = 'parquet',
   external_location = 's3://ibk-discovery-comercial-us-east-1-654654352211-data/discovery/comercial/sanherna/PLAFT/PJ/MINORISTA/DATA_INFERENCIA_PILOTO/INFERENCIA/',
   partitioned_by = ARRAY [ 'periodo' ]
@@ -25,19 +23,21 @@ WITH pd AS (
         TRY_CAST(a.imp_trx_abonosefect_6m AS DOUBLE) AS imp_trx_abonosefect_6m,
         TRY_CAST(a.imp_trx_cargosefe_6m AS DOUBLE) AS imp_trx_cargosefe_6m,
         TRY_CAST(a.avg_trx_cargostot_3m AS DOUBLE) AS avg_trx_cargostot_3m,
-        TRY_CAST(a.max_trx_abonos_3m AS DOUBLE) AS max_trx_abonos_3m,
+    TRY_CAST(a.max_trx_abonos_3m AS DOUBLE) AS max_trx_abonos_3m,
 
         -- Cantidades
         TRY_CAST(a.cnt_trx_cargostot_3m AS INTEGER) AS cnt_trx_cargostot_3m,
 
         -- Promedios / ratios
         TRY_CAST(a.cnt_trx_abonospromtot_3m AS DOUBLE) AS cnt_trx_abonospromtot_3m,
+        TRY_CAST(a.rat_trx_abonosefectot_1m AS DOUBLE) AS rat_trx_abonosefectot_1m,
         TRY_CAST(a.rat_trx_abonosefectot_3m AS DOUBLE) AS rat_trx_abonosefectot_3m,
+        TRY_CAST(a.rat_trx_abonosefectot_9m AS DOUBLE) AS rat_trx_abonosefectot_9m,
         TRY_CAST(a.rat_mntcrgsefetot_1m AS DOUBLE) AS rat_mntcrgsefetot_1m,
 
         -- Demográficas / antigüedad
         TRY_CAST(a.num_edad_constitucion AS INTEGER) AS num_edad_constitucion,
-        TRY_CAST(a.num_antiguedad AS INTEGER) AS num_antiguedad,
+    TRY_CAST(a.num_antiguedad AS INTEGER) AS num_antiguedad,
 
         -- Riesgo
         TRY_CAST(a.desc_nivel_rsg_lsb_tot AS DOUBLE) AS desc_nivel_rsg_lsb_tot,
@@ -56,6 +56,7 @@ WITH pd AS (
         -- Flags (string/bool → 0/1)
         CAST(a.flg_casos_hist AS INTEGER) AS flg_casos_hist,
         CAST(a.flg_vrcn_abonos_5m_1m AS INTEGER) AS flg_vrcn_abonos_5m_1m,
+        CAST(a.flg_vrcn_efe_cargos_5m_1m AS INTEGER) AS flg_vrcn_efe_cargos_5m_1m,
 
         -- Conteos
         a.cnt_ro_debajo_umbral,
@@ -63,6 +64,8 @@ WITH pd AS (
         a.mto_fact_declarado_sunat,
         TRY_CAST(a.avg_cp_men_ing_12m AS DOUBLE) AS avg_cp_men_ing_12m,
         TRY_CAST(a.avg_cpmenegr_12m AS DOUBLE) AS avg_cpmenegr_12m,
+        TRY_CAST(a.max_mto_cpmening_12m AS DOUBLE) AS max_mto_cpmening_12m,
+        TRY_CAST(a.max_mto_cpegrmen_12m AS DOUBLE) AS max_mto_cpegrmen_12m,
 
         -- Exterior
         a.flg_al_ext_12m,
@@ -87,49 +90,106 @@ WITH pd AS (
         a.flg_kyc_hist,
         TRY_CAST(a.cnt_kyc_hist AS INTEGER) AS cnt_kyc_hist,
         -- ======================================================
-        -- FEATURES DERIVADAS DEL MODELO v2
+        -- 🔹 ACELERACIÓN / CAMBIO DE COMPORTAMIENTO
         -- ======================================================
+        TRY_CAST(a.imp_trx_abonostot_1m AS DOUBLE)
+            / NULLIF(TRY_CAST(a.avg_trx_abonostot_6m AS DOUBLE), 0)
+            AS rat_abonos_1m_vs_6m,
 
-        -- Concentración en contraparte
+
+
+        -- ======================================================
+        -- 🔹 CONCENTRACIÓN EN CONTRAPARTE
+        -- ======================================================
         TRY_CAST(a.avg_cpmenegr_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_cargosefe_6m AS DOUBLE), 0)
+            / NULLIF(TRY_CAST(a.imp_trx_cargostot_6m AS DOUBLE), 0)
             AS share_cp_egresos,
 
-        TRY_CAST(a.avg_cp_men_ing_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_abonosefect_6m AS DOUBLE), 0)
-            AS share_cp_ingresos,
 
-        -- Exposición al exterior (proporción sobre egresos efectivo 12m)
-        TRY_CAST(a.mto_al_ext_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_cargosefe_12m AS DOUBLE), 0)
-            AS ratio_egresos_exterior
+
+        -- ======================================================
+        -- 🔹 NORMALIZACIÓN DE RIESGO
+        -- ======================================================
+        TRY_CAST(a.cnt_ros_hist AS DOUBLE)
+            / NULLIF(TRY_CAST(a.cnt_trx_cargostot_3m AS DOUBLE), 0)
+            AS rat_cntros_x_cnttrxegr_3m,
+
+
+        -- ======================================================
+        -- 🔹 COHERENCIA ECONÓMICA
+        -- ======================================================
+        TRY_CAST(a.imp_trx_abonostot_6m AS DOUBLE)
+            / NULLIF(TRY_CAST(a.mto_fact_declarado_sunat AS DOUBLE), 0)
+            AS rat_ing_tot_x_factura_6m,
+
+        TRY_CAST(a.mto_pas_soles AS DOUBLE)
+            / NULLIF(TRY_CAST(a.imp_trx_abonostot_6m AS DOUBLE), 0)
+            AS rat_pastot_x_ingtot_6m,
+
+
+
+        -- ======================================================
+        -- 🔹 EXPOSICIÓN AL EXTERIOR (PROPORCIONES)
+        -- ======================================================
+
+
+        TRY_CAST(a.mto_del_ext_12m AS DOUBLE)
+            / NULLIF(TRY_CAST(a.imp_trx_abonostot_12m AS DOUBLE), 0)
+            AS rat_ing_ext_x_ing_tot_12m,
+
+
+        -- ======================================================
+        -- 🔹 COHERENCIA PEP / LSB
+        -- ======================================================
+        TRY_CAST(a.cod_rsg_pep AS DOUBLE)
+            - TRY_CAST(a.desc_nivel_rsg_lsb_tot AS DOUBLE)
+            AS gap_riesgo_pep_lsb
 
     FROM e_perm_aws.t_agg_alertas_plaft a
-        WHERE a.cod_mes = '202607'
+    WHERE a.cod_mes = '202607'
       AND a.desc_subsegmento = 'BPE'
 ),
 
 target AS (
-    SELECT 
+ SELECT *
+FROM (
+    SELECT
         codunico,
-        periodo_alerta,
+        CAST(REPLACE(SUBSTRING(CAST(alerta_fecha AS VARCHAR),1,7),'-','') AS VARCHAR) AS periodo_alerta,
         tipo_alerta_n2,
         trx_riesgo_cliente,
-        MAX(calificacion_monitoreo) AS flg_alerta
+        ROW_NUMBER() OVER (
+            PARTITION BY codunico,
+                         REPLACE(SUBSTRING(CAST(alerta_fecha AS VARCHAR),1,7),'-','')
+            ORDER BY CASE
+                WHEN tipo_alerta_n2 = 'MANUAL' THEN 1
+                WHEN tipo_alerta_n2 = 'SEMI AUTOMATICA' THEN 2
+                WHEN tipo_alerta_n2 = 'AUTOMATICO' THEN 3
+                ELSE 99
+            END
+        ) AS rn,
+        MAX(CAST (orden_alerta AS INT )) AS flg_alerta
     FROM e_perm_aws.t_alertas_plaft
-    GROUP BY codunico, periodo_alerta, tipo_alerta_n2,trx_riesgo_cliente
-)
+    where periodo_alerta = '202607'
+    GROUP BY
+        codunico,
+        REPLACE(SUBSTRING(CAST(alerta_fecha AS VARCHAR),1,7),'-',''),
+        tipo_alerta_n2,
+        trx_riesgo_cliente
+) t
+WHERE rn = 1)
 
 SELECT 
     a.*,
     b.tipo_alerta_n2,
     b.trx_riesgo_cliente,
     CASE 
-        WHEN b.flg_alerta = '1' THEN 1 
+        WHEN b.flg_alerta = 1 THEN 1 
         ELSE 0 
     END AS target_m,
+    b.periodo_alerta,
     a.cod_mes as periodo
 FROM pd a
 LEFT JOIN target b
     ON a.cod_cli = b.codunico
-    AND cast(a.cod_mes as varchar) = b.periodo_alerta
+    AND cast(a.codmes_lag1 as varchar) = b.periodo_alerta

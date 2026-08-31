@@ -3,12 +3,6 @@ import subprocess
 import argparse
 import datetime
 import glob
-import warnings
-
-# Reduce ruido de deprecaciones en la imagen base (dask/pyarrow viejos).
-warnings.simplefilter("ignore", FutureWarning)
-warnings.filterwarnings("ignore", category=RuntimeWarning, message="Mean of empty slice")
-
 import pandas as pd
 import numpy as np
 import dask.dataframe as dd
@@ -31,39 +25,33 @@ COLS_IDS = ["cod_mes", "key_value","cod_cli","tipo_alerta_n2"]
 COLS_CONTROL = ["trx_riesgo_cliente"]
 COLS_POST = ["key_value", "tipo_alerta_n2", "cod_mes"]
 
-COLS_VARS = [  # VARIABLES FINALES del TRAIN (selected_columns.csv sin target)
-    "cnt_trx_cargostot_3m",
-    "mto_pas_soles",
-    "rat_pastot_x_ingtot_6m",
-    "cnt_trx_abonospromtot_3m",
-    "imp_trx_abonosefect_6m",
-    "num_antiguedad",
-    "imp_trx_cargosefe_6m",
-    "ratio_cargos_1m_vs_6m",
-    "cnt_meses_sinegresos_12m",
-    "cnt_alerta_hist",
-    "rat_trx_abonosefectot_3m",
-    "avg_trx_cargostot_3m",
-    "rat_mntcrgsefetot_1m",
-    "rat_trx_abonosefectot_1m",
-    "rat_cntros_x_cnttrxegr_3m",
-    "share_cp_egresos",
-    "mto_del_ext_12m",
-    "rat_ing_ext_x_ing_tot_12m",
-    "max_mto_cpegrmen_12m",
-    "avg_cpmenegr_12m",
-    "mto_al_ext_12m",
-    "ratio_egresos_exterior",
-    "cnt_ros_hist",
-    "cnt_trx_sinenv_alext_12m",
-    "flg_alerta_12m",
-    "flg_vrcn_abonos_5m_1m",
-    "avg_cp_men_ing_12m",
-    "cnt_noticias",
-    "share_cp_ingresos",
-    "mto_fact_declarado_sunat",
-    "cod_ubigeo_cd",
-    "cod_sectorista_id",
+COLS_VARS = [  # VARIABLES_FINALES_MODELO v2 – 26 features (ordenadas por importancia)
+    'cod_ubigeo_cd',            # importancia=10.5376%
+    'cnt_trx_cargostot_3m',     # importancia=9.8065%
+    'mto_pas_soles',            # importancia=9.4462%
+    'cnt_trx_abonospromtot_3m', # importancia=8.7688%
+    'imp_trx_abonosefect_6m',   # importancia=7.2957%
+    'imp_trx_cargosefe_6m',     # importancia=5.8602%
+    'rat_trx_abonosefectot_3m', # importancia=4.9247%
+    'cnt_meses_sinegresos_12m', # importancia=4.8011%
+    'mto_fact_declarado_sunat', # importancia=4.6183%
+    'num_antiguedad',           # importancia=4.6075%
+    'rat_mntcrgsefetot_1m',     # importancia=3.4839%
+    'avg_trx_cargostot_3m',     # importancia=3.3763%
+    'cnt_alerta_hist',          # importancia=3.3495%
+    'mto_del_ext_12m',          # importancia=2.8387%
+    'cod_sectorista_id',        # importancia=2.7957%
+    'avg_cpmenegr_12m',         # importancia=2.2903%
+    'share_cp_egresos',         # importancia=1.6075%  [avg_cpmenegr_12m / imp_trx_cargosefe_6m]
+    'cnt_ros_hist',             # importancia=1.5269%
+    'ratio_egresos_exterior',   # importancia=1.2688%  [mto_al_ext_12m / imp_trx_cargosefe_12m]
+    'mto_al_ext_12m',           # importancia=1.1882%
+    'avg_cp_men_ing_12m',       # importancia=1.1559%
+    'flg_alerta_12m',           # importancia=1.0430%
+    'flg_vrcn_abonos_5m_1m',    # importancia=0.9516%
+    'share_cp_ingresos',        # importancia=0.7634%  [avg_cp_men_ing_12m / imp_trx_abonosefect_6m]
+    'cnt_noticias',             # importancia=0.6613%
+    'cnt_trx_sinenv_alext_12m', # importancia=0.5161%
 ]
 
 # ======================== FUNCIONES DE UTILIDAD =========================
@@ -76,85 +64,6 @@ def read_data(dir_data):
     except:
         path = f"{dir_data}/*"
         df = dd.read_parquet(path).compute().reset_index(drop=True)
-    return df
-
-
-def _safe_fill_median(series: pd.Series, default_value: float = 0.0) -> pd.Series:
-    """Fill NaN with median, or with default when a column is fully null."""
-    non_null = series.dropna()
-    if non_null.empty:
-        median_value = default_value
-    else:
-        median_value = non_null.median()
-    return series.fillna(median_value)
-
-
-def _build_derived_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Create derived features required by the model when they are missing."""
-    def _first_existing(options):
-        for col in options:
-            if col in df.columns:
-                return col
-        return None
-
-    if "share_cp_ingresos" not in df.columns:
-        num_col = _first_existing(["avg_cp_men_ing_12m", "avg_cpmening_12m", "avg_cp_men_ing_6m"])
-        den_col = _first_existing(["imp_trx_abonosefect_6m", "imp_trx_abonostot_6m", "imp_trx_abonosefect_12m"])
-        if num_col and den_col:
-            den = pd.to_numeric(df[den_col], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df[num_col], errors="coerce")
-            df["share_cp_ingresos"] = num / den
-
-    if "ratio_egresos_exterior" not in df.columns:
-        num_col = _first_existing(["mto_al_ext_12m", "mto_alext_12m"])
-        den_col = _first_existing(["imp_trx_cargosefe_12m", "imp_trx_cargostot_12m", "imp_trx_cargosefe_6m"])
-        if num_col and den_col:
-            den = pd.to_numeric(df[den_col], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df[num_col], errors="coerce")
-            df["ratio_egresos_exterior"] = num / den
-
-    if "rat_pastot_x_ingtot_6m" not in df.columns:
-        num_col = _first_existing(["mto_pas_soles"])
-        den_col = _first_existing(["imp_trx_abonostot_6m", "imp_trx_abonosefect_6m", "avg_cp_men_ing_12m"])
-        if num_col and den_col:
-            den = pd.to_numeric(df[den_col], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df[num_col], errors="coerce")
-            df["rat_pastot_x_ingtot_6m"] = num / den
-
-    if "rat_cntros_x_cnttrxegr_3m" not in df.columns:
-        if {"cnt_ros_hist", "cnt_trx_cargostot_3m"}.issubset(df.columns):
-            den = pd.to_numeric(df["cnt_trx_cargostot_3m"], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df["cnt_ros_hist"], errors="coerce")
-            df["rat_cntros_x_cnttrxegr_3m"] = num / den
-
-    if "rat_ing_ext_x_ing_tot_12m" not in df.columns:
-        num_col = _first_existing(["mto_del_ext_12m"])
-        den_col = _first_existing(["imp_trx_abonostot_12m", "imp_trx_abonosefect_6m"])
-        if num_col and den_col:
-            den = pd.to_numeric(df[den_col], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df[num_col], errors="coerce")
-            df["rat_ing_ext_x_ing_tot_12m"] = num / den
-
-    if "ratio_cargos_1m_vs_6m" not in df.columns:
-        num_col = _first_existing(["imp_trx_cargostot_1m", "imp_trx_cargosefe_1m"])
-        den_col = _first_existing(["avg_trx_cargostot_6m", "imp_trx_cargostot_6m", "imp_trx_cargosefe_6m"])
-        if num_col and den_col:
-            den = pd.to_numeric(df[den_col], errors="coerce").replace(0, np.nan)
-            num = pd.to_numeric(df[num_col], errors="coerce")
-            df["ratio_cargos_1m_vs_6m"] = num / den
-
-    # Si por estructura de fuente no se pueden derivar, crear como 0 para estabilidad.
-    for col in [
-        "share_cp_ingresos",
-        "ratio_egresos_exterior",
-        "rat_pastot_x_ingtot_6m",
-        "rat_cntros_x_cnttrxegr_3m",
-        "rat_ing_ext_x_ing_tot_12m",
-        "ratio_cargos_1m_vs_6m",
-    ]:
-        if col not in df.columns:
-            df[col] = 0.0
-
     return df
 
 
@@ -179,8 +88,6 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
             df["mto_fact_declarado_sunat"], errors="coerce"
         )
 
-    df = _build_derived_features(df)
-
     # ── Imputación diferenciada (sección 8.2 del notebook) ─────────────────
     cols_transac   = [c for c in df.columns if c.startswith(("cnt_trx_", "imp_trx_", "max_trx_", "avg_trx_"))]
     cols_ratios    = [c for c in df.columns if c.startswith(("rat_", "ratio_", "share_", "gap_"))]
@@ -189,10 +96,10 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
 
     df[cols_transac]   = df[cols_transac].fillna(0)
     for col in cols_ratios:
-        df[col] = _safe_fill_median(df[col], default_value=0.0)
+        df[col] = df[col].fillna(df[col].median())
     df[cols_variacion] = df[cols_variacion].fillna(-1)
     if "num_antiguedad" in df.columns:
-        df["num_antiguedad"] = _safe_fill_median(df["num_antiguedad"], default_value=0.0)
+        df["num_antiguedad"] = df["num_antiguedad"].fillna(df["num_antiguedad"].median())
     df[cols_flag] = df[cols_flag].fillna(0)
 
     int32_cols = df.select_dtypes(include=["Int32"]).columns
@@ -206,7 +113,7 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
 
     for col in df.select_dtypes(include=[np.number]).columns:
         if df[col].isnull().sum() > 0:
-            df[col] = _safe_fill_median(df[col], default_value=0.0)
+            df[col] = df[col].fillna(df[col].median())
 
     # ── Label Encoding ordenado por tasa de positividad (sección 8.4) ──────
     # Cargar mapas calculados en TRAIN desde artefactos guardados
@@ -265,31 +172,9 @@ def inference_fn(dir_models: str, df: pd.DataFrame, cols_vars: list) -> pd.DataF
     model = xgb.Booster()
     model.load_model(model_path)
 
-    missing_cols = [c for c in cols_vars if c not in df.columns]
-    if missing_cols:
-        print(f"WARN: columnas faltantes en inferencia (se imputan con 0): {missing_cols}")
-        for col in missing_cols:
-            df[col] = 0
-
-    zero_share = (df[cols_vars].isna().mean() * 100).sort_values(ascending=False)
-    print("Top 10 variables con mayor %NA antes de imputar:")
-    print(zero_share.head(10).round(2).to_string())
-
-    for col in cols_vars:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
-    df[cols_vars] = df[cols_vars].replace([np.inf, -np.inf], np.nan).fillna(0)
-
     dmatrix = xgb.DMatrix(df[cols_vars])
     scores = model.predict(dmatrix)
     df["puntuacion"] = scores
-    print(
-        "Score stats -> "
-        f"min={df['puntuacion'].min():.6f}, "
-        f"p25={df['puntuacion'].quantile(0.25):.6f}, "
-        f"p50={df['puntuacion'].quantile(0.50):.6f}, "
-        f"p75={df['puntuacion'].quantile(0.75):.6f}, "
-        f"max={df['puntuacion'].max():.6f}"
-    )
     return df
 
 

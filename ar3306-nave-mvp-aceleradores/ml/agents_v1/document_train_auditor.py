@@ -6,15 +6,9 @@ entorno o en el archivo indicado por ``--env-file``.
 
 import argparse
 import json
-import os
-import urllib.error
-import urllib.request
 from pathlib import Path
 
-try:
-    import truststore
-except ImportError:
-    truststore = None
+import boto3
 
 try:
     import pymupdf as fitz
@@ -24,11 +18,8 @@ except ImportError:
     except ImportError:
         fitz = None
 
-if truststore is not None:
-    truststore.inject_into_ssl()
-
-MODEL_ID = "openai/gpt-5.5"
-API_URL = "https://models.github.ai/inference/chat/completions"
+MODEL_ID = "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+REGION = "us-east-1"
 ARTIFACT_SUFFIXES = {".ipynb", ".py"}
 CHUNK_SIZE = 42_000
 SYSTEM_PROMPT = """Sos un auditor tecnico especializado en modelos PLAFT. Trabajas solo
@@ -40,36 +31,28 @@ citar ruta relativa y celda de notebook o linea de script. Si el codigo y el doc
 se contradicen, declara NO CUMPLE o PARCIAL y explica la contradiccion."""
 
 
-def load_environment(path: Path) -> None:
-    if not path.is_file():
-        return
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-
-
-def call_api(token: str, prompt: str, max_tokens: int) -> str:
-    payload = {"model": MODEL_ID, "max_tokens": max_tokens, "messages": [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": prompt},
-    ]}
-    request = urllib.request.Request(API_URL, data=json.dumps(payload).encode("utf-8"), headers={
-        "Authorization": f"Bearer {token}", "Content-Type": "application/json", "Accept": "application/json",
-    }, method="POST")
+def call_bedrock(prompt: str, max_tokens: int, model_id: str, region: str) -> str:
+    client = boto3.client("bedrock-runtime", region_name=region)
+    body = {
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": max_tokens,
+        "system": SYSTEM_PROMPT,
+        "messages": [{"role": "user", "content": prompt}],
+    }
     try:
-        with urllib.request.urlopen(request, timeout=180) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"GitHub Models devolvio HTTP {error.code}: {detail}") from error
-    except urllib.error.URLError as error:
-        raise RuntimeError(f"No fue posible conectar con GitHub Models: {error.reason}") from error
+        response = client.invoke_model(
+            modelId=model_id,
+            body=json.dumps(body),
+            contentType="application/json",
+            accept="application/json",
+        )
+        result = json.loads(response["body"].read())
+    except Exception as error:
+        raise RuntimeError(f"Amazon Bedrock no pudo invocar {model_id}: {error}") from error
     try:
-        return result["choices"][0]["message"]["content"]
+        return result["content"][0]["text"]
     except (KeyError, IndexError, TypeError) as error:
-        raise RuntimeError("Respuesta inesperada de GitHub Models") from error
+        raise RuntimeError("Respuesta inesperada de Amazon Bedrock") from error
 
 
 def split_text(text: str) -> list[str]:
@@ -113,41 +96,43 @@ def artifact_paths(train_dir: Path) -> list[Path]:
     return sorted(path for path in train_dir.rglob("*") if path.is_file() and path.suffix.lower() in ARTIFACT_SUFFIXES)
 
 
-def analyse_document(token: str, document_text: str, max_tokens: int) -> str:
+def analyse_document(document_text: str, max_tokens: int, model_id: str, region: str) -> str:
     parts = []
     for number, chunk in enumerate(split_text(document_text), 1):
-        parts.append(call_api(token, f"""Extrae todos los requisitos verificables del fragmento {number} del PDF.
+        parts.append(call_bedrock(f"""Extrae todos los requisitos verificables del fragmento {number} del PDF.
 Incluye pagina, seccion, valores exactos y evidencia tecnica requerida para datos, target,
 temporalidad, muestreo, faltantes, variables, modelo, HPO, metricas, validacion,
 explicabilidad, gobierno y resultados. No evalues aun.
 
-<DOCUMENTO>\n{chunk}\n</DOCUMENTO>""", max_tokens))
+<DOCUMENTO>\n{chunk}\n</DOCUMENTO>""", max_tokens, model_id, region))
     return "\n\n".join(parts)
 
 
-def analyse_artifacts(token: str, paths: list[Path], train_dir: Path, max_tokens: int) -> str:
+def analyse_artifacts(paths: list[Path], train_dir: Path, max_tokens: int, model_id: str, region: str) -> str:
     reviews = []
     for path in paths:
         content = load_artifact(path, train_dir)
         fragments = []
         for number, chunk in enumerate(split_text(content), 1):
-            fragments.append(call_api(token, f"""Realiza arqueologia tecnica del fragmento {number} del artefacto.
+            fragments.append(call_bedrock(f"""Realiza arqueologia tecnica del fragmento {number} del artefacto.
 Identifica objetivo, entradas/salidas, fuente, target, horizonte, particiones,
 preprocesamiento, variables, algoritmo, HPO, metricas, validaciones, artefactos,
 dependencias y ambiguedades. Cita ruta, celda o linea exacta.
 
-<ARTEFACTO>\n{chunk}\n</ARTEFACTO>""", max_tokens))
+<ARTEFACTO>\n{chunk}\n</ARTEFACTO>""", max_tokens, model_id, region))
         reviews.append(f"## {path.relative_to(train_dir).as_posix()}\n" + "\n\n".join(fragments))
     return "\n\n".join(reviews)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Audita un PDF contra Train con GPT-5.5 y genera un unico reporte")
+    parser = argparse.ArgumentParser(description="Audita un PDF contra Train con Amazon Bedrock y genera un unico reporte")
     parser.add_argument("--document", required=True)
     parser.add_argument("--train-dir", required=True)
     parser.add_argument("--output-dir", default="docs/auditoria_documento_train")
-    parser.add_argument("--env-file", default="C:\\Users\\b46637\\OneDrive - Interbank\\PLAFT\\Interbank\\PLAFT\\Desarrollo\\Minorista_regulado\\Documentacion\\github.env")
     parser.add_argument("--max-tokens", type=int, default=4096)
+    parser.add_argument("--model", default=MODEL_ID, help="ID del modelo habilitado en Bedrock")
+    parser.add_argument("--region", default=REGION, help="Region AWS de Bedrock")
+    parser.add_argument("--artifact", help="Unico artefacto relativo dentro de Train para probar")
     args = parser.parse_args()
     document = Path(args.document)
     train_dir = Path(args.train_dir)
@@ -155,20 +140,21 @@ def main() -> None:
         parser.error(f"No se encontro el PDF: {document}")
     if not train_dir.is_dir():
         parser.error(f"No se encontro Train: {train_dir}")
-    load_environment(Path(args.env_file))
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        parser.error("No se encontro GITHUB_TOKEN en el entorno ni en --env-file")
     paths = artifact_paths(train_dir)
     if not paths:
         parser.error("No se encontraron .ipynb ni .py en Train")
+    if args.artifact:
+        selected = train_dir / args.artifact
+        if selected not in paths:
+            parser.error(f"El artefacto no existe o no es .ipynb/.py dentro de Train: {args.artifact}")
+        paths = [selected]
     document_text = extract_pdf(document)
     if not document_text.strip():
         parser.error("El PDF no tiene texto extraible")
-    print(f"Modelo API: {MODEL_ID}")
+    print(f"Modelo Bedrock: {args.model}")
     print(f"Artefactos: {len(paths)}")
-    requirements = analyse_document(token, document_text, args.max_tokens)
-    archaeology = analyse_artifacts(token, paths, train_dir, args.max_tokens)
+    requirements = analyse_document(document_text, args.max_tokens, args.model, args.region)
+    archaeology = analyse_artifacts(paths, train_dir, args.max_tokens, args.model, args.region)
     final_prompt = f"""Genera UN SOLO REPORTE FINAL de auditoria comparando el documento contra TODOS los artefactos.
 No generes fichas separadas ni archivos adicionales. Debe contener exactamente:
 # Reporte final de auditoria del modelo PLAFT
@@ -184,7 +170,7 @@ Cada evidencia debe tener ruta y celda/linea concreta. Usa solo la evidencia pro
 
 <REQUISITOS>\n{requirements}\n</REQUISITOS>
 <ARQUEOLOGIA TRAIN>\n{archaeology}\n</ARQUEOLOGIA TRAIN>"""
-    report = call_api(token, final_prompt, args.max_tokens)
+    report = call_bedrock(final_prompt, args.max_tokens, args.model, args.region)
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)
     report_path = output / "reporte_final.md"
