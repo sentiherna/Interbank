@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Casos para Presentacion - Grafo PLAFT</title>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; background:#f4f6f8; color:#1f2937; margin:0; }
+.container { width:94%; max-width:1450px; margin:auto; }
+.header { background:linear-gradient(135deg,#0b4f6c,#0f766e); color:white; padding:38px 0; margin-bottom:26px; }
+.header h1 { margin:0; font-size:32px; }
+.header p { margin:10px 0 0; font-size:16px; opacity:.92; }
+.section { background:white; padding:26px; margin-bottom:22px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,.06); }
+h2 { color:#0b4f6c; border-bottom:2px solid #0f766e; padding-bottom:8px; margin-top:0; }
+h3 { margin:3px 0 0; color:#12364a; }
+.note { background:#e8f3f1; border-left:5px solid #0f766e; padding:14px; line-height:1.5; }
+.kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:16px; }
+.kpi { background:#f8fafc; border:1px solid #d9e1e7; border-radius:8px; padding:14px; }
+.kpi b { display:block; color:#0b4f6c; font-size:12px; text-transform:uppercase; }
+.kpi span { font-size:25px; font-weight:700; }
+.tabla-datos { border-collapse:collapse; width:100%; font-size:12px; }
+.tabla-datos th { background:#0b4f6c; color:white; padding:8px; white-space:nowrap; }
+.tabla-datos td { border-bottom:1px solid #ddd; padding:7px; text-align:right; white-space:nowrap; }
+.tabla-datos td:first-child, .tabla-datos td:nth-child(6) { text-align:left; }
+.tabla-datos tr:nth-child(even) { background:#f8fafc; }
+.case-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.case-card { border:1px solid #d9e1e7; border-radius:8px; padding:16px; background:#fbfcfe; }
+.case-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; border-bottom:1px solid #e5e7eb; padding-bottom:10px; }
+.eyebrow { margin:0; color:#64748b; font-size:12px; text-transform:uppercase; }
+.rank { min-width:82px; text-align:center; background:#e8f3f1; border-radius:8px; padding:8px; color:#0b4f6c; font-size:12px; }
+.rank b { font-size:20px; }
+.metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+.metrics div { background:white; border:1px solid #edf0f2; border-radius:8px; padding:10px; }
+.metrics b { display:block; font-size:15px; color:#0b4f6c; }
+.metrics span { display:block; color:#64748b; font-size:11px; margin-top:4px; }
+.readout { margin:8px 0 0; font-size:13px; line-height:1.45; }
+.badge { display:inline-block; border-radius:999px; padding:3px 8px; margin-left:6px; font-size:11px; font-weight:700; }
+.badge.yes { background:#fee2e2; color:#991b1b; }
+.badge.no { background:#e5e7eb; color:#475569; }
+@media(max-width:950px) { .case-grid, .kpis { grid-template-columns:1fr; } .metrics { grid-template-columns:repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<div class="header"><div class="container">
+<h1>Casos seleccionados para presentacion</h1>
+<p>Clientes P5 con score mayor a 0.98 en comunidades peque?as, distintas entre si, priorizados por se?ales de ROS, alertas, PEP, noticias, PageRank y monto.</p>
+</div></div>
+<div class="container">
+<section class="section">
+<h2>1. Criterio de seleccion</h2>
+<div class="note">Se seleccionaron 8 casos de comunidades con 2 a 1,000 nodos. Cada caso pertenece a una comunidad distinta para evitar repetir la misma estructura en la presentacion.</div>
+<div class="kpis">
+<div class="kpi"><b>Casos</b><span>8</span></div>
+<div class="kpi"><b>Comunidades</b><span>8</span></div>
+<div class="kpi"><b>Comunidad menor</b><span>2</span></div>
+<div class="kpi"><b>Comunidad mayor</b><span>3</span></div>
+</div>
+</section>
+<section class="section">
+<h2>2. Ejemplo de salida analitica</h2>
+<div style="overflow-x:auto">
+    <table class="tabla-datos">
+        <thead><tr><th>Cliente</th><th>Comunidad</th><th>Nodos comunidad</th><th>Contrapartes</th><th>Rank PR comunidad</th><th>Lider comunidad</th><th>Lider ROS</th><th>Lider alerta</th><th>Monto total</th><th>ROS directos</th><th>Dist. ROS</th><th>ROS comunidad</th><th>Alertas comunidad</th><th>PEP comunidad</th><th>Noticias comunidad</th></tr></thead>
+        <tbody><tr><td>0022002126</td><td>29,436</td><td>2</td><td>1</td><td>1</td><td>0022002126</td><td>0</td><td>0</td><td>72,000.00</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td>0022180326</td><td>54,265</td><td>3</td><td>2</td><td>1</td><td>0022180326</td><td>0</td><td>0</td><td>53,136.00</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0022270417</td><td>27,659</td><td>2</td><td>1</td><td>1</td><td>0022270417</td><td>0</td><td>0</td><td>5,563,440.00</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0021948921</td><td>55,331</td><td>2</td><td>1</td><td>1</td><td>0021948921</td><td>0</td><td>0</td><td>627,363.00</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0022200589</td><td>54,827</td><td>2</td><td>1</td><td>1</td><td>0022200589</td><td>0</td><td>0</td><td>15,567.39</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0022180886</td><td>54,263</td><td>2</td><td>1</td><td>1</td><td>0021825711</td><td>0</td><td>0</td><td>6,733,359.00</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0020830653</td><td>48,620</td><td>2</td><td>1</td><td>1</td><td>0020445365</td><td>0</td><td>0</td><td>72,047.70</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>0022214259</td><td>54,434</td><td>2</td><td>1</td><td>1</td><td>0022194085</td><td>0</td><td>0</td><td>547.11</td><td>0</td><td></td><td>0</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+    </table>
+    </div>
+</section>
+<section class="section">
+<h2>3. Lectura ejecutiva de casos</h2>
+<div class="case-grid">
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 29,436 ? 2 nodos</p>
+                <h3>0022002126</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>72,000.00</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0022002126</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>1</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 54,265 ? 3 nodos</p>
+                <h3>0022180326</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>53,136.00</b><span>Monto total</span></div>
+            <div><b>2</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0022180326</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 27,659 ? 2 nodos</p>
+                <h3>0022270417</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>5,563,440.00</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0022270417</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 55,331 ? 2 nodos</p>
+                <h3>0021948921</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>627,363.00</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0021948921</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 54,827 ? 2 nodos</p>
+                <h3>0022200589</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>15,567.39</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0022200589</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 54,263 ? 2 nodos</p>
+                <h3>0022180886</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>6,733,359.00</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0021825711</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 48,620 ? 2 nodos</p>
+                <h3>0020830653</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>72,047.70</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0020445365</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    
+
+    <article class="case-card">
+        <div class="case-head">
+            <div>
+                <p class="eyebrow">Comunidad 54,434 ? 2 nodos</p>
+                <h3>0022214259</h3>
+            </div>
+            <div class="rank">Rank PR<br><b>1</b></div>
+        </div>
+        <div class="metrics">
+            <div><b>547.11</b><span>Monto total</span></div>
+            <div><b>1</b><span>Contrapartes</span></div>
+            <div><b>0</b><span>ROS comunidad</span></div>
+            <div><b>0</b><span>Alertas comunidad</span></div>
+        </div>
+        <p class="readout">
+            Lider: <b>0022194085</b> <span class="badge no">sin ROS</span> <span class="badge no">sin alerta</span>
+        </p>
+        <p class="readout">
+            PEP comunidad: <b>0</b> ? Noticias comunidad: <b>0</b> ? Distancia ROS: <b>Sin ROS cercano</b>
+        </p>
+    </article>
+    </div>
+</section>
+</div>
+</body>
+</html>

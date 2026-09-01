@@ -14,14 +14,22 @@ import numpy as np
 import dask.dataframe as dd
 import tarfile
 import os
+
+# La validación que generó los scores de referencia usa XGBoost 1.7.6.
+subprocess.check_call([sys.executable, "-m", "pip", "install", "xgboost==1.7.6", "-q"])
+
 import xgboost as xgb
 import pytz
+
+if xgb.__version__ != "1.7.6":
+    raise RuntimeError(f"Versión XGBoost no compatible: {xgb.__version__}. Se requiere 1.7.6.")
 
 # ======================== RUTAS DE ENTRADA ==============================
 DIR_DATA      = "/opt/ml/processing/input/data"
 DIR_MODELS    = "/opt/ml/processing/input/models"
 DIR_RENAME    = "/opt/ml/processing/input/rename"
-DIR_ARTIFACTS = "/opt/ml/processing/input/artifacts"  # encoding_maps.json + percentil_limits.json
+DIR_ARTIFACTS = "/opt/ml/processing/input/artifacts"
+ENCODING_MAPS_FILE = "encoding_maps.json"
 
 # ======================== RUTAS DE SALIDA ===============================
 DIR_RESULTS = "/opt/ml/processing/output/results"
@@ -87,6 +95,33 @@ def _safe_fill_median(series: pd.Series, default_value: float = 0.0) -> pd.Serie
     else:
         median_value = non_null.median()
     return series.fillna(median_value)
+
+
+def apply_feature_mappings(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply categorical mappings fitted during training."""
+    import json
+
+    maps_path = os.path.join(DIR_ARTIFACTS, ENCODING_MAPS_FILE)
+    if not os.path.exists(maps_path):
+        raise FileNotFoundError(
+            f"No se encontró {maps_path}. "
+            "Monte MODEL/artifacts_v2 en la entrada artifacts."
+        )
+
+    with open(maps_path, "r", encoding="utf-8") as file:
+        feature_maps = json.load(file)
+
+    for column, mapping in feature_maps.items():
+        if column not in df.columns or column not in COLS_VARS:
+            continue
+        raw_values = df[column].fillna("SIN_INFO").astype(str)
+        mapped_values = raw_values.map(mapping)
+        unknown_count = int(mapped_values.isna().sum())
+        if unknown_count:
+            print(f"WARN: {column} tiene {unknown_count:,} valores no mapeados; se asignan a 0.")
+        df[column] = mapped_values.fillna(0).astype("float32")
+
+    return df
 
 
 def _build_derived_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -174,6 +209,8 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
     if "cnt_alerta_hist" in df.columns:
         df["cnt_alerta_hist"] = df["cnt_alerta_hist"].astype("float64")
 
+    df = apply_feature_mappings(df)
+
     if "mto_fact_declarado_sunat" in df.columns:
         df["mto_fact_declarado_sunat"] = pd.to_numeric(
             df["mto_fact_declarado_sunat"], errors="coerce"
@@ -208,48 +245,18 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
         if df[col].isnull().sum() > 0:
             df[col] = _safe_fill_median(df[col], default_value=0.0)
 
-    # ── Label Encoding ordenado por tasa de positividad (sección 8.4) ──────
-    # Cargar mapas calculados en TRAIN desde artefactos guardados
-    import json
-
-    EXCLUIR_ENCODE = {
-        "key_value", "cod_cli", "tipo_alerta_n2",
-        "trx_riesgo_cliente", "desc_provincia", "desc_departamento",
-    }
-    TARGET_COL = "target"
-
-    fp_enc = os.path.join(DIR_ARTIFACTS, "encoding_maps.json")
-    if os.path.exists(fp_enc):
-        with open(fp_enc, "r", encoding="utf-8") as f:
-            encoding_maps = json.load(f)
-
-        cols_cat_encode = [
-            c for c in df.select_dtypes(include=["object", "string"]).columns
-            if c != TARGET_COL and c not in EXCLUIR_ENCODE
-        ]
-        for col in cols_cat_encode:
-            if col in encoding_maps:
-                df[col] = df[col].map(encoding_maps[col]).fillna(0).astype(int)
-            else:
-                # Variable no vista en train → 0 (categoría nula)
-                df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
-    else:
-        # Fallback si no hay artefacto: convertir a numérico
-        cols_cat_encode = [
-            c for c in df.select_dtypes(include=["object", "string"]).columns
-            if c != TARGET_COL and c not in EXCLUIR_ENCODE
-        ]
-        for col in cols_cat_encode:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
-
-    # ── Winsorización con límites del TRAIN (sección 8.6) ───────────────────
+    # ── Winsorización con límites del TRAIN, si el artefacto está disponible ─
     fp_wins = os.path.join(DIR_ARTIFACTS, "percentil_limits.json")
     if os.path.exists(fp_wins):
-        with open(fp_wins, "r", encoding="utf-8") as f:
-            percentil_limits = json.load(f)
+        import json
+
+        with open(fp_wins, "r", encoding="utf-8") as file:
+            percentil_limits = json.load(file)
         for col, (p1, p99) in percentil_limits.items():
             if col in df.columns:
                 df[col] = df[col].clip(lower=p1, upper=p99)
+    else:
+        print("WARN: percentil_limits.json no disponible; no se aplicará winsorización.")
 
     return df
 
@@ -267,9 +274,10 @@ def inference_fn(dir_models: str, df: pd.DataFrame, cols_vars: list) -> pd.DataF
 
     missing_cols = [c for c in cols_vars if c not in df.columns]
     if missing_cols:
-        print(f"WARN: columnas faltantes en inferencia (se imputan con 0): {missing_cols}")
-        for col in missing_cols:
-            df[col] = 0
+        raise ValueError(
+            "Columnas requeridas por el modelo ausentes en inferencia: "
+            f"{missing_cols}. Revise Inference.sql antes de puntuar."
+        )
 
     zero_share = (df[cols_vars].isna().mean() * 100).sort_values(ascending=False)
     print("Top 10 variables con mayor %NA antes de imputar:")
@@ -300,20 +308,21 @@ def postprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
     df["tipo_alerta_n2"] = df["tipo_alerta_n2"].astype(str)
 
     # ── Umbral nueva alerta ─────────────────────────────────────────────
-    UMBRAL_NUEVA_ALERTA = 0.992137148976326
+    UMBRAL_NUEVA_ALERTA = 0.99296
 
     df["grupo_corte_nueva_alerta"] = (
-        (df["puntuacion"] > UMBRAL_NUEVA_ALERTA)
+        (df["puntuacion"] >= UMBRAL_NUEVA_ALERTA)
         & (df["tipo_alerta_n2"] == "0")
     ).astype(int)
 
-    # ── Quintiles de riesgo (P1=menor riesgo, P5=mayor riesgo) ──────────
+    # ── Quintiles de riesgo, referencia: 202508 ─────────────────────────
+    # Cohorte de validación: alertas AUTOMATICA con riesgo distinto de A.
     cortes = [
         -float("inf"),
-        0.746,   # P1 | P2
-        0.909,   # P2 | P3
-        0.963,   # P3 | P4
-        0.987,   # P4 | P5
+        0.224,   # P5 | P4
+        0.690,   # P4 | P3
+        0.892,   # P3 | P2
+        0.977,   # P2 | P1
         float("inf")
     ]
     etiquetas = [5, 4, 3, 2, 1]

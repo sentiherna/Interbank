@@ -1,6 +1,6 @@
 -- CTAS de inferencia para PLAFT PJ Minorista (universo BPE)
 -- Actualizar PERIODO_INFERENCIA cuando corresponda.
-CREATE TABLE "disc_comercial"."plaft_pj_minorista_202607" WITH (
+CREATE TABLE "disc_comercial"."plaft_pj_minorista_202508" WITH (
      format = 'parquet',
   external_location = 's3://ibk-discovery-comercial-us-east-1-654654352211-data/discovery/comercial/sanherna/PLAFT/PJ/MINORISTA/DATA_INFERENCIA_PILOTO/INFERENCIA/',
   partitioned_by = ARRAY [ 'periodo' ]
@@ -24,7 +24,12 @@ WITH pd AS (
         TRY_CAST(a.mto_pas_soles AS DOUBLE) AS mto_pas_soles,
         TRY_CAST(a.imp_trx_abonosefect_6m AS DOUBLE) AS imp_trx_abonosefect_6m,
         TRY_CAST(a.imp_trx_cargosefe_6m AS DOUBLE) AS imp_trx_cargosefe_6m,
+        TRY_CAST(a.imp_trx_cargostot_1m AS DOUBLE) AS imp_trx_cargostot_1m,
+        TRY_CAST(a.imp_trx_cargostot_6m AS DOUBLE) AS imp_trx_cargostot_6m,
+        TRY_CAST(a.imp_trx_abonostot_6m AS DOUBLE) AS imp_trx_abonostot_6m,
+        TRY_CAST(a.imp_trx_abonostot_12m AS DOUBLE) AS imp_trx_abonostot_12m,
         TRY_CAST(a.avg_trx_cargostot_3m AS DOUBLE) AS avg_trx_cargostot_3m,
+        TRY_CAST(a.avg_trx_cargostot_6m AS DOUBLE) AS avg_trx_cargostot_6m,
         TRY_CAST(a.max_trx_abonos_3m AS DOUBLE) AS max_trx_abonos_3m,
 
         -- Cantidades
@@ -33,6 +38,7 @@ WITH pd AS (
         -- Promedios / ratios
         TRY_CAST(a.cnt_trx_abonospromtot_3m AS DOUBLE) AS cnt_trx_abonospromtot_3m,
         TRY_CAST(a.rat_trx_abonosefectot_3m AS DOUBLE) AS rat_trx_abonosefectot_3m,
+        TRY_CAST(a.rat_trx_abonosefectot_1m AS DOUBLE) AS rat_trx_abonosefectot_1m,
         TRY_CAST(a.rat_mntcrgsefetot_1m AS DOUBLE) AS rat_mntcrgsefetot_1m,
 
         -- Demográficas / antigüedad
@@ -63,6 +69,7 @@ WITH pd AS (
         a.mto_fact_declarado_sunat,
         TRY_CAST(a.avg_cp_men_ing_12m AS DOUBLE) AS avg_cp_men_ing_12m,
         TRY_CAST(a.avg_cpmenegr_12m AS DOUBLE) AS avg_cpmenegr_12m,
+        TRY_CAST(a.max_mto_cpegrmen_12m AS DOUBLE) AS max_mto_cpegrmen_12m,
 
         -- Exterior
         a.flg_al_ext_12m,
@@ -92,20 +99,20 @@ WITH pd AS (
 
         -- Concentración en contraparte
         TRY_CAST(a.avg_cpmenegr_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_cargosefe_6m AS DOUBLE), 0)
+            / NULLIF(TRY_CAST(a.imp_trx_cargostot_6m AS DOUBLE), 0)
             AS share_cp_egresos,
 
         TRY_CAST(a.avg_cp_men_ing_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_abonosefect_6m AS DOUBLE), 0)
+            / NULLIF(TRY_CAST(a.imp_trx_abonostot_6m AS DOUBLE), 0)
             AS share_cp_ingresos,
 
-        -- Exposición al exterior (proporción sobre egresos efectivo 12m)
+        -- Exposición al exterior (proporción sobre abonos totales 12m)
         TRY_CAST(a.mto_al_ext_12m AS DOUBLE)
-            / NULLIF(TRY_CAST(a.imp_trx_cargosefe_12m AS DOUBLE), 0)
+            / NULLIF(TRY_CAST(a.imp_trx_abonostot_12m AS DOUBLE), 0)
             AS ratio_egresos_exterior
 
     FROM e_perm_aws.t_agg_alertas_plaft a
-        WHERE a.cod_mes = '202607'
+        WHERE a.cod_mes =  '202508'
       AND a.desc_subsegmento = 'BPE'
 ),
 
