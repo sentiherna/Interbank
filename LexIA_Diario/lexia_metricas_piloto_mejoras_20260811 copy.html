@@ -52,11 +52,63 @@
     <div class="topbar">
       <div>
         <h1>Piloto 2026 - LexIA Normativo Diario</h1>
-        <div class="subtitle">Metricas finales reestructuradas del piloto de julio 2026</div>
+        <div class="subtitle">Resultados observados del piloto de agosto 2026</div>
       </div>
       <div>
-        <div class="pill">Periodo 2026-07-01 a 2026-07-30</div>
-        <div class="pill-sub">18 dias con reporte y validacion en Excel</div>
+        <div class="pill">Corte 2026-08-01 a 2026-08-26</div>
+        <div class="pill-sub">24 reportes disponibles y validacion del analista hasta el 26/08</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">TRAZABILIDAD</div>
+        <div class="band-title">Detalle desde las 23 normas validadas por el analista</div>
+      </div>
+      <table class="cm">
+        <tr>
+          <th>Etapa</th>
+          <th>Cantidad</th>
+          <th>Tratamiento y resultado</th>
+        </tr>
+        <tr>
+          <td class="axis">Normas unicas validadas por el analista</td>
+          <td class="tn"><span class="n">23</span><span class="l">universo comparable</span></td>
+          <td class="tn"><span class="l">Normas de interes con reporte LexIA disponible hasta el 26/08.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Decretos de estado de emergencia</td>
+          <td class="fn"><span class="n">4</span><span class="l">categoria separada</span></td>
+          <td class="tn"><span class="l">Se muestran fuera de las metricas regulatorias principales.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Ordenanzas municipales de publicidad exterior</td>
+          <td class="fn"><span class="n">3</span><span class="l">categoria local separada</span></td>
+          <td class="tn"><span class="l">Sin obligacion bancaria directa; se muestran fuera de la matriz.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">Universo de la matriz principal</td>
+          <td class="tp"><span class="n">16</span><span class="l">normas comparables</span></td>
+          <td class="tn"><span class="l">Base para precision, recall, TP, FP y FN.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">TP observados</td>
+          <td class="tp"><span class="n">11</span><span class="l">capturados originalmente</span></td>
+          <td class="tn"><span class="l">Coincidencias directas entre LexIA y la validacion del analista.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">TP recuperables por parseo corregido</td>
+          <td class="tp"><span class="n">3</span><span class="l">332-EF/15, 02027-SBS y 0020-BCRP</span></td>
+          <td class="tn"><span class="l">Omitidos por cuadernillo consolidado; recuperables con el flujo corregido.</span></td>
+        </tr>
+        <tr>
+          <td class="axis">FN residuales</td>
+          <td class="fp"><span class="n">2</span><span class="l">videovigilancia y endeudamiento interno</span></td>
+          <td class="tn"><span class="l">Requieren regla especifica o validacion mediante reproceso.</span></td>
+        </tr>
+      </table>
+      <div class="foot">
+        Flujo de calculo: <b>23</b> normas del analista - <b>4</b> decretos de emergencia - <b>3</b> ordenanzas locales = <b>16</b> normas en matriz. De estas, <b>11 TP observados + 3 TP recuperables = 14 TP</b>; permanecen <b>2 FN</b> residuales.
       </div>
     </div>
 
@@ -67,54 +119,54 @@
       </div>
       <div class="grid4">
         <div class="mini">
-          <div class="num">1750</div>
-          <div class="txt">publicaciones totales vistas en los reportes diarios de julio</div>
+          <div class="num">865</div>
+          <div class="txt">publicaciones totales incluidas en los reportes comparables</div>
         </div>
         <div class="mini">
-          <div class="num">38</div>
-          <div class="txt">normas de interes validadas por el analista</div>
+          <div class="num">16</div>
+          <div class="txt">normas de interes en la matriz principal, sin categorias municipales o de emergencia</div>
         </div>
         <div class="mini">
-          <div class="num">66</div>
-          <div class="txt">alertas positivas emitidas por LexIA en el mes validado</div>
+          <div class="num">16</div>
+          <div class="txt">alertas positivas esperadas con la correccion de parseo</div>
         </div>
         <div class="mini">
-          <div class="num">18</div>
-          <div class="txt">dias del mes con reporte y validacion disponible</div>
+          <div class="num">24</div>
+          <div class="txt">reportes diarios incluidos en la comparacion</div>
         </div>
       </div>
       <div class="foot">
-        El total de <b>1750</b> corresponde a todas las publicaciones incluidas en los reportes diarios de julio 2026. Sobre ese universo, LexIA emitio <b>66 alertas positivas</b> y el analista valido <b>38 normas de interes</b>.
+        El total de <b>865</b> corresponde a las publicaciones de los <b>24 reportes</b> disponibles hasta el 26/08/2026. El analista valido 23 normas unicas de interes: cuatro decretos de estado de emergencia y tres ordenanzas municipales de publicidad exterior se presentan en un cuadro aparte. Las <b>16 normas restantes</b> integran la matriz principal. LexIA emitio 13 alertas observadas; con la recuperacion de tres casos de parseo, el escenario corregido considera <b>16 alertas</b>. Se excluyeron 6 registros del analista de los dias 01 y 23/08, porque no existe reporte LexIA de esas fechas.
       </div>
     </div>
 
     <div class="band">
       <div class="band-head">
-        <div class="band-kicker">METRICAS FINALES</div>
-        <div class="band-title">Solo precision y recall sobre el escenario reestructurado</div>
+        <div class="band-kicker">METRICAS AJUSTADAS</div>
+        <div class="band-title">Escenario corregido por recuperacion de parseo</div>
       </div>
       <div class="grid2">
         <div class="metric-card">
           <h3>Metricas clave</h3>
           <div class="metric-row">
             <div class="metric-box">
-              <div class="value">94.7%</div>
-              <div class="label">Recall final</div>
-              <div class="sub">36 de 38 normas de interes capturadas</div>
+              <div class="value">87.5%</div>
+              <div class="label">Recall corregido esperado</div>
+              <div class="sub">14 de 16 normas de interes capturadas</div>
             </div>
             <div class="metric-box">
-              <div class="value">54.6%</div>
-              <div class="label">Precision final</div>
-              <div class="sub">36 TP sobre 66 alertas totales esperadas</div>
+              <div class="value">87.5%</div>
+              <div class="label">Precision corregida esperada</div>
+              <div class="sub">14 TP sobre 16 alertas positivas esperadas</div>
             </div>
           </div>
           <div class="foot">
-            El recall final refleja la recuperacion proyectada de 10 de los 12 FN del piloto. La precision se muestra solo como lectura de control del escenario final, manteniendo sensibilidad alta para no perder normas relevantes.
+            El escenario ajustado incorpora tres normas que se perdieron por un problema tecnico de parseo ya corregido. El recall se calcula sobre normas regulatorias y operativas comparables, separando los decretos de estado de emergencia y las ordenanzas municipales informativas.
           </div>
         </div>
 
         <div class="confusion">
-          <h3>Matriz de confusion final</h3>
+          <h3>Matriz de confusion ajustada</h3>
           <table class="cm">
             <tr>
               <th></th>
@@ -123,8 +175,8 @@
             </tr>
             <tr>
               <td class="axis">LexIA SI</td>
-              <td class="tp"><span class="n">36</span><span class="l">TP</span></td>
-              <td class="fp"><span class="n">30</span><span class="l">FP</span></td>
+              <td class="tp"><span class="n">14</span><span class="l">TP</span></td>
+              <td class="fp"><span class="n">2</span><span class="l">FP</span></td>
             </tr>
             <tr>
               <td class="axis">LexIA NO</td>
@@ -133,7 +185,7 @@
             </tr>
           </table>
           <div class="foot">
-            Para este piloto se siguio el foco operativo del negocio: captura de normas de interes. Por eso la matriz prioriza `TP`, `FP` y `FN`; los `TN` no fueron medidos en esta presentacion.
+            La matriz incorpora como TP recuperables tres normas con evidencia de perdida por parseo en cuadernillos consolidados. Los verdaderos negativos no fueron medidos porque el Excel de validacion no contiene el universo completo de normas descartadas por el analista.
           </div>
         </div>
       </div>
@@ -141,32 +193,62 @@
 
     <div class="band">
       <div class="band-head">
-        <div class="band-kicker">LECTURA DEL CAMBIO</div>
-        <div class="band-title">Que cambia con el esquema reestructurado</div>
+        <div class="band-kicker">CUADRO COMPLEMENTARIO</div>
+        <div class="band-title">Categorias informativas locales y de emergencia fuera de las metricas</div>
+      </div>
+      <table class="cm">
+        <tr>
+          <th>Fecha</th>
+          <th>Normas validadas</th>
+          <th>Resultado LexIA original</th>
+          <th>Tratamiento</th>
+        </tr>
+        <tr>
+          <td class="axis">05/08/2026</td>
+          <td class="fn"><span class="n">4</span><span class="l">DS N° 065, 066, 067 y 068-2026-PCM</span></td>
+          <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
+          <td class="tn"><span class="n">Fuera</span><span class="l">categoria informativa de emergencia; no impacta TP, FP, FN ni recall</span></td>
+        </tr>
+        <tr>
+          <td class="axis">15, 18 y 20/08/2026</td>
+          <td class="fn"><span class="n">3</span><span class="l">Ord. N° 683-2026-MDB, 741/MDC y 00392-2026/MDSA</span></td>
+          <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
+          <td class="tn"><span class="n">Fuera</span><span class="l">ordenanzas locales sobre publicidad exterior; sin obligacion bancaria directa</span></td>
+        </tr>
+      </table>
+      <div class="foot">
+        Estas siete normas se mantienen visibles para seguimiento. Los decretos responden a emergencias climaticas y las ordenanzas regulan publicidad exterior local; por su caracter informativo o local, se separan de la medicion principal de desempeño regulatorio y operativo.
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">HALLAZGOS DEL PILOTO</div>
+        <div class="band-title">Principales causas de las brechas observadas</div>
       </div>
       <div class="grid4">
         <div class="mini">
-          <div class="num">30</div>
-          <div class="txt">falsos positivos del piloto original</div>
+          <div class="num">3</div>
+          <div class="txt">FN recuperables por la correccion del parseo del cuadernillo</div>
         </div>
         <div class="mini">
-          <div class="num">18</div>
-          <div class="txt">casos de embanderamiento u ornato municipal levantados por criterio operativo amplio</div>
+          <div class="num">2</div>
+          <div class="txt">FN residuales: videovigilancia y endeudamiento interno</div>
         </div>
         <div class="mini">
-          <div class="num">Parseo</div>
-          <div class="txt">grupo de casos con identidad dudosa por mezcla de encabezados, fechas internas y numeros mal reconstruidos</div>
+          <div class="num">87.5%</div>
+          <div class="txt">recall esperado luego de incorporar los casos recuperables</div>
         </div>
         <div class="mini">
-          <div class="num">12</div>
-          <div class="txt">casos restantes por criterio amplio o seguimiento indirecto no marcado por el analista</div>
+          <div class="num">2</div>
+          <div class="txt">falsos positivos: una identidad mal asociada y un proyecto normativo sin validacion positiva</div>
         </div>
       </div>
       <div class="foot">
-        Las <b>30 FP</b> deben leerse de forma conservadora. Primero, <b>18</b> normas municipales de embanderamiento u ornato que LexIA levanto por sensibilidad operativa, pero que el analista no conto como positivas. Segundo, hubo un <b>grupo de casos de parseo e identidad dudosa</b>, concentrado principalmente el <b>2026-07-15</b>, donde el parser mezclo texto, fechas internas y encabezados de otras normas; este bloque <b>no se presenta como mejora comprometida ni como recuperacion garantizada</b>. Tercero, el resto responde a criterio amplio o seguimiento indirecto.
+        Los tres FN recuperables son la <b>RM N° 332-2026-EF/15</b>, la <b>Resolucion SBS N° 02027-2026</b> y la <b>Circular N° 0020-2026-BCRP</b>. En las corridas originales, el cuadernillo consolidado redujo el procesamiento a un solo documento y una sola norma. Con el parseo corregido, pasan al escenario de TP recuperables. Permanecen dos FN residuales: la norma de videovigilancia y la operacion de endeudamiento interno.
       </div>
       <div class="foot">
-        Si la identidad de una norma queda dudosa por parseo, el flujo reestructurado la deja visible para revision del analista. Eso ayuda a no perder una norma relevante, pero no implica sumar automaticamente todos los errores de parseo como mejora confirmada del recall.
+        Las correcciones posteriores del manejo de cuadernillos consolidados recuperaron tres casos originalmente omitidos: <b>Resolucion SBS N° 02104-2026</b>, <b>Resolucion SBS N° 02116-2026</b> y <b>Ordenanza N° 754-MSB</b>. Estos ya estan incluidos dentro de los <b>11 TP</b> y no se contabilizan nuevamente como FN. Los <b>2 FP</b> tienen causas distintas: una identidad mal asociada por parseo y un proyecto normativo sin validacion positiva. El flujo actual conserva las normas con identidad dudosa para revision del analista y usa el listado oficial cuando El Peruano entrega un cuadernillo consolidado.
       </div>
     </div>
   </div>
