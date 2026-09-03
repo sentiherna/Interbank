@@ -1,0 +1,365 @@
+N°	VARIABLE INICIAL	VARIABLE FINAL	TIPO DE DATO	PK	DESCRIPCION	ESTADO/RAZON_AUDITORIA
+1	mes_base	cod_mes	string		Periodo de referencia en formato año-mes.	ID
+2	tipo_documento	tip_doc	string	PK	Tipo de documento de identificación del cliente.	ID
+3	num_documento	key_value	string	PK	Número de documento del cliente, correspondiente al tipo de documento indicado.	ID
+4	codunico	|	string	PK	Código único que identifica al cliente.	ID
+5	tipo_cliente	tip_cliente	string		Tipo de cliente: persona natural o jurídica.	UNICO
+6	fecha_vinculacion	fec_vinculacion	date		Fecha en la que el cliente se vinculó (año-mes-dia)	ID
+7	fecha_nacimiento	fec_nac_value	date		Fecha de nacimiento del cliente(debe estar encriptado- dato sensible)	SIN-EVID
+8	edad	num_edad_value	int		Edad del cliente(debe estar encriptado- dato sensible)	SIN-EVID
+9	nacionalidad	cod_nacionalidad	string		Nacionalidad del cliente	SIN-EVID
+10	fecha_constitucion	fec_constitucion	date		Fecha de constitución de la empresa (año-mes-dia)	ID
+11	edad_constitucion	num_edad_constitucion	int		Número de años desde la constitución de la empresa	SQL-01
+12	provincia	desc_provincia	string		Provincia correspondiente a la dirección del cliente.	SQL-01
+13	departamento	desc_departamento	string		Departamento correspondiente a la dirección del cliente	SQL-01
+14	v12_lugar_residencia_riesgo	cod_v12_lugar_rsdn_rsg	string		Clasificación del lugar de residencia según el nivel de riesgo	SIN-EVID
+15	ubigeo_cd	cod_ubigeo_cd	string		Código UBIGEO del cliente	MODELO(#31;0.56%)
+16	sectorista_id	cod_sectorista_id	string		Identificador del sector asignado al cliente	MODELO(#32;0.55%)
+17	riesgo_pep	cod_rsg_pep	codunico		Nivel de riesgo asignado al cliente por su condición de PEP.	SQL-01
+18	flag_pep	flg_pep	int		Indicador que señala si el cliente ha sido clasificado como PEP	SQL-01
+19	cargo_pep	desc_cargo_pep	string		Cargo o función pública ejercida por el cliente que le otorga la condición de PEP.	SIN-EVID
+20	fecha_inicio_pep	cod_fecha_inicio_pep	string		Fecha de inicio de la condición de PEP	SIN-EVID
+21	fecha_fin_pep	cod_fecha_fin_pep	string		Fecha de cese del cargo o condición de PEP	SIN-EVID
+22	flag_activo_pep	flg_activo_pep	string		Indicador que determina si la condición de PEP aún está activa	SQL-01
+23	tipo_cliente_sensible	tip_cliente_snsb_value	string		Clasificación del cliente según riesgo sensible	SIN-EVID
+24	score_con_excepcion	num_score_con_excepcion	decimal(38,6)		Score de riesgo del cliente	SIN-EVID
+25	ciiu_v4	cod_ciiu_v4	string		Codigos ciiu (Clasificación Industrial Internacional Uniforme) según la sunat versión 4	SQL-01
+26	descripcion_ciiu_v4	desc_ciiu_v4	string		Descripción de los codigos ciiu (Clasificación Industrial Internacional Uniforme) según la sunat versión 4	SIN-EVID
+27	facturacion	mto_fact_declarado_sunat	decimal(38,6)		Monto de facturación declarado del cliente, según SUNAT	MODELO(#30;0.59%)
+28	coddocrele	key_value_rele	string		Código de representante legal de la empresa relacionada	ID
+29	tipobancadesc	desc_tipobanca	string		Tipo de banca asignada al cliente	SIN-EVID
+30	flag_activo	flg_activo	int		Indicador si el cliente mantiene productos activos	SIN-EVID
+31	flag_pasivo	flg_pasivo	int		Indicador si el cliente tiene productos pasivos	SIN-EVID
+32	pasivo_soles	mto_pas_soles	decimal(38,6)		Monto de pasivos del cliente en moneda de tipo soles.	MODELO(#2;8.81%)
+33	flag_casos_12m	flg_casos_12m	int		Indicador si el cliente ha tenido casos de investigación por PLAFT en los últimos 12 meses.	UNICO
+34	flag_casos_hist	flg_casos_hist	string		Indicador si el cliente tiene casos históricos de investigación relacionados a PLAFT.	SQL-01
+35	estado_ultimo_caso	desc_estado_ultimo_caso	string		Estado actual del último caso investigado	SIN-EVID
+36	fecha_ultimo_caso	ts_ultimo_caso	timestamp		Fecha del último caso de investigación registrado.	SIN-EVID
+37	q_casos_hist	cnt_casos_hist	int		Cantidad total de casos históricos de investigación asociados al cliente.	SIN-EVID
+38	flag_desv_activa	flg_desv_activa	string		Indicador que señala si el cliente se encuentra actualmente en proceso activo de desvinculación por riesgos PLAFT.	UNICO
+39	flag_desv_hist	flg_desv_hist	int		Indicador que señala si el cliente ha tenido algún proceso histórico de desvinculación.	UNICO
+40	estado_ultima_desv	desc_estado_ultima_desv	string		Estado del último proceso de desvinculación	SIN-EVID
+41	periodo_inicio_desv_max	cod_mesmax_inicio_desv	string		Periodo (mes y año) en el que se inició el proceso de desvinculación más reciente.	SIN-EVID
+42	periodo_cierre_desv_max	cod_mesmax_cierre_desv	string		Periodo en el que se cerró o finalizó el proceso de desvinculación más reciente.	SIN-EVID
+43	meses_en_proceso_desvinculacion	num_meses_en_prcs_dsv	int		Número de meses que dura el proceso de desvinculación	SIN-EVID
+44	flag_alerta_12m	flg_alerta_12m	int		Indicador si el cliente ha generado alguna alerta PLAFT en los últimos 12 meses.	MODELO(#25;0.87%)
+45	flag_alerta_hist	flg_alerta_hist	int		Indicador si el cliente tiene historial de alertas por comportamiento sospechoso.	UNICO
+46	calificacion_ultima_alerta	cod_calificacion_ltm_lrt	string		Evaluación o nivel de riesgo asignado a la última alerta.	SIN-EVID
+47	fecha_ultima_alerta	ts_ultima_alerta	timestamp		Fecha en que se registró la última alerta generada para el cliente.	SIN-EVID
+48	q_alerta_hist	cnt_alerta_hist	int		Cantidad total de alertas históricas relacionadas al cliente.	MODELO(#10;4.05%)
+49	flag_ros_12m	flg_ros_12m	int		Indicador si el cliente ha sido reportado en un ROS durante los últimos 12 meses.	SQL-01
+50	flag_ros_hist	flg_ros_hist	string		Indicador si el cliente tiene historial de ROS emitidos.	UNICO
+51	fecha_ultimo_ros	ts_ultimo_ros	timestamp		Fecha del último Reporte de Operación Sospechosa enviado relacionado al cliente.	SIN-EVID
+52	q_ros_hist	cnt_ros_hist	int		Número total de ROS en los que el cliente ha estado involucrado.	MODELO(#23;0.95%)
+53	flag_kyc_12m	flg_kyc_12m	int		Indicador si se realizó una revisión KYC al cliente en los últimos 12 meses.	SQL-01
+54	flag_kyc_hist	flg_kyc_hist	int		Indicador si el cliente tiene alguna revisión KYC histórica registrada.	SQL-01
+55	fecha_ultimo_kyc_hist	ts_ultimo_kyc_hist	timestamp		Fecha en que se realizó la última revisión KYC al cliente.	SIN-EVID
+56	cantidad_kyc_hist	cnt_kyc_hist	int		Número total de revisiones KYC registradas en el historial del cliente.	SQL-01
+57	flag_hecar_12m_v	flg_hecar_v_12m	int		Indicador si se generó una evaluación HECAR de tipo “V” (vinculación) en los últimos 12 meses.	SIN-EVID
+58	flag_hecar_h_v	flg_hecar_h_v	int		Indicador si existen evaluaciones HECAR tipo “V” en el historial del cliente.	SIN-EVID
+59	fecha_ultimo_hecar_v	ts_ultimo_hecar_v	timestamp		Fecha de la última evaluación HECAR tipo “V” realizada.	SIN-EVID
+60	q_hecar_v	cnt_hecar_v	int		Cantidad total de evaluaciones tipo “V” en el historial.	SIN-EVID
+61	flag_hecar_12m_a	flg_hecar_a_12m	int		Indicador si hubo una evaluación HECAR tipo “A” en los últimos 12 meses.	SIN-EVID
+62	flag_hecar_h_a	flg_hecar_h_a	int		Indicador si el cliente tiene evaluaciones históricas tipo “A”.	SIN-EVID
+63	fecha_ultimo_hecar_a	ts_ultimo_hecar_a	timestamp		Fecha de la última evaluación tipo “A” registrada.	SIN-EVID
+64	q_hecar_a	cnt_hecar_a	int		Cantidad de evaluaciones tipo “A” en el historial.	SIN-EVID
+65	q_hecar_12m	cnt_hecar_12m	int		Número total de evaluaciones HECAR,  tipo A o V realizadas en los últimos 12 meses.	SIN-EVID
+66	nivel_riesgo_lsb_total	desc_nivel_rsg_lsb_tot	string		Nivel de riesgo consolidado de la información negativa encontrada en las listas LSB.(ALTO-MEDIO-BAJO)	SQL-01
+67	nivel_riesgo_lsb_ultima	desc_nivel_rsg_lsb_ultima	string		Nivel de riesgo asociado a la última entrada en las listas LSB.(ALTO-MEDIO-BAJO)	CORR-00
+68	fecha_mas_antiguo_lsb	ts_mas_antiguo_lsb	timestamp		Fecha de la alerta o reporte más antiguo registrado en las listas LSB.	UNICO
+69	fecha_mas_reciente_lsb	ts_mas_reciente_lsb	timestamp		Fecha del reporte más reciente en listas LSB.	UNICO
+70	cantidad_lsb	cnt_lsb	int		Número total de registros del cliente en las listas de sanciones bancarias.	SIN-EVID
+71	flag_cce_r1	flg_cce_r1	int		Indicador si el cliente aparece en la lista CCE R1	UNICO
+72	ultima_fecha_r1	fec_ultima_r1	date		Fecha del último evento o inclusión del cliente en la lista CCE R1.	SIN-EVID
+73	ultimo_periodo_noticia	cod_mesmax_notc	string		Periodo de la última noticia negativa vinculada al cliente.	SIN-EVID
+74	cantidad_noticias	cnt_noticias	int		Número total de noticias negativas registradas del cliente.	MODELO(#28;0.69%)
+75	nivel_riesgo_not_neg	desc_nivel_rsg_not_neg	string		Nivel de riesgo asignado en función del contenido y relevancia de la noticia	SIN-EVID
+76	cp_monto_total_ing	mto_cp_tot_ing_12m	decimal(38,6)		Monto total de ingresos en soles que el cliente ha recibido de sus contrapartes en los últimos 12 meses.	SIN-EVID
+77	cp_promedio_mensual_ing	avg_cp_men_ing_12m	decimal(38,6)		Promedio mensual de ingresos provenientes de suscontrapartes en los últimos 12 meses.	MODELO(#27;0.73%)
+78	cp_maximo_mensual_ing	max_mto_cpmening_12m	decimal(38,6)		Monto máximo ingreso en un solo mes de una o más contrapartes dentro de los últimos 12 meses.	SQL-01
+79	cp_cant_trx_ing	cnt_trx_totcping_12m	int		Cantidad total de operaciones de ingreso registradas por sus contrapartes en los últimos 12 meses.	SIN-EVID
+80	cp_ultimo_mes_ing	cod_mesmax_cp_ing_12m	string		Último mes en el que se registró una operación de ingreso con contrapartes en los últimos 12 meses.	SIN-EVID
+81	cp_ratio_ing	rat_cpingreso_12m	decimal(38,6)		Ratio o indicador comparativo que evalúa el comportamiento de ingresos de sus contrapartes en los últimos 12 meses.	SIN-EVID
+82	cp_monto_total_egr	mto_cptotegreso_12m	decimal(38,6)		Monto total de egresos en soles realizados por el cliente hacia contrapartes en los últimos 12 meses.	SIN-EVID
+83	cp_promedio_mensual_egr	avg_cpmenegr_12m	decimal(38,6)		Promedio mensual de egresos hacia contrapartes en los últimos 12 meses.	MODELO(#20;1.38%)
+84	cp_maximo_mensual_egr	max_mto_cpegrmen_12m	decimal(38,6)		Monto máximo de egreso en un solo mes de una o más contrapartes dentro de los últimos 12 meses.	MODELO(#19;1.48%)
+85	cp_cant_trx_egr	cnt_trx_cpegr_12m	int		Cantidad total de operaciones de egreso realizadas por sus contrapartes en los últimos 12 meses.	SIN-EVID
+86	cp_ultimo_mes_egr	cod_mesmax_trx_cp_egr_12m	string		Último mes en que se detectó una operación de egreso hacia contrapartes en los últimos 12 meses.	SIN-EVID
+87	cp_ratio_egr	rat_cp_egr_12m	decimal(38,6)		Ratio comparativo que analiza la salida de fondos hacia contrapartes en los últimos 12 meses.	SIN-EVID
+88	cu_contraparte_ing	cod_cli_cp_ing_12m	string		Código único (CU) de la contraparte que más transacciones de ingreso ha realizado hacia el cliente en los últimos 12 meses.	SIN-EVID
+89	dni_contraparte_ing	key_value_top1cp_ing_12m	string		Documento de identidad de la contraparte top1 en los últimos 12 meses.	SIN-EVID
+90	cp_acumulado_ing	mto_tot_acumuladoing_12m	decimal(38,6)		Monto total acumulado de ingresos de la contraparte top 1 en los últimos 12 meses.	SIN-EVID
+91	cp_cantidad_ing	cnt_trx_top1cping_12m	int		Cantidad total de operaciones ingreso realizadas por sus contrapartes top 1 en los últimos 12 meses.	SIN-EVID
+92	cp_flag_noticia_ing	flg_t1cp_notneging_12m	int		Indicador si la contraparte top 1  tiene noticias negativas asociadas en los últimos 12 meses.	SIN-EVID
+93	cp_flag_ros_ing	flg_t1cp_rosing_12m	int		Indicador si la contraparte top1 ha sido incluida en un Reporte de Operación Sospechosa en los últimos 12 meses.	SIN-EVID
+94	cp_fecha_ultimo_ros_ing	ts_top1cpultimoros	timestamp		Fecha del último ROS en el que estuvo involucrada la contraparte top 1.	SIN-EVID
+95	cp_flag_desv_ing	flg_t1cp_desving_12m	int		Indicador si la contraparte top1 ha sido objeto de un proceso de desvinculación en los últimos 12 meses.	SIN-EVID
+96	cp_fecha_inicio_desv_max_ing	cod_fecmax_cpincdsv_ing	string		Fecha de inicio del proceso de desvinculación más relevante de la contraparte top 1.	SIN-EVID
+97	cp_fecha_mas_antiguo_lsb_ing	fec_top1cplsbant_ing	string		Fecha del registro LSB más antiguo relacionado con la contraparte top1.	SIN-EVID
+98	cp_fecha_mas_reciente_lsb_ing	fec_cp_ms_rcnt_lsb_ing	string		Fecha más reciente en la que se identificó a la contraparte top1 en listas LSB.	SIN-EVID
+99	cp_cantidad_lsb_ing	cnt_cp_lsb_ing	int		Número de veces que la contraparte ha sido mencionada en listas de sanción.	SIN-EVID
+100	cu_contraparte_egr	cod_cli_cp_egr_12m	string		Código único (CU) de la contraparte que más transacciones de egresos ha realizado hacia el cliente en los últimos 12 meses.	SIN-EVID
+101	dni_contraparte_egr	key_value_cp_egr_12m	string		Documento de identidad de la contraparte top1 en los últimos 12 meses.	SIN-EVID
+102	cp_acumulado_egr	mto_t1cp_acum_egr_12m	decimal(38,6)		Monto total acumulado de egresos de la contraparte top 1 en los últimos 12 meses.	SIN-EVID
+103	cp_cantidad_egr	cnt_cp_egr	int		Número de operaciones de egreso a esa contraparte.	SIN-EVID
+104	cp_flag_noticia_egr	flg_cp_noticia_egr_12m	int		Indicador si la contraparte top1 tiene noticias negativas en los últimos 12 meses.	SIN-EVID
+105	cp_flag_ros_egr	flg_cp_ros_egr_12m	int		Indicador si la contraparte top1 aparece en reportes ROS en los últimos 12 meses.	SIN-EVID
+106	cp_fecha_ultimo_ros_egr	ts_cp_ultimo_ros_egr	timestamp		Fecha del último ROS vinculado en la que se identificó a la contraparte top1.	SIN-EVID
+107	cp_flag_desv_egr	flg_cp_desv_egr_12m	int		Indicador de desvinculación de la contraparte top1 en los últimos 12 meses.	SIN-EVID
+108	cp_fecha_inicio_desv_max_egr	cod_fecmax_cp_inc_dsv_egr	string		Fecha de inicio del proceso de desvinculación más relevante en la que se identificó a la contraparte top1.	SIN-EVID
+109	cp_fecha_mas_antiguo_lsb_egr	fec_cp_ms_ntg_lsb_egr	string		Fecha más antigua de presencia en listas LSB en la que se identificó a la contraparte top1.	SIN-EVID
+110	cp_fecha_mas_reciente_lsb_egr	fec_cp_ms_rcnt_lsb_egr	string		Fecha más reciente en listas LSB en la que se identificó a la contraparte top1.	SIN-EVID
+111	cp_cantidad_lsb_egr	cnt_cp_lsb_egr	int		Número total de registros en listas LSB.	SIN-EVID
+112	flag_inteligo	flg_inteligo	int		Si ha realizado operaciones en las tiendas de inteligo (COD: '3160', '6470')	SIN-EVID
+113	v01_lista_riesgo	cod_v01_lista_rsg	int		lista de riesgo con personas PEP.	SIN-EVID
+114	cp_monto_pep_ing	mto_cp_pep_ing	decimal(38,6)		Monto total de ingresos provenientes de contrapartes clasificadas como PEP.	SIN-EVID
+115	cp_monto_pep_egr	mto_cp_pep_egr	decimal(38,6)		Monto total de egresos enviados a contrapartes clasificadas como PEP.	SIN-EVID
+116	v11_pais_operativa_riesgo	cod_v11_pais_op_rsg	int		Riesgo asociado al país donde opera principalmente el cliente	SIN-EVID
+117	monto_ro_debajo_umbral	mto_ro_debajo_umbral	decimal(38,6)		Monto total de operaciones del cliente que están por debajo del umbral de reporte obligatorio ROS	CORR-00
+118	q_ro_debajo_umbral	cnt_ro_debajo_umbral	int		Número de operaciones que no superan el umbral ROS	SQL-01
+119	ing_tienda_riesgo_alto	mto_ing_tnda_rsg_alto_12m	decimal(38,6)		Monto total de ingresos del cliente realizados en tiendas clasificadas como de riesgo alto en los últimos 12 meses.	SIN-EVID
+120	ing_tienda_riesgo_medio	mto_ing_tnda_rsgmedio_12m	decimal(38,6)		Monto total de ingresos en tiendas de riesgo medio en los últimos 12 meses.	SIN-EVID
+121	ing_tienda_riesgo_bajo	mto_ing_tnda_rsg_bajo_12m	decimal(38,6)		Monto total de ingresos en tiendas de riesgo bajo en los últimos 12 meses.	SIN-EVID
+122	q_tienda_riesgo_alto	cnt_tienda_rsg_alto_12m	int		Número de transacciones registradas en tiendas de riesgo alto en los últimos 12 meses.	SIN-EVID
+123	q_tienda_riesgo_medio	cnt_tienda_rsg_medio_12m	int		Cantidad de transacciones en tiendas de riesgo medio en los últimos 12 meses.	SIN-EVID
+124	q_tienda_riesgo_bajo	cnt_tienda_rsg_bajo_12m	int		Número de transacciones realizadas en tiendas de riesgo bajo en los últimos 12 meses.	SIN-EVID
+125	v13_lugar_operativa_riesgo	cod_v13_lugar_op_rsg_12m	int		Clasificación de riesgo del lugar habitual donde el cliente opera en los últimos 12 meses.	SIN-EVID
+126	ing_canal_riesgo_alto	mto_ing_cnl_rsg_alto_12m	decimal(38,6)		Monto total de ingresos a través de canales de riesgo alto en los últimos 12 meses.	SIN-EVID
+127	ing_canal_riesgo_medio	mto_ing_cnl_rsg_medio_12m	decimal(38,6)		Monto de ingresos en canales de riesgo medio en los últimos 12 meses.	SIN-EVID
+128	ing_canal_riesgo_bajo	mto_ing_cnl_rsg_bajo_12m	decimal(38,6)		Monto de ingresos por canales de riesgo bajo en los últimos 12 meses.	SIN-EVID
+129	q_canal_riesgo_alto	cnt_canal_rsg_alto_12m	int		Número de operaciones por canales de riesgo alto en los últimos 12 meses.	SIN-EVID
+130	q_canal_riesgo_medio	cnt_canal_rsg_medio_12m	int		Número de operaciones por canales de riesgo medio en los últimos 12 meses.	SIN-EVID
+131	q_canal_riesgo_bajo	cnt_canal_rsg_bajo_12m	int		Número de operaciones por canales de riesgo bajo en los últimos 12 meses.	SIN-EVID
+132	v16_canal_operacion_riesgo	cod_v16_canal_op_rsg_12m	int		Clasificación general de riesgo del canal de operación más representativo del cliente en los últimos 12 meses.	SIN-EVID
+133	trx_q_abonos_1m_total	cnt_trx_abonostot_1m	int		Cantidad total de abonos en el último mes.	CORR-00
+134	trx_q_abonos_3m_total	cnt_trx_abonostot_3m	int		Cantidad total de abonos en los últimos 3 meses.	CORR-00
+135	trx_q_abonos_6m_total	cnt_trx_abonostot_6m	int		Cantidad total de abonos en los úlimos en 6 meses.	CORR-00
+136	trx_q_abonos_9m_total	cnt_trx_abonostot_9m	int		Cantidad total de abonos en los últimos 9 meses.	CORR-00
+137	trx_q_abonos_12m_total	cnt_trx_abonostot_12m	int		Cantidad total de abonos en los últimos 12 meses.	CORR-00
+138	trx_q_abonos_1m_efectivo	cnt_trx_abonosefect_1m	int		Cantidad total de abonos en efectivo en el ultimo mes.	SIN-EVID
+139	trx_q_abonos_3m_efectivo	cnt_trx_abonosefect_3m	int		Cantidad total de abonos en efectivo en los últimos 3 meses.	SIN-EVID
+140	trx_q_abonos_6m_efectivo	cnt_trx_abonosefect_6m	int		Cantidad abonos en efectivo en los últimos 6 meses.	CORR-00
+141	trx_q_abonos_9m_efectivo	cnt_trx_abonosefect_9m	int		Cantidad abonos en efectivo en los últimos en 9 meses.	CORR-00
+142	trx_q_abonos_12m_efectivo	cnt_trx_abonosefect_12m	int		Cantidad abonos en efectivo realizados en los últimos en 12 meses.	CORR-00
+143	trx_q_abonos_promedio_3m_total	cnt_trx_abonospromtot_3m	decimal(38,6)		Promedio mensual de cantidad de abonos totales en los últimos 3 meses.	MODELO(#4;7.55%)
+144	trx_q_abonos_promedio_6m_total	cnt_trx_abonospromtot_6m	decimal(38,6)		Promedio mensual de cantidad de abonos totales en los últimos 6 meses.	CORR-00
+145	trx_q_abonos_promedio_9m_total	cnt_trx_abonospromtot_9m	decimal(38,6)		Promedio mensual de cantidad de abonos totales en los últimos 9 meses.	CORR-00
+146	trx_q_abonos_promedio_12m_total	cnt_trx_abonospromtot_12m	decimal(38,6)		Promedio mensual de cantidad de abonos totales en los últimos 12 meses.	CORR-00
+147	trx_q_abonos_ratio_1m_efectivo_total	rat_trx_abonosefectot_1m	decimal(38,6)		Ratio de cantida de abonos en efectivo respecto a la cantidad total de abonos, considerando ambos valores acumulados en el último mes.	MODELO(#14;2.79%)
+148	trx_q_abonos_ratio_3m_efectivo_total	rat_trx_abonosefectot_3m	decimal(38,6)		Ratio de cantidad de abonos en efectivo respecto a la cantidad total de abonos, considerando ambos valores acumulados en los últimos 3 meses	MODELO(#11;3.80%)
+149	trx_q_abonos_ratio_6m_efectivo_total	rat_trx_abonosefectot_6m	decimal(38,6)		Ratio de cantidad de abonos en efectivo respecto a la cantidad total de abonos, considerando ambos valores acumulados en los últimos 6 meses	CORR-00
+150	trx_q_abonos_ratio_9m_efectivo_total	rat_trx_abonosefectot_9m	decimal(38,6)		Ratio de cantidad de abonos en efectivo respecto a la cantidad total de abonos, considerando ambos valores acumulados en los últimos 9 meses	CORR-02
+151	trx_q_abonos_ratio_12m_efectivo_total	rat_trx_abonosefectot_12m	decimal(38,6)		Ratio de cantidad de abonos en efectivo respecto a la cantidad total de abonos, considerando ambos valores acumulados en los últimos 12 meses	CORR-00
+152	trx_monto_abonos_1m_total	imp_trx_abonostot_1m	decimal(38,6)		Monto total abonado recibidoss en el último mes.	CORR-00
+153	trx_monto_abonos_3m_total	imp_trx_abonostot_3m	decimal(38,6)		Monto total de abonos recibidos en los últimos 3 meses.	CORR-00
+154	trx_monto_abonos_6m_total	imp_trx_abonostot_6m	decimal(38,6)		Monto total de abonos recibidos en los últimos 6 meses.	CORR-00
+155	trx_monto_abonos_9m_total	imp_trx_abonostot_9m	decimal(38,6)		Monto total de abonos recibidos en los últimos 9 meses.	CORR-00
+156	trx_monto_abonos_12m_total	imp_trx_abonostot_12m	decimal(38,6)		Monto total de abonos recibidos en los últimos 12 meses.	CORR-00
+157	trx_monto_abonos_1m_efectivo	imp_trx_abonosefect_1m	decimal(38,6)		Monto total de abonos en efectivo en el último mes.	SIN-EVID
+158	trx_monto_abonos_3m_efectivo	imp_trx_abonosefect_3m	decimal(38,6)		Monto total de abonos en efectivo en los últimos 3 meses.	SIN-EVID
+159	trx_monto_abonos_6m_efectivo	imp_trx_abonosefect_6m	decimal(38,6)		Monto total de abonos en efectivo en los últimos 6 meses.	MODELO(#5;6.39%)
+160	trx_monto_abonos_9m_efectivo	imp_trx_abonosefect_9m	decimal(38,6)		Monto total de abonos en efectivo en los últimos 9 meses.	CORR-00
+161	trx_monto_abonos_12m_efectivo	imp_trx_abonosefect_12m	decimal(38,6)		Monto total de abonos en efectivo en los últimos 12 meses.	CORR-00
+162	trx_monto_abonos_promedio_3m_total	avg_trx_abonostot_3m	decimal(38,6)		Promedio mensual de abonos (en monto) en los últimos 3 meses.	CORR-00
+163	trx_monto_abonos_promedio_6m_total	avg_trx_abonostot_6m	decimal(38,6)		Promedio mensual de abonos (en monto) en los últimos 6 meses.	CORR-00
+164	trx_monto_abonos_promedio_9m_total	avg_trx_abonostot_9m	decimal(38,6)		Promedio mensual de abonos (en monto) en los últimos 9 meses.	CORR-00
+165	trx_monto_abonos_promedio_12m_total	avg_trx_abonostot_12m	decimal(38,6)		Promedio mensual de abonos (en monto) en los últimos 12 meses.	CORR-00
+166	trx_monto_abonos_ratio_1m_efectivo_total	rat_trx_mntabnsefetot_1m	decimal(38,6)		Ratio de abonos en efectivo respecto al total de abonos, considerando ambos valores acumulados en los último mes.	CORR-00
+167	trx_monto_abonos_ratio_3m_efectivo_total	rat_trx_mntabnsefetot_3m	decimal(38,6)		Ratio de abonos en efectivo respecto al total de abonos, considerando ambos valores acumulados en los últimos 3 meses.	CORR-00
+168	trx_monto_abonos_ratio_6m_efectivo_total	rat_trx_mntabnsefetot_6m	decimal(38,6)		Ratio de abonos en efectivo respecto al total de abonos, considerando ambos valores acumulados en los últimos 6 meses.	CORR-00
+169	trx_monto_abonos_ratio_9m_efectivo_total	rat_trx_mntabnsefetot_9m	decimal(38,6)		Ratio de abonos en efectivo respecto al total de abonos, considerando ambos valores acumulados en los últimos 9 meses.	CORR-00
+170	trx_monto_abonos_ratio_12m_efectivo_total	rat_trx_mntabnsefetot_12m	decimal(38,6)		Ratio de abonos en efectivo respecto al total de abonos, considerando ambos valores acumulados en los últimos 12 meses.	CORR-00
+171	trx_monto_abonos_ratio_1a3m_4a6m_total	rat_trx_mntabontot_13_46	decimal(38,6)		Ratio de la diferencia del monto de los abonos 2 ventanas de tiempo entre el monto total ((monto mes1 al mes3)-(monto mes4 al mes6))/(monto total)	SIN-EVID
+172	trx_monto_abonos_ratio_1a3m_4a9m_total	rat_trx_mntabontot_13_49	decimal(38,6)		Ratio de la diferencia del monto de los abonos 2 ventanas de tiempo entre el monto total ((monto mes1 al mes3)-(monto mes4 al mes9))/(monto total)	SIN-EVID
+173	trx_monto_abonos_ratio_1a6m_7a12m_total	rat_trx_mntabontot_16_712	decimal(38,6)		Ratio de la diferencia del monto de los abonos 2 ventanas de tiempo entre el monto total ((monto mes1 al mes6)-(monto mes7 al mes12))/(monto total)	SIN-EVID
+174	q_meses_ingresos_0	cnt_meses_siningresos_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en que no se registraron abonos.	SQL-01
+175	trx_monto_abonos_1m_max	max_trx_abonos_1m	decimal(38,6)		Monto más alto recibido en un solo abono en el último mes.	CORR-00
+176	trx_monto_abonos_3m_max	max_trx_abonos_3m	decimal(38,6)		Monto más alto recibido en un solo abono en los últimos 3 meses.	SQL-01
+177	trx_monto_abonos_6m_max	max_trx_abonos_6m	decimal(38,6)		Monto más alto recibido en un solo abono en los últimos 6 meses.	CORR-00
+178	trx_monto_abonos_9m_max	max_trx_abonos_9m	decimal(38,6)		Monto más alto recibido en un solo abono en los últimos 9 meses.	CORR-00
+179	trx_monto_abonos_12m_max	max_trx_abonos_12m	decimal(38,6)		Monto más alto recibido en un solo abono en los últimos 12 meses.	CORR-00
+180	trx_q_cargos_1m_total	cnt_trx_cargostot_1m	int		Cantidad total de cargos en el último mes.	CORR-00
+181	trx_q_cargos_3m_total	cnt_trx_cargostot_3m	int		Cantidad de cargos  en los últimos 3 meses.	MODELO(#1;9.77%)
+182	trx_q_cargos_6m_total	cnt_trx_cargostot_6m	int		Cantidad de cargos en los últimos 6 meses.	CORR-00
+183	trx_q_cargos_9m_total	cnt_trx_cargostot_9m	int		Cantidad de cargos registrados en 9 meses.	CORR-00
+184	trx_q_cargos_12m_total	cnt_trx_cargostot_12m	int		Cantidad de cargos en el periodo de 12 meses.	CORR-00
+185	trx_q_cargos_1m_efectivo	cnt_trx_cargosefe_1m	int		Cantidad de cargos en efectivo en el último mes.	SIN-EVID
+186	trx_q_cargos_3m_efectivo	cnt_trx_cargosefe_3m	int		Cantidad de cargos en efectivo en los últimos 3 meses.	SIN-EVID
+187	trx_q_cargos_6m_efectivo	cnt_trx_cargosefe_6m	int		Cantidad de cargos en efectivo en los últimos 6 meses.	CORR-00
+188	trx_q_cargos_9m_efectivo	cnt_trx_cargosefe_9m	int		Cantidad total de cargos en efectivo en los últimos 9 meses.	CORR-00
+189	trx_q_cargos_12m_efectivo	cnt_trx_cargosefe_12m	int		Cantidad de cargos en efectivo en los ultimos 12 meses.	CORR-00
+190	trx_q_cargos_promedio_3m_total	avg_trx_cargos_3m	decimal(38,6)		Promedio mensual de cargos en los últimos 3 meses.	CORR-00
+191	trx_q_cargos_promedio_6m_total	avg_trx_cargos_6m	decimal(38,6)		Promedio de cargos en los últimos 6 meses.	CORR-00
+192	trx_q_cargos_promedio_9m_total	avg_trx_cargos_9m	decimal(38,6)		Promedio de cargos en los últimos 9 meses.	CORR-00
+193	trx_q_cargos_promedio_12m_total	avg_trx_cargos_12m	decimal(38,6)		Promedio mensual de egresos en los últimos 12 meses.	CORR-00
+194	trx_q_cargos_ratio_1m_efectivo_total	rat_trx_cargosefe_1m	decimal(38,6)		Ratio de cantida de cargos en efectivo respecto a la cantidad total de cargos, considerando ambos valores acumulados en el último mes.	CORR-00
+195	trx_q_cargos_ratio_3m_efectivo_total	rat_trx_cargosefe_3m	decimal(38,6)		Ratio de cantidad de cargos en efectivo respecto a la cantidad total de cargos, considerando ambos valores acumulados en los últimos 3 meses.	CORR-00
+196	trx_q_cargos_ratio_6m_efectivo_total	rat_trx_cargosefe_6m	decimal(38,6)		Ratio de cantidad de cargos en efectivo respecto a la cantidad total de cargos, considerando ambos valores acumulados en los últimos 6 meses.	CORR-00
+197	trx_q_cargos_ratio_9m_efectivo_total	rat_trx_cargosefe_9m	decimal(38,6)		Ratio de cantidad de cargos en efectivo respecto a la cantidad total de cargos, considerando ambos valores acumulados en los últimos 9 meses.	CORR-00
+198	trx_q_cargos_ratio_12m_efectivo_total	rat_trx_cargosefe_12m	decimal(38,6)		Ratio de cantidad de cargos en efectivo respecto a la cantidad total de cargos, considerando ambos valores acumulados en los últimos 12 meses.	CORR-00
+199	trx_monto_cargos_1m_total	imp_trx_cargostot_1m	decimal(38,6)		Monto total de cargos realizados en el último mes.	CORR-00
+200	trx_monto_cargos_3m_total	imp_trx_cargostot_3m	decimal(38,6)		Monto total de cargos realizados en los últimos 3 meses.	CORR-00
+201	trx_monto_cargos_6m_total	imp_trx_cargostot_6m	decimal(38,6)		Monto total de cargos realizados en los últimos 6 meses.	CORR-00
+202	trx_monto_cargos_9m_total	imp_trx_cargostot_9m	decimal(38,6)		Monto total de cargos realizados en los últimos 9 meses.	CORR-00
+203	trx_monto_cargos_12m_total	imp_trx_cargostot_12m	decimal(38,6)		Monto total de cargos realizados en los últimos 12 meses.	CORR-00
+204	trx_monto_cargos_1m_efectivo	imp_trx_cargosefe_1m	decimal(38,6)		Monto total de cargos  realizados en efectivo durante el último mes.	SIN-EVID
+205	trx_monto_cargos_3m_efectivo	imp_trx_cargosefe_3m	decimal(38,6)		Suma total de cargos en efectivo en los últimos 3 meses.	SIN-EVID
+206	trx_monto_cargos_6m_efectivo	imp_trx_cargosefe_6m	decimal(38,6)		Total egresado en efectivo en los ultimos 6 meses.	MODELO(#7;5.29%)
+207	trx_monto_cargos_9m_efectivo	imp_trx_cargosefe_9m	decimal(38,6)		Monto acumulado de cargos en efectivo durante los últimos 9 meses.	CORR-00
+208	trx_monto_cargos_12m_efectivo	imp_trx_cargosefe_12m	decimal(38,6)		Total anual de cargos realizados exclusivamente en efectivo.	CORR-00
+209	trx_monto_cargos_promedio_3m_total	avg_trx_cargostot_3m	decimal(38,6)		Promedio de los cargos totales en los últimos 3 meses.	MODELO(#12;3.40%)
+210	trx_monto_cargos_promedio_6m_total	avg_trx_cargostot_6m	decimal(38,6)		Promedio de los cargos totales en los últimos 6 meses.	CORR-00
+211	trx_monto_cargos_promedio_9m_total	avg_trx_cargostot_9m	decimal(38,6)		Promedio de los cargos totales en los últimos 9 meses.	CORR-00
+212	trx_monto_cargos_promedio_12m_total	avg_trx_cargostot_12m	decimal(38,6)		Promedio de los cargos  totales en los últimos 12 meses.	CORR-00
+213	trx_monto_cargos_ratio_1m_efectivo_total	rat_mntcrgsefetot_1m	decimal(38,6)		Porcentaje del monto de cargos realizados en efectivo sobre el total de cargos del último mes.	MODELO(#13;3.37%)
+214	trx_monto_cargos_ratio_3m_efectivo_total	rat_mntcrgsefetot_3m	decimal(38,6)		Porcentaje del monto de cargos realizados en efectivo sobre el total de cargos del los ultimos 3 meses.	CORR-00
+215	trx_monto_cargos_ratio_6m_efectivo_total	rat_mntcrgsefetot_6m	decimal(38,6)		Porcentaje del monto de cargos realizados en efectivo sobre el total de cargos del los ultimos 6 meses.	CORR-00
+216	trx_monto_cargos_ratio_9m_efectivo_total	rat_mntcrgsefetot_9m	decimal(38,6)		Porcentaje del monto de cargos realizados en efectivo sobre el total de cargos del los ultimos 9 meses.	SIN-EVID
+217	trx_monto_cargos_ratio_12m_efectivo_total	rat_trx_cargosefe_tot_12m	decimal(38,6)		Porcentaje del monto de cargos realizados en efectivo sobre el total de cargos del los ultimos 12 meses.	CORR-00
+218	q_meses_egresos_0	cnt_meses_sinegresos_12m	int		Número de meses, dentro de los últimos 12 meses, en que no se registraron cargos.	MODELO(#9;4.46%)
+219	trx_monto_cargos_1m_max	max_trx_cargos_1m	decimal(38,6)		Monto más alto de cargos registrado durante el último mes.	CORR-00
+220	trx_monto_cargos_3m_max	max_trx_cargos_3m	decimal(38,6)		Monto más alto de cargos registrado durante los últimos 3 meses.	CORR-00
+221	trx_monto_cargos_6m_max	max_trx_cargos_6m	decimal(38,6)		Monto más alto de cargos registrado durante los últimos 6 meses.	CORR-00
+222	trx_monto_cargos_9m_max	max_trx_cargos_9m	decimal(38,6)		Monto más alto de cargos registrado durante los últimos 9 meses.	CORR-00
+223	trx_monto_cargos_12m_max	max_trx_cargos_12m	decimal(38,6)		Monto más alto de cargos registrado durante los últimos 12 meses.	CORR-00
+224	q_trx_al_exterior_3m	cnt_trx_al_ext_3m	int		Cantidad de transacciones hacia el exterior en los últimos 3 meses.	SIN-EVID
+225	q_trx_al_exterior_6m	cnt_trx_al_ext_6m	int		Cantidad de transacciones hacia el exterior en los últimos 6 meses.	SIN-EVID
+226	q_trx_al_exterior_9m	cnt_trx_al_ext_9m	int		Cantidad de transacciones hacia el exterior en los últimos 9 meses.	SIN-EVID
+227	q_trx_al_exterior_12m	cnt_trx_al_ext_12m	int		Cantidad de transacciones hacia el exterior en los últimos 12 meses.	SIN-EVID
+228	q_trx_del_exterior_3m	cnt_trx_del_ext_3m	int		Cantidad de transacciones recibidas desde el exterior en 3 meses.	SIN-EVID
+229	q_trx_del_exterior_6m	cnt_trx_del_ext_6m	int		Cantidad de transacciones recibidas desde el exterior en 6 meses.	SIN-EVID
+230	q_trx_del_exterior_9m	cnt_trx_del_ext_9m	int		Cantidad de transacciones recibidas desde el exterior en 9 meses.	SIN-EVID
+231	q_trx_del_exterior_12m	cnt_trx_del_ext_12m	int		Cantidad de transacciones recibidas desde el exterior en 12 meses.	SIN-EVID
+232	monto_al_exterior_3m	mto_al_ext_3m	decimal(38,6)		Monto total enviado al exterior en los últimos 3 meses.	SIN-EVID
+233	monto_al_exterior_6m	mto_al_ext_6m	decimal(38,6)		Monto total enviado al exterior en los últimos 6 meses.	SIN-EVID
+234	monto_al_exterior_9m	mto_al_ext_9m	decimal(38,6)		Monto total enviado al exterior en los últimos 9 meses.	SIN-EVID
+235	monto_al_exterior_12m	mto_al_ext_12m	decimal(38,6)		Monto total enviado al exterior en los últimos 12 meses.	MODELO(#21;1.21%)
+236	monto_del_exterior_3m	mto_del_ext_3m	decimal(38,6)		Monto total recibido desde el exterior en los últimos 3 meses.	SIN-EVID
+237	monto_del_exterior_6m	mto_del_ext_6m	decimal(38,6)		Monto total recibido desde el exterior en los últimos 6 meses.	SIN-EVID
+238	monto_del_exterior_9m	mto_del_ext_9m	decimal(38,6)		Monto total recibido desde el exterior en los últimos 9 meses.	SIN-EVID
+239	monto_del_exterior_12m	mto_del_ext_12m	decimal(38,6)		Monto total recibido desde el exterior en los últimos 12 meses.	MODELO(#17;1.95%)
+240	q_meses_al_exterior_0	cnt_mes_sinenv_alext_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en los que no se registraron envíos al exterior.	MODELO*(#24;0.87%)
+241	q_meses_al_exterior_100	cnt_mes_al_ext_100_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en que se registraron envíos al exterior mayores a 100.	SIN-EVID
+242	q_meses_al_exterior_1000	cnt_mes_al_ext_1000_12m	int		Cantidad de meses, dentro de los últimos 12 meses,en que se registraron envíos al exterior mayores a 1000.	SQL-01*
+243	q_meses_al_exterior_10000	cnt_mes_al_ext_10k_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en que se registraron envíos al exterior mayores a 10000.	SIN-EVID
+244	q_meses_al_exterior_100000	cnt_mes_al_ext_100k_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en que se registraron envíos al exterior mayores a 100000.	SIN-EVID
+245	q_meses_al_exterior_1000000	cnt_mes_al_ext_1000k_12m	int		Cantidad de meses, dentro de los últimos 12 meses, en que se registraron envíos al exterior mayores a 1000000.	SIN-EVID
+246	q_meses_del_exterior_0	cnt_mes_sinenv_delext_12m	int		Cantidad de meses, dentro de los últimos 12 meses, sin recepción de fondos desde el exterior.	SIN-EVID
+247	q_meses_del_exterior_100	cnt_mes_del_ext_100_12m	int		Cantidad de meses, dentro de los últimos 12 meses, con recepción de fondos desde el exterior mayores a 100.	SIN-EVID
+248	q_meses_del_exterior_1000	cnt_mes_del_ext_1000_12m	int		Cantidad de meses, dentro de los últimos 12 meses, con recepción de fondos desde el exterior mayores a 1000.	SIN-EVID
+249	q_meses_del_exterior_10000	cnt_mes_del_ext_10k_12m	int		Cantidad de meses, dentro de los últimos 12 meses, con recepción de fondos desde el exterior mayores a 10000.	SIN-EVID
+250	q_meses_del_exterior_100000	cnt_mes_del_ext_100k_12m	int		Cantidad de meses, dentro de los últimos 12 meses, con recepción de fondos desde el exterior mayores a 100000.	SIN-EVID
+251	q_meses_del_exterior_1000000	cnt_mes_delext_1mll_12m	int		Cantidad de meses, dentro de los últimos 12 meses, con recepción de fondos desde el exterior mayores a 1000000.	SIN-EVID
+252	flag_al_exterior	flg_al_ext_12m	int		Indicador que señala si el cliente realizó envíos al exterior dentro de los últimos 12 meses.	SQL-01
+253	flag_del_exterior	flg_del_ext_12m	int		Indicador que señala si el cliente recibio envíos al exterior dentro de los últimos 12 meses.	SQL-01
+254	ing_del_ext_riesgo_alto	mto_ing_delextrsgalto_12m	decimal(38,6)		Monto total ingresado desde el exterior clasificado como de riesgo alto dentro de los últimos 12 meses.	SIN-EVID
+255	ing_del_ext_total	mto_ing_delexttot_12m	decimal(38,6)		Monto total ingresado desde el exterior, sin distinción de riesgo dentro de los últimos 12 meses.	SIN-EVID
+256	ratio_monto_ing_del_ext_alto_total	rat_ing_dl_xt_lt_tot_12m	decimal(38,6)		Proporción del monto de ingresos de riesgo alto respecto al total de ingresos desde el exterior dentro de los últimos 12 meses.	SIN-EVID
+257	q_del_ext_riesgo_alto	cnt_trx_delextrsgalto_12m	int		Número de transacciones desde el exterior clasificadas como de riesgo alto dentro de los últimos 12 meses.	SIN-EVID
+258	q_del_ext_total	cnt_trx_delexttot_12m	int		Número de transacciones recibidas desde el exterior dentro de los últimos 12 meses.	SIN-EVID
+259	ratio_q_ing_del_ext_alto_total	rat_trx_ingextrsgalto_12m	decimal(38,6)		Ratio de transacciones de alto riesgo sobre el total de ingresos desde el exterior dentro de los últimos 12 meses.	SIN-EVID
+260	ing_al_ext_riesgo_alto	mto_al_extrsgaltot_12m	decimal(38,6)		Monto total enviado al exterior identificado como de riesgo alto dentro de los últimos 12 meses.	SIN-EVID
+261	ing_al_ext_total	mto_al_ext_tot_12m	decimal(38,6)		Monto total enviado al exterior dentro de los últimos 12 meses.	SIN-EVID
+262	ratio_monto_ing_al_ext_alto_total	rat_mto_al_xt_lt_12m	decimal(38,6)		Ratio del monto de egresos al exterior de riesgo alto sobre el total de egresos al exterior dentro de los últimos 12 meses.	SIN-EVID
+263	q_al_ext_riesgo_alto	cnt_trx_alextrsgalto	int		Cantidad de transacciones de egreso al exterior consideradas de alto riesgo.	SIN-EVID
+264	q_al_ext_total	cnt_al_ext_tot_12m	int		Total de transacciones de egreso al exterior dentro de los últimos 12 meses.	SIN-EVID
+265	ratio_q_ing_al_ext_alto_total	rat_cnt_ing_al_xt_lt_tot	decimal(38,6)		Ratio entre la cantidad de egresos de alto riesgo y el total de egresos internacionales.	SIN-EVID
+266	cant_trx_debajo_10k_ing	cnt_trx_debajo10k_ing_12m	int		Cantidad de transacciones de ingreso que no superan los 10 000 soles dentro de los últimos 12 meses.	SIN-EVID
+267	monto_trx_debajo_10k_ing	imp_trx_debajo10k_ing_12m	decimal(38,6)		Monto total de transacciones de ingreso que no superan los 10 000 dentro de los últimos 12 meses.	SIN-EVID
+268	cant_trx_debajo_10k_egr	cnt_trx_debajo10k_egr_12m	int		Cantidad de transacciones de egresos que no superan los 10 000 soles dentro de los últimos 12 meses.	SIN-EVID
+269	monto_trx_debajo_10k_egr	imp_trx_debajo10k_egr_12m	decimal(38,6)		Monto de transacciones de egreso que no superan los 10 000 dentro de los últimos 12 meses.	SIN-EVID
+270	cp_cant_trx_ing_desv	cnt_cp_trx_ing_desv	int		Cantidad de operaciones de ingreso de las contraparte que esten en proceso de desvinculación.	SIN-EVID
+271	cp_monto_total_ing_desv	mto_cp_tot_ing_desv	decimal(38,6)		Monto total de abonos de las contraparte que están en proceso de desvinculación.	SIN-EVID
+272	cp_cant_trx_egr_desv	cnt_cp_trx_egr_desv	int		Cantidad de operaciones de egreso de la contraparte que están en proceso de desvinculación.	SIN-EVID
+273	cp_monto_total_egr_desv	mto_cp_tot_egr_desv	decimal(38,6)		Monto total de egreso de la contraparte que están en proceso de desvinculación.	SIN-EVID
+274	cp_cant_trx_ing_ros	cnt_cp_trx_ing_ros	int		Cantidad de operaciones de ingreso de la contraparte que han sido reportadas en un ROS.	CORR-00
+275	cp_monto_total_ing_ros	mto_cp_tot_ing_ros	decimal(38,6)		Monto total de ingreso de la contraparte que han sido reportadas en un ROS.	SIN-EVID
+276	cp_cant_trx_egr_ros	cnt_cp_trx_egr_ros	int		Cantidad de transacciones de egreso de la contraparte incluidas en un ROS.	CORR-00
+277	cp_monto_total_egr_ros	mto_cp_tot_egr_ros	decimal(38,6)		Monto total de las transacciones de egreso de la contraparte que han sido reportadas en un ROS	SIN-EVID
+278	flag_variacion_abono_monto_total_5m_1m	flg_vrcn_abonos_5m_1m	string		Si el monto total abonos del último mes es mayor al monto promedio total abonos de los últimos 5 meses coloco 1, caso contrario 0	MODELO(#26;0.80%)
+279	flag_variacion_efect_cargos_monto_5m_1m	flg_vrcn_efe_cargos_5m_1m	string		Si el monto total cargos en efectivo del último mes es mayor al monto promedio total cargos en efectivo de los últimos 5 meses coloco 1, caso contrario 0	CORR-02
+280	antiguedad	num_antiguedad	int		Años de relación comercial con el cliente	MODELO(#6;5.58%)
+281	dif_monto_abonos_cargos_efectivo_6m	mto_dif_abn_crgsefe_6m	decimal(38,6)		Diferencia entre el monto acumulado de abonos en efectivo y el monto acumulado de cargos en efectivo en los últimos 6 meses.	SIN-EVID
+282	dif_q_abonos_cargos_efectivo_6m	cnt_dif_abn_crgsefe_6m	int		Diferencia entre cantidad acumulada de abonos en efectivos y la cantidad acumulada de cargos en efectivo en los últimos 6 meses	CORR-00
+283	subsegmento	desc_subsegmento	string		Clasificación del cliente dentro de un nivel más específico del segmento(segmento comercial)	UNICO
+284	flg_alerta	flg_alerta	string		Indicador que señala si el cliente ha sido identificado con alguna alerta según reglas de riesgo	TARGET
+285	fecha_ejecucion	ts_carga	timestamp		Fecha de carga del proceso	UNICO
+286	p_codmes	p_codmes	string		Partición de la tabla (YYYYMM)	ID
+299	ingresos_vs_facturacion	rat_ing_tot_x_factura_6m	string		Esta variable mide la relación entre los ingresos totales (abonos) en los últimos 6 meses y la facturación reportada. Es un indicador de coherencia económica, ya que compara los ingresos operativos con la facturación declarada.	SQL-01
+300	pasivo_vs_ingresos	rat_pastot_x_ingtot_6m	string		 Esta variable calcula la relación entre el pasivo total en soles y los ingresos totales (abonos) en los últimos 6 meses. Es un indicador de la capacidad de la empresa para cubrir sus pasivos con los ingresos generados.	MODELO(#3;8.42%)
+301	ratio_abonos_1m_vs_6m	rat_abonos_1m_vs_6m	string		Este ratio mide la aceleración o desaceleración de los ingresos (abonos) en el último mes en comparación con el promedio mensual de los últimos 6 meses. Es útil para identificar cambios recientes en el comportamiento financiero.	SQL-01
+302	alertas_por_antiguedad	alertas_por_antiguedad	string		 Esta variable calcula el promedio de alertas históricas por año de antigüedad de la empresa. Es un indicador de la frecuencia de alertas en relación con la edad de la empresa.	SQL-01
+303	ratio_cargos_1m_vs_6m	rat_cargos_1m_vs_6m	string		Este ratio mide la aceleración o desaceleración de los egresos (cargos) en el último mes en comparación con el promedio mensual de los últimos 6 meses. Es útil para identificar cambios recientes en el comportamiento de egresos.	MODELO(#8;5.04%)
+304	ratio_ingresos_exterior	rat_ing_ext_x_ing_tot_12m	string		Esta variable mide la proporción de ingresos provenientes del exterior en relación con los ingresos totales (abonos) en los últimos 12 meses. Es un indicador de la dependencia de la empresa en ingresos internacionales.	MODELO(#18;1.82%)
+305	ros_por_trx_3m	rat_cntros_x_cnttrxegr_3m	string		Esta variable calcula la relación entre la cantidad de reportes de operaciones sospechosas (ROS) históricos y el número total de transacciones de egresos en los últimos 3 meses. Es un indicador de riesgo asociado a las operaciones recientes.	MODELO(#15;2.46%)
+306		avg_cp_men_ing_12m			Promedio mensual de ingresos provenientes de suscontrapartes en los últimos 12 meses.	MODELO(fila duplicada de #77)
+307	ratio_egresos_exterior	rat_egr_ext_x_egr_tot_12m			Esta variable mide la proporción de egresos provenientes del exterior en relación con los egresos totales en los últimos 12 meses. Es un indicador de la dependencia de la empresa en egresos internacionales.	MODELO*(#22;1.20%)
+
+=================================================================================
+LEYENDA - COLUMNA "ESTADO/RAZON_AUDITORIA"
+=================================================================================
+Metodologia: revision de los notebooks 0.limpieza_datos.ipynb, 01.genera_base_train.ipynb
+y 02.bivariados+EDA_train+seleccion_variables.ipynb del modelo Minorista Regulado.
+La ultima etapa de seleccion de variables (02) uso un modelo LightGBM y quedo con
+32 variables finales que acumulan el 99% de la importancia total.
+
+MODELO(#rank;importancia%)
+  -> La variable SI ENTRO AL MODELO FINAL. Es una de las 32 variables seleccionadas
+     en 02.bivariados+EDA_train+seleccion_variables.ipynb tras el filtro de importancia
+     LightGBM (>=99% acumulado). Se indica el puesto (#rank) y el % de importancia.
+
+CORR-00
+  -> DESCARTADA por alta correlacion (Pearson y/o Spearman, umbral >=0.9) con otra
+     variable de una ventana temporal distinta de la misma familia (p.ej. el monto a
+     3 meses vs. 6/9/12 meses). Hallazgo documentado en 0.limpieza_datos.ipynb.
+
+CORR-02
+  -> DESCARTADA en 02.bivariados+EDA_train+seleccion_variables.ipynb por alta
+     correlacion (>0.70) con otra variable que si quedo en el modelo final.
+
+UNICO
+  -> DESCARTADA por ser una variable constante (un solo valor / varianza cero) en
+     la base analizada. Hallazgo documentado en 0.limpieza_datos.ipynb.
+
+ID
+  -> NO ES FEATURE: variable identificadora del cliente, de control de proceso o de
+     particion de la tabla (ej. documento, codigo unico, periodo). Se excluye
+     explicitamente del set de variables candidatas en los notebooks revisados.
+
+TARGET
+  -> NO ES FEATURE: variable utilizada para construir la variable objetivo (target)
+     del modelo, no se evalua como predictor.
+
+SQL-01
+  -> La variable SI se incluyo como candidata en la consulta SQL de
+     01.genera_base_train.ipynb (o fue derivada/calculada en ese notebook), pero NO
+     fue parte de las 32 variables finales seleccionadas en 02 (quedo fuera por
+     correlacion o por no superar el umbral de importancia LightGBM).
+
+SIN-EVID
+  -> SIN EVIDENCIA: no se encontro referencia explicita a esta variable en los tres
+     notebooks revisados (0, 01, 02). No hay confirmacion de que haya sido evaluada
+     o descartada en esta iteracion del modelo; se recomienda confirmar con el
+     equipo de modelamiento si fue analizada en otra instancia (p.ej. versiones
+     anteriores del pipeline, notebooks de inferencia, u otros entregables).
+
+(*) Nota de hallazgo: se detecto una posible inconsistencia de nomenclatura entre
+el codigo y esta ficha documental en las filas 240, 242 y 307: el codigo usa
+'cnt_trx_sinenv_alext_12m', 'cnt_trx_al_ext_1000_12m' y 'ratio_egresos_exterior'
+mientras que la ficha documenta 'cnt_mes_sinenv_alext_12m', 'cnt_mes_al_ext_1000_12m'
+y 'rat_egr_ext_x_egr_tot_12m' respectivamente. Se recomienda validar con el equipo
+de modelamiento si son la misma variable o variables distintas.
+
+Hallazgos adicionales para reportar a auditoria:
+- 3 variables usadas en el modelo final NO figuran en esta ficha de 305/307
+  variables: 'share_cp_egresos', 'share_cp_ingresos' y 'cnt_trx_sinenv_alext_12m'
+  (creadas en 01.genera_base_train.ipynb). Se recomienda documentarlas formalmente.
+- La fila 306 aparece duplicada respecto a la fila 77 (misma variable final
+  'avg_cp_men_ing_12m'); se recomienda corregir la ficha maestra.
+- Existen inconsistencias entre 0.limpieza_datos.ipynb (pipeline/iteracion anterior,
+  con nombres de variable INICIAL) y 01/02 (pipeline actual, con nombres FINAL) para
+  variables como 'flag_alerta_12m' y 'flag_ros_12m': en 0 se reportan como constantes
+  (valor unico) mientras que en 01/02 se usan como candidatas/variable del modelo.
+  Esto sugiere que 0.limpieza_datos.ipynb corresponde a una base o periodo distinto
+  al usado en 01/02, o a una iteracion descontinuada del pipeline.
+

@@ -1,0 +1,200 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LexIA - Metricas finales del piloto</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#fff;color:#173b84}
+  .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px;box-sizing:border-box}
+  .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;color:#214a99;font-size:54px;line-height:1.02;font-weight:800}
+  .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+  .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+  .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+  .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+  .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+  .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;margin-top:18px}
+  .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+  .mini .num{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+  .mini .txt{font-size:14px;color:#637392;margin-top:6px}
+  .metric-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .metric-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .metric-box{border-radius:18px;padding:18px;background:#f8fbff;text-align:center}
+  .metric-box .value{font-size:52px;font-weight:800;color:#214a99;line-height:1}
+  .metric-box .label{font-size:15px;color:#637392;margin-top:6px}
+  .metric-box .sub{font-size:13px;color:#7b89a4;margin-top:8px}
+  .confusion{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .confusion h3,.metric-card h3{margin:0 0 14px 0;font-size:24px;color:#214a99}
+  table{border-collapse:separate;border-spacing:10px;width:100%}
+  .cm th,.cm td{border-radius:18px;padding:18px 16px;text-align:center}
+  .cm th{background:#eef3fb;color:#214a99;font-size:16px}
+  .cm .axis{background:#eef3fb;font-weight:700;color:#214a99}
+  .cm .tp{background:#e7f8ee}
+  .cm .fp{background:#fff2e8}
+  .cm .fn{background:#eef3fb}
+  .cm .tn{background:#f7f8fc}
+  .cm .n{display:block;font-size:42px;font-weight:800;color:#214a99;line-height:1}
+  .cm .l{display:block;font-size:14px;color:#5f6f8e;margin-top:6px}
+  .foot{margin-top:16px;font-size:14px;color:#5a6d8b;line-height:1.45}
+  @media (max-width:1100px){
+    .grid4{grid-template-columns:repeat(2,1fr)}
+    .grid2{grid-template-columns:1fr}
+    h1{font-size:40px}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topline"></div>
+    <div class="topbar">
+      <div>
+        <h1>Piloto 08/2026 - LexIA Normativo Diario</h1>
+        <div class="subtitle">Resultados observados del piloto de agosto 2026</div>
+      </div>
+      <div>
+        <div class="pill">Corte 2026-08-01 a 2026-08-31</div>
+        <div class="pill-sub">24 reportes disponibles y validacion del analista hasta el 31/08</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">VOLUMEN DEL PERIODO</div>
+        <div class="band-title">Resumen ejecutivo del universo revisado</div>
+      </div>
+      <div class="grid4">
+        <div class="mini">
+          <div class="num">1.258</div>
+          <div class="txt">publicaciones totales incluidas en los reportes comparables</div>
+        </div>
+        <div class="mini">
+          <div class="num">23</div>
+          <div class="txt">normas de interes en la matriz principal, sin categorias municipales o de emergencia</div>
+        </div>
+        <div class="mini">
+          <div class="num">20</div>
+          <div class="txt">alertas positivas esperadas con la correccion de parseo</div>
+        </div>
+      </div>
+      <div class="foot">
+      El analista valido 23 normas unicas de interes: Tres ordenanzas municipales de publicidad exterior se presentn excel.</b>. 
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">METRICAS AJUSTADAS</div>
+        <div class="band-title">Escenario corregido por recuperacion de parseo</div>
+      </div>
+      <div class="grid2">
+        <div class="metric-card">
+          <h3>Metricas clave</h3>
+          <div class="metric-row">
+            <div class="metric-box">
+              <div class="value">87.5%</div>
+              <div class="label">Recall corregido esperado</div>
+              <div class="sub">20 de 23 normas de interes capturadas</div>
+            </div>
+            <div class="metric-box">
+              <div class="value">87.5%</div>
+              <div class="label">Precision corregida esperada</div>
+              <div class="sub">14 TP sobre 16 alertas positivas esperadas</div>
+            </div>
+          </div>
+          <div class="foot">
+            El escenario ajustado incorpora tres normas que se perdieron por un problema tecnico de parseo ya corregido. El recall se calcula sobre normas regulatorias y operativas comparables, separando los decretos de estado de emergencia y las ordenanzas municipales informativas.
+          </div>
+        </div>
+
+        <div class="confusion">
+          <h3>Matriz de confusion ajustada</h3>
+          <table class="cm">
+            <tr>
+              <th></th>
+              <th>Analista SI</th>
+              <th>Analista NO</th>
+            </tr>
+            <tr>
+              <td class="axis">LexIA SI</td>
+              <td class="tp"><span class="n">18</span><span class="l">TP</span></td>
+              <td class="fp"><span class="n">2</span><span class="l">FP</span></td>
+            </tr>
+            <tr>
+              <td class="axis">LexIA NO</td>
+              <td class="fn"><span class="n">5</span><span class="l">FN</span></td>
+              <td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td>
+            </tr>
+          </table>
+          <div class="foot">
+            La matriz incorpora como TP recuperables tres normas con evidencia de perdida por parseo en cuadernillos consolidados. Los verdaderos negativos no fueron medidos porque el Excel de validacion no contiene el universo completo de normas descartadas por el analista.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">CUADRO COMPLEMENTARIO</div>
+        <div class="band-title">Categorias informativas locales y de emergencia fuera de las metricas</div>
+      </div>
+      <table class="cm">
+        <tr>
+          <th>Fecha</th>
+          <th>Normas validadas</th>
+          <th>Resultado LexIA original</th>
+          <th>Tratamiento</th>
+        </tr>
+        <tr>
+          <td class="axis">05/08/2026</td>
+          <td class="fn"><span class="n">4</span><span class="l">DS N° 065, 066, 067 y 068-2026-PCM</span></td>
+          <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
+          <td class="tn"><span class="n">Fuera</span><span class="l">categoria informativa de emergencia; no impacta TP, FP, FN ni recall</span></td>
+        </tr>
+        <tr>
+          <td class="axis">15, 18 y 20/08/2026</td>
+          <td class="fn"><span class="n">3</span><span class="l">Ord. N° 683-2026-MDB, 741/MDC y 00392-2026/MDSA</span></td>
+          <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
+          <td class="tn"><span class="n">Fuera</span><span class="l">ordenanzas locales sobre publicidad exterior; sin obligacion bancaria directa</span></td>
+        </tr>
+      </table>
+      <div class="foot">
+        Estas siete normas se mantienen visibles para seguimiento. Los decretos responden a emergencias climaticas y las ordenanzas regulan publicidad exterior local; por su caracter informativo o local, se separan de la medicion principal de desempeño regulatorio y operativo.
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">HALLAZGOS DEL PILOTO</div>
+        <div class="band-title">Principales causas de las brechas observadas</div>
+      </div>
+      <div class="grid4">
+        <div class="mini">
+          <div class="num">3</div>
+          <div class="txt">FN recuperables por la correccion del parseo del cuadernillo</div>
+        </div>
+        <div class="mini">
+          <div class="num">2</div>
+          <div class="txt">FN residuales: videovigilancia y endeudamiento interno</div>
+        </div>
+        <div class="mini">
+          <div class="num">87.5%</div>
+          <div class="txt">recall esperado luego de incorporar los casos recuperables</div>
+        </div>
+        <div class="mini">
+          <div class="num">2</div>
+          <div class="txt">falsos positivos: una identidad mal asociada y un proyecto normativo sin validacion positiva</div>
+        </div>
+      </div>
+      <div class="foot">
+        Los tres FN recuperables son la <b>RM N° 332-2026-EF/15</b>, la <b>Resolucion SBS N° 02027-2026</b> y la <b>Circular N° 0020-2026-BCRP</b>. En las corridas originales, el cuadernillo consolidado redujo el procesamiento a un solo documento y una sola norma. Con el parseo corregido, pasan al escenario de TP recuperables. Permanecen dos FN residuales: la norma de videovigilancia y la operacion de endeudamiento interno.
+      </div>
+      <div class="foot">
+        Las correcciones posteriores del manejo de cuadernillos consolidados recuperaron tres casos originalmente omitidos: <b>Resolucion SBS N° 02104-2026</b>, <b>Resolucion SBS N° 02116-2026</b> y <b>Ordenanza N° 754-MSB</b>. Estos ya estan incluidos dentro de los <b>11 TP</b> y no se contabilizan nuevamente como FN. Los <b>2 FP</b> tienen causas distintas: una identidad mal asociada por parseo y un proyecto normativo sin validacion positiva. El flujo actual conserva las normas con identidad dudosa para revision del analista y usa el listado oficial cuando El Peruano entrega un cuadernillo consolidado.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
