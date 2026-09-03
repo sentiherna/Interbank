@@ -51,12 +51,11 @@
     <div class="topline"></div>
     <div class="topbar">
       <div>
-        <h1>Piloto 2026 - LexIA Normativo Diario</h1>
+        <h1>Piloto 08-2026 - LexIA Normativo Diario</h1>
         <div class="subtitle">Resultados observados del piloto de agosto 2026</div>
       </div>
       <div>
-        <div class="pill">Corte 2026-08-01 a 2026-08-26</div>
-        <div class="pill-sub">24 reportes disponibles y validacion del analista hasta el 26/08</div>
+        <div class="pill">Corte 2026-08-01 a 2026-08-31</div>
       </div>
     </div>
 
@@ -67,24 +66,20 @@
       </div>
       <div class="grid4">
         <div class="mini">
-          <div class="num">865</div>
+          <div class="num">1.258</div>
           <div class="txt">publicaciones totales incluidas en los reportes comparables</div>
         </div>
         <div class="mini">
-          <div class="num">16</div>
-          <div class="txt">normas de interes en la matriz principal, sin categorias municipales o de emergencia</div>
+          <div class="num">23</div>
+          <div class="txt">normas de interes validadas por el analista e incluidas en la matriz</div>
         </div>
         <div class="mini">
           <div class="num">16</div>
           <div class="txt">alertas positivas esperadas con la correccion de parseo</div>
         </div>
-        <div class="mini">
-          <div class="num">24</div>
-          <div class="txt">reportes diarios incluidos en la comparacion</div>
-        </div>
       </div>
       <div class="foot">
-        El total de <b>865</b> corresponde a las publicaciones de los <b>24 reportes</b> disponibles hasta el 26/08/2026. El analista valido 23 normas unicas de interes: cuatro decretos de estado de emergencia y tres ordenanzas municipales de publicidad exterior se presentan en un cuadro aparte. Las <b>16 normas restantes</b> integran la matriz principal. LexIA emitio 13 alertas observadas; con la recuperacion de tres casos de parseo, el escenario corregido considera <b>16 alertas</b>. Se excluyeron 6 registros del analista de los dias 01 y 23/08, porque no existe reporte LexIA de esas fechas.
+        El analista valido <b>23 normas unicas de interes comparables</b>. LexIA emitio 13 alertas observadas; con la recuperacion esperada de tres casos de parseo, el escenario corregido considera <b>16 alertas</b>. Los DS N° 117, 118 y 119-2026-PCM y el DS N° 012-2026-PRODUCE se publicaron el 23/08, fecha sin reporte LexIA, por lo que no se incluyen como TP ni FN.
       </div>
     </div>
 
@@ -98,9 +93,9 @@
           <h3>Metricas clave</h3>
           <div class="metric-row">
             <div class="metric-box">
-              <div class="value">87.5%</div>
+              <div class="value">60.9%</div>
               <div class="label">Recall corregido esperado</div>
-              <div class="sub">14 de 16 normas de interes capturadas</div>
+              <div class="sub">14 de 23 normas de interes capturadas</div>
             </div>
             <div class="metric-box">
               <div class="value">87.5%</div>
@@ -109,7 +104,7 @@
             </div>
           </div>
           <div class="foot">
-            El escenario ajustado incorpora tres normas que se perdieron por un problema tecnico de parseo ya corregido. El recall se calcula sobre normas regulatorias y operativas comparables, separando los decretos de estado de emergencia y las ordenanzas municipales informativas.
+            El escenario ajustado incorpora tres normas que se perdieron por un problema tecnico de parseo ya corregido. El recall se calcula sobre las 23 normas validadas por el analista para las que existe reporte LexIA.
           </div>
         </div>
 
@@ -128,12 +123,12 @@
             </tr>
             <tr>
               <td class="axis">LexIA NO</td>
-              <td class="fn"><span class="n">2</span><span class="l">FN</span></td>
+              <td class="fn"><span class="n">9</span><span class="l">FN</span></td>
               <td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td>
             </tr>
           </table>
           <div class="foot">
-            La matriz incorpora como TP recuperables tres normas con evidencia de perdida por parseo en cuadernillos consolidados. Los verdaderos negativos no fueron medidos porque el Excel de validacion no contiene el universo completo de normas descartadas por el analista.
+            La matriz incorpora como TP recuperables tres normas con evidencia de perdida por parseo en cuadernillos consolidados. Los nueve FN incluyen cuatro DS de emergencia publicados el 05/08, tres ordenanzas municipales sobre publicidad exterior y dos FN regulatorios residuales.
           </div>
         </div>
       </div>
@@ -141,31 +136,31 @@
 
     <div class="band">
       <div class="band-head">
-        <div class="band-kicker">CUADRO COMPLEMENTARIO</div>
-        <div class="band-title">Categorias informativas locales y de emergencia fuera de las metricas</div>
+        <div class="band-kicker">CASOS ESPECIALES</div>
+        <div class="band-title">Detalle de falsos negativos y normas sin corrida comparable</div>
       </div>
       <table class="cm">
         <tr>
           <th>Fecha</th>
           <th>Normas validadas</th>
           <th>Resultado LexIA original</th>
-          <th>Tratamiento</th>
+          <th>Contribucion a la matriz</th>
         </tr>
         <tr>
           <td class="axis">05/08/2026</td>
           <td class="fn"><span class="n">4</span><span class="l">DS N° 065, 066, 067 y 068-2026-PCM</span></td>
           <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
-          <td class="tn"><span class="n">Fuera</span><span class="l">categoria informativa de emergencia; no impacta TP, FP, FN ni recall</span></td>
+          <td class="fn"><span class="n">4 FN</span><span class="l">cuadernillo consolidado no fue segmentado correctamente; incluidos en recall</span></td>
         </tr>
         <tr>
           <td class="axis">15, 18 y 20/08/2026</td>
           <td class="fn"><span class="n">3</span><span class="l">Ord. N° 683-2026-MDB, 741/MDC y 00392-2026/MDSA</span></td>
           <td class="fn"><span class="n">0</span><span class="l">alertas emitidas</span></td>
-          <td class="tn"><span class="n">Fuera</span><span class="l">ordenanzas locales sobre publicidad exterior; sin obligacion bancaria directa</span></td>
+          <td class="fn"><span class="n">3 FN</span><span class="l">ordenanzas locales sobre publicidad exterior; incluidas en recall</span></td>
         </tr>
       </table>
       <div class="foot">
-        Estas siete normas se mantienen visibles para seguimiento. Los decretos responden a emergencias climaticas y las ordenanzas regulan publicidad exterior local; por su caracter informativo o local, se separan de la medicion principal de desempeño regulatorio y operativo.
+        Los siete FN especiales de la matriz comprenden los cuatro DS N° 065 a 068-2026-PCM y las tres ordenanzas de publicidad exterior. Los DS N° 117, 118 y 119-2026-PCM y el DS N° 012-2026-PRODUCE se mantienen como trazabilidad fuera de la matriz: fueron publicados el 23/08, fecha sin reporte LexIA.
       </div>
     </div>
 
@@ -180,12 +175,12 @@
           <div class="txt">FN recuperables por la correccion del parseo del cuadernillo</div>
         </div>
         <div class="mini">
-          <div class="num">2</div>
-          <div class="txt">FN residuales: videovigilancia y endeudamiento interno</div>
+          <div class="num">9</div>
+          <div class="txt">FN: cuatro decretos, tres ordenanzas y dos normas regulatorias residuales</div>
         </div>
         <div class="mini">
-          <div class="num">87.5%</div>
-          <div class="txt">recall esperado luego de incorporar los casos recuperables</div>
+          <div class="num">60.9%</div>
+          <div class="txt">recall esperado al incluir las 23 normas validadas</div>
         </div>
         <div class="mini">
           <div class="num">2</div>
@@ -193,10 +188,10 @@
         </div>
       </div>
       <div class="foot">
-        Los tres FN recuperables son la <b>RM N° 332-2026-EF/15</b>, la <b>Resolucion SBS N° 02027-2026</b> y la <b>Circular N° 0020-2026-BCRP</b>. En las corridas originales, el cuadernillo consolidado redujo el procesamiento a un solo documento y una sola norma. Con el parseo corregido, pasan al escenario de TP recuperables. Permanecen dos FN residuales: la norma de videovigilancia y la operacion de endeudamiento interno.
+        Los tres FN recuperables son la <b>RM N° 332-2026-EF/15</b>, la <b>Resolucion SBS N° 02027-2026</b> y la <b>Circular N° 0020-2026-BCRP</b>. En las corridas originales, el cuadernillo consolidado redujo el procesamiento a un solo documento y una sola norma. Con el parseo corregido, pasan al escenario de TP recuperables. Los nueve FN resultantes comprenden los DS N° 065 a 068-2026-PCM, las tres ordenanzas municipales detalladas arriba, la norma de videovigilancia y la operacion de endeudamiento interno.
       </div>
       <div class="foot">
-        Las correcciones posteriores del manejo de cuadernillos consolidados recuperaron tres casos originalmente omitidos: <b>Resolucion SBS N° 02104-2026</b>, <b>Resolucion SBS N° 02116-2026</b> y <b>Ordenanza N° 754-MSB</b>. Estos ya estan incluidos dentro de los <b>11 TP</b> y no se contabilizan nuevamente como FN. Los <b>2 FP</b> tienen causas distintas: una identidad mal asociada por parseo y un proyecto normativo sin validacion positiva. El flujo actual conserva las normas con identidad dudosa para revision del analista y usa el listado oficial cuando El Peruano entrega un cuadernillo consolidado.
+        Las correcciones posteriores del manejo de cuadernillos consolidados recuperaron tres casos originalmente omitidos: <b>Resolucion SBS N° 02104-2026</b>, <b>Resolucion SBS N° 02116-2026</b> y <b>Ordenanza N° 754-MSB</b>. Estos ya estan incluidos dentro de los <b>11 TP</b> y no se contabilizan nuevamente como FN. Los <b>2 FP</b> son la <b>Resolucion N° 179-2026-INEI</b>, por identidad mal asociada con texto de MINAM, y la <b>Resolucion SBS N° 02022-2026</b>, proyecto en consulta publica sin obligacion inmediata. El flujo actual conserva las normas con identidad dudosa para revision del analista y usa el listado oficial cuando El Peruano entrega un cuadernillo consolidado.
       </div>
     </div>
   </div>
