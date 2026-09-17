@@ -114,6 +114,22 @@
 
     <div class="band">
       <div class="band-head">
+        <div class="band-kicker">PLAN DE RECUPERACION</div>
+        <div class="band-title">Causa y solucion propuesta para los cinco FN</div>
+      </div>
+      <table class="detail">
+        <tr><th>Norma</th><th>Causa identificada</th><th>Accion correctiva</th></tr>
+        <tr><td>Resolucion 003-2026-EF/30<br>NIIF version 2026</td><td>La corrida original se ejecutó antes de incorporar la regla para NIIF/IFRS.</td><td>Reprocesar la fecha: la regla actual clasifica las actualizaciones NIIF/IFRS como <b>SI / INFORMATIVA</b>.</td></tr>
+        <tr><td>RM D000295-2026-MINAM<br>Obras por Impuestos</td><td>La corrida original se ejecutó antes de incorporar el patrón de Obras por Impuestos.</td><td>Reprocesar la fecha: la regla actual detecta <b>Obras por Impuestos</b> como <b>SI / INFORMATIVA</b>.</td></tr>
+        <tr><td>Resolucion SBS 02248-2026<br>BiPay</td><td>El clasificador local no tiene una regla para autorizaciones SBS de empresas emisoras de dinero electronico.</td><td>Agregar regla: <b>empresa emisora de dinero electronico</b> y <b>autorizan funcionamiento</b> => <b>SI / INFORMATIVA</b>.</td></tr>
+        <tr><td>DS 186-2026-EF<br>Financiamiento MIPYME</td><td>No existe un criterio para reglamentos que promueven financiamiento MIPYME, emprendimientos y startups.</td><td>Agregar regla: <b>financiamiento MIPYME</b>, <b>emprendimientos</b>, <b>startups</b> o <b>DU 013-2020</b> => <b>SI / INFORMATIVA</b>.</td></tr>
+        <tr><td>DS 018-2026-MTC<br>Llamadas y mensajes comerciales</td><td>No existe un criterio para regulacion de llamadas y mensajes de texto con fines comerciales o publicitarios.</td><td>Agregar regla: <b>numeracion</b>, <b>llamadas</b>, <b>mensajes de texto</b> y <b>fines comerciales/publicitarios</b> => <b>SI / IMPACTO BAJO</b>.</td></tr>
+      </table>
+      <div class="note" style="margin-top:16px"><b>Resultado esperado:</b> el reproceso de las dos primeras normas y la incorporacion de las tres reglas restantes permiten recuperar los cinco FN identificados en este corte. La validacion final debe realizarse contra una nueva salida diaria y el Excel del analista.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
         <div class="band-kicker">NORMAS NO TOMADAS POR EL ANALISTA</div>
         <div class="band-title">Falsos positivos: alertas LexIA sin marca de interes en el Excel</div>
       </div>
