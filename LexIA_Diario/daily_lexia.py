@@ -50,7 +50,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-sync-reference", action="store_true", help="No intenta actualizar el Excel historico desde Drive.")
     parser.add_argument("--llm-backend", default="copilot", choices=["copilot", "groq"])
     parser.add_argument("--copilot-model", default="gpt-4o")
-    parser.add_argument("--llm-max-contexts", type=int, default=3)
+    parser.add_argument("--llm-max-contexts", type=int, default=6)
     parser.add_argument("--llm-min-score", type=int, default=2)
     parser.add_argument("--disable-semantic-prioritization", action="store_true", help="Desactiva embeddings + cross-encoder para priorizar candidatas al LLM.")
     parser.add_argument("--semantic-embed-model", default="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
@@ -178,7 +178,7 @@ def run_pipeline(args: argparse.Namespace, run_date: date, csv_path: Path) -> No
 
     cmd = [
         sys.executable,
-        str(BASE_DIR / "rag_pipeline_s3_diario_job_10.py"),
+        str(BASE_DIR / "rag_pipeline_s3_diario_job_11.py"),
         "--analysis-date",
         run_date.strftime("%Y-%m-%d"),
         "--output-dir",
@@ -582,6 +582,45 @@ def classify_manifest_publication(title: object) -> dict[str, str] | None:
     descripcion = extract_manifest_descripcion(text)
     emisor = extract_manifest_emisor(text)
 
+    if "ORDENANZA" in upper and ("MUNICIPALIDAD" in upper or "ORDENANZA MUNICIPAL" in upper):
+        return {
+            "NUMERO": numero or "NO DISPONIBLE",
+            "TIPO_NORMA": "Ordenanza Municipal",
+            "DESCRIPCION": descripcion,
+            "EMISOR": emisor,
+            "INTERES_AL_BANCO": "SI",
+            "NIVEL_IMPACTO": "BAJO",
+            "JUSTIFICACION": "Ordenanza municipal incluida para seguimiento obligatorio del banco; puede afectar establecimientos, autorizaciones o controles locales.",
+            "IMPORTANCIA": "Si",
+        }
+
+    if any(term in upper for term in ("NORMAS INTERNACIONALES DE INFORMACIÓN FINANCIERA", "NORMAS INTERNACIONALES DE INFORMACION FINANCIERA", "NIIF", "IFRS")):
+        return {
+            "NUMERO": numero or "NO DISPONIBLE",
+            "TIPO_NORMA": tipo,
+            "DESCRIPCION": descripcion,
+            "EMISOR": emisor,
+            "INTERES_AL_BANCO": "SI",
+            "NIVEL_IMPACTO": "INFORMATIVA",
+            "JUSTIFICACION": "Actualización del marco NIIF/IFRS; requiere seguimiento por Finanzas, Contabilidad, Auditoría y Cumplimiento del banco.",
+            "IMPORTANCIA": "Si",
+        }
+
+    if "OBRAS POR IMPUESTOS" in upper or (
+        "DECRETO DE URGENCIA N° 010-2026" in upper
+        and any(term in upper for term in ("RELACIÓN DE SERVICIOS", "RELACION DE SERVICIOS", "LISTADO DE SERVICIOS"))
+    ):
+        return {
+            "NUMERO": numero or "NO DISPONIBLE",
+            "TIPO_NORMA": tipo,
+            "DESCRIPCION": descripcion,
+            "EMISOR": emisor,
+            "INTERES_AL_BANCO": "SI",
+            "NIVEL_IMPACTO": "INFORMATIVA",
+            "JUSTIFICACION": "Disposición sobre Obras por Impuestos; corresponde a seguimiento informativo por potencial participación del banco en financiamiento, garantías o proyectos vinculados.",
+            "IMPORTANCIA": "Si",
+        }
+
     if "ESTADO DE EMERGENCIA" in upper and "PCM" in upper:
         return {
             "NUMERO": numero or "NO DISPONIBLE",
@@ -610,6 +649,28 @@ def classify_manifest_publication(title: object) -> dict[str, str] | None:
         return None
 
     if "RESOLUCIÓN SBS" in upper or "RESOLUCION SBS" in upper:
+        if "GOBIERNO CORPORATIVO" in upper or "GESTIÓN INTEGRAL DE RIESGOS" in upper or "GESTION INTEGRAL DE RIESGOS" in upper:
+            return {
+                "NUMERO": numero or "NO DISPONIBLE",
+                "TIPO_NORMA": tipo,
+                "DESCRIPCION": descripcion,
+                "EMISOR": "SBS",
+                "INTERES_AL_BANCO": "SI",
+                "NIVEL_IMPACTO": "ALTO",
+                "JUSTIFICACION": "Modificación SBS sobre gobierno corporativo y gestión integral de riesgos con impacto alto y adecuación obligatoria para el banco.",
+                "IMPORTANCIA": "Si",
+            }
+        if "FONDO DE SEGURO DE DEPÓSITOS" in upper or "FONDO DE SEGURO DE DEPOSITOS" in upper:
+            return {
+                "NUMERO": numero or "NO DISPONIBLE",
+                "TIPO_NORMA": tipo,
+                "DESCRIPCION": descripcion,
+                "EMISOR": "SBS",
+                "INTERES_AL_BANCO": "SI",
+                "NIVEL_IMPACTO": "MEDIO",
+                "JUSTIFICACION": "Modificación SBS sobre cobertura, recursos o pago de imposiciones cubiertas del Fondo de Seguro de Depositos; requiere seguimiento regulatorio y revisión operativa por su efecto en obligaciones y esquema de protección de depositantes.",
+                "IMPORTANCIA": "Si",
+            }
         if "CONDUCTA DE MERCADO" in upper or "COMISIONES Y GASTOS" in upper:
             return {
                 "NUMERO": numero or "NO DISPONIBLE",
@@ -643,6 +704,22 @@ def classify_manifest_publication(title: object) -> dict[str, str] | None:
                 "JUSTIFICACION": "Modificación SBS aplicable al sistema financiero; requiere revisar nuevas obligaciones, clasificación y eventuales adecuaciones.",
                 "IMPORTANCIA": "Si",
             }
+
+    if (
+        "BANCO CENTRAL DE RESERVA" in upper
+        and "CIRCULAR" in upper
+        and ("ÍNDICE DE REAJUSTE DIARIO" in upper or "INDICE DE REAJUSTE DIARIO" in upper)
+    ):
+        return {
+            "NUMERO": numero or "NO DISPONIBLE",
+            "TIPO_NORMA": "Circular",
+            "DESCRIPCION": descripcion,
+            "EMISOR": "BCRP",
+            "INTERES_AL_BANCO": "SI",
+            "NIVEL_IMPACTO": "INFORMATIVA",
+            "JUSTIFICACION": "Circular BCRP sobre indice de reajuste diario de la Ley General del Sistema Financiero; corresponde a seguimiento informativo para el banco.",
+            "IMPORTANCIA": "Si",
+        }
 
     if (
         "BANCO CENTRAL DE RESERVA" in upper
@@ -718,6 +795,10 @@ def prune_low_confidence_interest_rows(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     result = df.copy()
+    if "REVISION_ANALISTA" not in result.columns:
+        result["REVISION_ANALISTA"] = "NO"
+    if "MOTIVO_REVISION" not in result.columns:
+        result["MOTIVO_REVISION"] = ""
     interes = result.get("INTERES_AL_BANCO", pd.Series(index=result.index, dtype=object)).map(norm_si_no)
     identidad = result.get("IDENTIDAD_CONFIABLE", pd.Series(index=result.index, dtype=object)).astype(str).str.upper()
     obs = result.get("OBS_IDENTIDAD", pd.Series(index=result.index, dtype=object)).astype(str)
@@ -741,6 +822,8 @@ def prune_low_confidence_interest_rows(df: pd.DataFrame) -> pd.DataFrame:
         result.loc[low_conf_mask, "NIVEL_IMPACTO"] = "NO APLICA"
         result.loc[low_conf_mask, "JUSTIFICACION"] = "Descartada en reporte por identidad inconsistente; requiere validación adicional del documento fuente."
         result.loc[low_conf_mask, "IMPORTANCIA"] = "No"
+        result.loc[low_conf_mask, "REVISION_ANALISTA"] = "SI"
+        result.loc[low_conf_mask, "MOTIVO_REVISION"] = "Posible error de parseo o identidad inconsistente; revisar documento fuente."
 
     return result
 
@@ -754,6 +837,10 @@ def prune_interest_without_manifest_support(df: pd.DataFrame, source_manifest: p
         return df
 
     result = df.copy()
+    if "REVISION_ANALISTA" not in result.columns:
+        result["REVISION_ANALISTA"] = "NO"
+    if "MOTIVO_REVISION" not in result.columns:
+        result["MOTIVO_REVISION"] = ""
     interes = result.get("INTERES_AL_BANCO", pd.Series(index=result.index, dtype=object)).map(norm_si_no)
     emisor = result.get("EMISOR", pd.Series(index=result.index, dtype=object)).astype(str).str.strip().str.upper()
     descripcion = result.get("DESCRIPCION", pd.Series(index=result.index, dtype=object)).astype(str)
@@ -779,6 +866,8 @@ def prune_interest_without_manifest_support(df: pd.DataFrame, source_manifest: p
         result.loc[drop_mask, "NIVEL_IMPACTO"] = "NO APLICA"
         result.loc[drop_mask, "JUSTIFICACION"] = "Descartada en reporte por OCR inconsistente sin respaldo suficiente en el manifiesto oficial."
         result.loc[drop_mask, "IMPORTANCIA"] = "No"
+        result.loc[drop_mask, "REVISION_ANALISTA"] = "SI"
+        result.loc[drop_mask, "MOTIVO_REVISION"] = "OCR o parseo inconsistente sin respaldo suficiente en el manifiesto; revisar norma."
 
     generic_exec_mask = (
         interes.eq("SI")
@@ -793,7 +882,36 @@ def prune_interest_without_manifest_support(df: pd.DataFrame, source_manifest: p
         result.loc[generic_exec_mask, "NIVEL_IMPACTO"] = "NO APLICA"
         result.loc[generic_exec_mask, "JUSTIFICACION"] = "Descartada en reporte por referencia genérica del Poder Ejecutivo sin sustento suficiente en el manifiesto oficial."
         result.loc[generic_exec_mask, "IMPORTANCIA"] = "No"
+        result.loc[generic_exec_mask, "REVISION_ANALISTA"] = "SI"
+        result.loc[generic_exec_mask, "MOTIVO_REVISION"] = "Referencia genérica del Poder Ejecutivo con identidad débil; revisar parseo y documento fuente."
 
+    return result
+
+
+def force_include_municipal_ordinances(df: pd.DataFrame) -> pd.DataFrame:
+    """Garantiza visibilidad de toda ordenanza municipal en el reporte diario."""
+    if df.empty:
+        return df
+
+    result = df.copy()
+    tipo = result.get("TIPO_NORMA", pd.Series(index=result.index, dtype=object)).astype(str).str.upper()
+    emisor = result.get("EMISOR", pd.Series(index=result.index, dtype=object)).astype(str).str.upper()
+    is_ordenanza = tipo.str.contains("ORDENANZA", na=False)
+    is_municipal = tipo.str.contains("MUNICIPAL", na=False) | emisor.str.contains("MUNICIPALIDAD", na=False)
+    municipal_mask = is_ordenanza & is_municipal
+
+    if not municipal_mask.any():
+        return result
+
+    result.loc[municipal_mask, "C_NORMATIVO"] = "SI"
+    result.loc[municipal_mask, "INTERES_BANCO"] = "SI"
+    result.loc[municipal_mask, "INTERES_AL_BANCO"] = "SI"
+    result.loc[municipal_mask, "NIVEL_IMPACTO"] = "BAJO"
+    result.loc[municipal_mask, "JUSTIFICACION"] = (
+        "Ordenanza municipal incluida para seguimiento obligatorio del banco; "
+        "puede afectar establecimientos, autorizaciones o controles locales."
+    )
+    result.loc[municipal_mask, "IMPORTANCIA"] = "Si"
     return result
 
 
@@ -1039,7 +1157,12 @@ def build_reports(
         df.loc[rescued_mask, "OBS_IDENTIDAD"] = existing_obs[rescued_mask].values
     df = prune_low_confidence_interest_rows(df)
     df = prune_interest_without_manifest_support(df, source_manifest)
+    df = force_include_municipal_ordinances(df)
     df = dedupe_report_rows(df)
+    if "REVISION_ANALISTA" not in df.columns:
+        df["REVISION_ANALISTA"] = "NO"
+    if "MOTIVO_REVISION" not in df.columns:
+        df["MOTIVO_REVISION"] = ""
 
     comparison_date = run_date - timedelta(days=1)
     comparison_csv = csv_path.parent / f"normas_{comparison_date:%Y-%m-%d}.csv"
@@ -1054,12 +1177,14 @@ def build_reports(
 
     if not df.empty:
         si = df[df["INTERES_AL_BANCO"].map(norm_si_no).eq("SI")].copy()
+        revision_parseo = df[df["REVISION_ANALISTA"].map(norm_si_no).eq("SI")].copy()
         if "REFERENCIA_HUMANA" in si.columns:
             si["REFERENCIA_ANALISTA"] = si["REFERENCIA_HUMANA"]
         no_count = int(df["INTERES_AL_BANCO"].map(norm_si_no).eq("NO").sum())
         levels = si["NIVEL_IMPACTO"].map(norm_nivel).value_counts().to_dict()
     else:
         si = pd.DataFrame()
+        revision_parseo = pd.DataFrame()
         no_count = 0
         levels = {}
     backfill_info = backfill_info or {}
@@ -1102,6 +1227,7 @@ def build_reports(
         <div class="kpi">Publicadas fuente<br><b>{len(source_manifest) if not source_manifest.empty else 'N/A'}</b></div>
         <div class="kpi">Procesadas IA<br><b>{len(df)}</b></div>
         <div class="kpi">Interés banco<br><b>{len(si)}</b></div>
+        <div class="kpi">Revision parseo<br><b>{len(revision_parseo)}</b></div>
         <div class="kpi">No interés<br><b>{no_count}</b></div>
         <div class="kpi">Referencia analista<br><b>{int(df.get('REFERENCIA_HUMANA', pd.Series(dtype=str)).astype(str).str.upper().eq('SI').sum()) if not df.empty else 0}</b></div>
       </div>
@@ -1118,8 +1244,11 @@ def build_reports(
       <p>{escape(str(levels))}</p>
       <h2>Normas de interés para el banco</h2>
       {html_table(si, ['NUMERO','TIPO_NORMA','NIVEL_IMPACTO','REFERENCIA_ANALISTA','IDENTIDAD_CONFIABLE','OBS_IDENTIDAD','DESCRIPCION','JUSTIFICACION'])}
+      <h2>Normas enviadas para revisión del analista por parseo</h2>
+      <p>Estas filas no cuentan como alerta positiva de LexIA. Se muestran para control porque el documento presenta OCR, parseo o identidad dudosa y conviene validarlas manualmente.</p>
+      {html_table(revision_parseo, ['NUMERO','TIPO_NORMA','REVISION_ANALISTA','MOTIVO_REVISION','IDENTIDAD_CONFIABLE','OBS_IDENTIDAD','DESCRIPCION','JUSTIFICACION'], max_rows=40)}
       <h2>Normas revisadas del día</h2>
-      {html_table(df, ['NUMERO','TIPO_NORMA','INTERES_AL_BANCO','NIVEL_IMPACTO','IDENTIDAD_CONFIABLE','OBS_IDENTIDAD','DESCRIPCION'], max_rows=50)}
+      {html_table(df, ['NUMERO','TIPO_NORMA','INTERES_AL_BANCO','NIVEL_IMPACTO','REVISION_ANALISTA','IDENTIDAD_CONFIABLE','OBS_IDENTIDAD','DESCRIPCION'], max_rows=50)}
       <h2>Comparativa con Excel analista</h2>
       <p>La comparativa se calcula con el dia anterior ({comparison_date:%Y-%m-%d}), porque la validacion del analista llega con rezago. CSV IA usado para contraste: {escape(comparison_csv.name if comparison_csv.exists() else 'no disponible')}.</p>
       <p>{'Comparativa pendiente: el Excel aun no tiene filas del analista para esa fecha; no se calculan TP, FP, FN ni metricas.' if not metrics['comparison_available'] else f"Filas analista: {metrics['analyst_rows']} | Analista SI: {metrics['analyst_count']} | Alertas IA SI: {metrics['pred_count']} | TP: {metrics['tp']} | FP: {metrics['fp']} | FN: {metrics['fn']} | Recall: {pct(metrics['recall'])} | Precision: {pct(metrics['precision'])}"}</p>
@@ -1139,6 +1268,7 @@ def build_reports(
         source_manifest.to_excel(writer, sheet_name="publicadas_fuente", index=False)
         backfill_missing.to_excel(writer, sheet_name="extraordinarias_prev", index=False)
         si.to_excel(writer, sheet_name="interes_banco", index=False)
+        revision_parseo.to_excel(writer, sheet_name="revision_parseo", index=False)
         raw_df.to_excel(writer, sheet_name="normas_dia_raw", index=False)
         comparison_human.to_excel(writer, sheet_name="referencia_analista_prev", index=False)
         comparison_df.to_excel(writer, sheet_name="ia_prev", index=False)
@@ -1153,6 +1283,7 @@ def build_reports(
         "source_rows": len(source_manifest) if not source_manifest.empty else None,
         "raw_total_rows": len(raw_df),
         "interest_rows": len(si),
+        "revision_parseo_rows": len(revision_parseo),
         "no_rows": no_count,
         "levels": levels,
         "manifest_added": manifest_added,

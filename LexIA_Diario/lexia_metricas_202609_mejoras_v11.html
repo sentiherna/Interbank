@@ -1,0 +1,114 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LexIA - Mejoras aplicadas septiembre 2026</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#fff;color:#173b84}
+  .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px;box-sizing:border-box}
+  .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;color:#214a99;font-size:54px;line-height:1.02;font-weight:800}
+  .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+  .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+  .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+  .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+  .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+  .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;margin-top:18px}
+  .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+  .mini .num{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+  .mini .txt{font-size:14px;color:#637392;margin-top:6px}
+  .metric-card,.confusion{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .metric-card h3,.confusion h3{margin:0 0 14px;color:#214a99;font-size:24px}
+  .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .metric-box{border-radius:18px;padding:18px;background:#f8fbff;text-align:center}
+  .metric-box .value{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+  .metric-box .label{font-size:15px;color:#637392;margin-top:6px}
+  .metric-box .sub{font-size:13px;color:#7b89a4;margin-top:8px}
+  table{border-collapse:collapse;width:100%}
+  .cm{border-collapse:separate;border-spacing:10px}
+  .cm th,.cm td{border-radius:18px;padding:18px 16px;text-align:center}
+  .cm th{background:#eef3fb;color:#214a99;font-size:16px}
+  .cm .axis{background:#eef3fb;font-weight:700;color:#214a99}.cm .tp{background:#e7f8ee}.cm .fp{background:#fff2e8}.cm .fn{background:#eef3fb}.cm .tn{background:#f7f8fc}
+  .cm .n{display:block;font-size:42px;font-weight:800;color:#214a99;line-height:1}.cm .l{display:block;font-size:14px;color:#5f6f8e;margin-top:6px}
+  .detail th,.detail td{border:1px solid #dce4f1;padding:10px;text-align:left;vertical-align:top;font-size:13px;line-height:1.35}.detail th{background:#eef3fb;color:#214a99}
+  .foot{margin-top:16px;font-size:14px;color:#5a6d8b;line-height:1.45}
+  .flow{display:grid;grid-template-columns:1fr 46px 1fr;gap:10px;align-items:center}.flow-card{background:#fff;border-radius:18px;padding:18px;text-align:center;box-shadow:0 0 0 1px #edf1f8 inset}.flow-card b{font-size:27px;color:#214a99}.arrow{font-size:34px;font-weight:800;color:#16c35b;text-align:center}
+  .note{padding:13px 15px;background:#fff;border-left:5px solid #16c35b;border-radius:8px;font-size:14px;color:#526785;line-height:1.45}
+  @media(max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}.grid2,.flow{grid-template-columns:1fr}.metric-row{grid-template-columns:1fr}h1{font-size:40px}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topline"></div>
+    <div class="topbar">
+      <div><h1>Piloto 09/2026 - LexIA Normativo Diario</h1><div class="subtitle">Mejoras aplicadas con job_11 y reproceso controlado</div></div>
+      <div><div class="pill">Corte 2026-09-01 a 2026-09-15</div><div class="pill-sub">9 fechas validadas en el Excel del analista</div></div>
+    </div>
+
+    <div class="band">
+      <div class="band-head"><div class="band-kicker">UNIVERSO</div><div class="band-title">Base de comparacion del corte</div></div>
+      <div class="grid4">
+        <div class="mini"><div class="num">753</div><div class="txt">normas procesadas por LexIA</div></div>
+        <div class="mini"><div class="num">17</div><div class="txt">normas de interes validadas por el analista</div></div>
+        <div class="mini"><div class="num">5</div><div class="txt">FN identificados antes de aplicar job_11</div></div>
+        <div class="mini"><div class="num">0</div><div class="txt">FN luego del reproceso controlado</div></div>
+      </div>
+      <div class="foot">Se mantienen incluidos los decretos y ordenanzas en la matriz. Las salidas anteriores no fueron reemplazadas: el reproceso se guardó de forma aislada con las reglas de <b>job_11</b>.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head"><div class="band-kicker">EFECTO DE LA MEJORA</div><div class="band-title">Recuperacion de normas de interes</div></div>
+      <div class="flow">
+        <div class="flow-card"><b>12 TP | 35 FP | 5 FN</b><div class="foot">Medicion previa: recall 70.6%</div></div>
+        <div class="arrow">&#8594;</div>
+        <div class="flow-card"><b>17 TP | 37 FP | 0 FN</b><div class="foot">Reproceso job_11: recall 100.0%</div></div>
+      </div>
+      <div class="grid2">
+        <div class="metric-card">
+          <h3>Metricas posteriores a la mejora</h3>
+          <div class="metric-row">
+            <div class="metric-box"><div class="value">100.0%</div><div class="label">Recall</div><div class="sub">17 de 17 normas del analista</div></div>
+            <div class="metric-box"><div class="value">31.5%</div><div class="label">Precision</div><div class="sub">17 TP sobre 54 alertas</div></div>
+            <div class="metric-box"><div class="value">47.2%</div><div class="label">F1</div><div class="sub">balance de recall y precision</div></div>
+          </div>
+        </div>
+        <div class="confusion">
+          <h3>Matriz de confusion posterior</h3>
+          <table class="cm">
+            <tr><th></th><th>Analista SI</th><th>Analista NO</th></tr>
+            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">17</span><span class="l">TP</span></td><td class="fp"><span class="n">37</span><span class="l">FP</span></td></tr>
+            <tr><td class="axis">LexIA NO</td><td class="fn"><span class="n">0</span><span class="l">FN</span></td><td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="foot">Los dos FP adicionales provienen de normas de Obras por Impuestos que la regla levanta preventivamente, pero que no están marcadas como interés en el Excel de este corte.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head"><div class="band-kicker">FN RECUPERADOS</div><div class="band-title">Reglas nuevas aplicadas en el reproceso</div></div>
+      <table class="detail">
+        <tr><th>Fecha</th><th>Norma</th><th>Patron incorporado</th><th>Resultado job_11</th></tr>
+        <tr><td>10/09/2026</td><td>Resolucion 003-2026-EF/30</td><td>NIIF / IFRS</td><td>SI / INFORMATIVA</td></tr>
+        <tr><td>11/09/2026</td><td>RM D000295-2026-MINAM</td><td>Obras por Impuestos</td><td>SI / INFORMATIVA</td></tr>
+        <tr><td>12/09/2026</td><td>DS 186-2026-EF</td><td>Financiamiento MIPYME, emprendimientos y startups</td><td>SI / INFORMATIVA</td></tr>
+        <tr><td>15/09/2026</td><td>Resolucion SBS 02248-2026</td><td>Autorizacion de empresa emisora de dinero electronico</td><td>SI / INFORMATIVA</td></tr>
+        <tr><td>15/09/2026</td><td>DS 018-2026-MTC</td><td>Llamadas y mensajes comerciales/publicitarios</td><td>SI / IMPACTO BAJO</td></tr>
+      </table>
+    </div>
+
+    <div class="band">
+      <div class="band-head"><div class="band-kicker">LLM PARA NORMAS NUEVAS</div><div class="band-title">Cobertura adicional sin perder el control de costo</div></div>
+      <div class="grid4">
+        <div class="mini"><div class="num">6</div><div class="txt">maximo diario de candidatas nuevas al LLM</div></div>
+        <div class="mini"><div class="num">SBS</div><div class="txt">normas nuevas de entidades financieras se priorizan</div></div>
+        <div class="mini"><div class="num">BCRP/MEF</div><div class="txt">emisores financieros y economicos se priorizan</div></div>
+        <div class="mini"><div class="num">Pagos</div><div class="txt">dinero electronico, MIPYME y comunicaciones comerciales se revisan</div></div>
+      </div>
+      <div class="note" style="margin-top:16px"><b>Regla operativa:</b> las normas nuevas potencialmente financieras ya no quedan fuera del LLM solo por provenir del manifiesto consolidado. El clasificador local conserva las reglas conocidas y el LLM revisa hasta seis candidatas nuevas priorizadas por emisor y contenido.</div>
+    </div>
+  </div>
+</body>
+</html>
