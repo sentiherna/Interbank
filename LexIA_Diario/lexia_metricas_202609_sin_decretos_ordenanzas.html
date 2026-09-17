@@ -49,7 +49,7 @@
     <div class="topbar">
       <div>
         <h1>Piloto 09/2026 - LexIA Normativo Diario</h1>
-        <div class="subtitle">Cruce de normas de interes, sin decretos ni ordenanzas</div>
+        <div class="subtitle">Cruce completo de normas de interes, incluidos decretos y ordenanzas</div>
       </div>
       <div>
         <div class="pill">Corte 2026-09-01 a 2026-09-15</div>
@@ -68,28 +68,28 @@
         <div class="mini"><div class="num">12</div><div class="txt">TP, incluidos 3 decretos detectados por LexIA</div></div>
         <div class="mini"><div class="num">5</div><div class="txt">FN, incluidos 2 decretos no detectados por LexIA</div></div>
       </div>
-      <div class="foot">Se utilizaron las fechas 01, 02, 04, 05, 09, 10, 11, 12 y 15 de septiembre de 2026. LexIA procesó <b>753</b> normas y emitió <b>33</b> alertas de tipo Decreto u Ordenanza. Todas las normas validadas por el analista, incluidos decretos y ordenanzas, permanecen en el universo: si LexIA las detecta son TP y, si no, FN. Las alertas locales adicionales de LexIA que no cruzan con el analista no se agregan a FP.</div>
+      <div class="foot">Se utilizaron las fechas 01, 02, 04, 05, 09, 10, 11, 12 y 15 de septiembre de 2026. LexIA procesó <b>753</b> normas y emitió <b>33</b> alertas de tipo Decreto u Ordenanza. Todas las normas y alertas, incluidos decretos y ordenanzas, se incluyen en la matriz: si cruzan con el analista son TP; si no cruzan son FP; y las normas del analista que LexIA no alertó son FN.</div>
     </div>
 
     <div class="band">
       <div class="band-head">
         <div class="band-kicker">METRICAS</div>
-        <div class="band-title">Resultado observado sin decretos ni ordenanzas</div>
+        <div class="band-title">Resultado observado con todos los tipos de norma</div>
       </div>
       <div class="grid2">
         <div class="metric-card">
           <h3>Metricas clave</h3>
           <div class="metric-row">
             <div class="metric-box"><div class="value">70.6%</div><div class="label">Recall</div><div class="sub">12 de 17 normas del analista capturadas por LexIA</div></div>
-            <div class="metric-box"><div class="value">70.6%</div><div class="label">Precision</div><div class="sub">12 TP sobre 17 alertas LexIA incluidas</div></div>
+            <div class="metric-box"><div class="value">25.5%</div><div class="label">Precision</div><div class="sub">12 TP sobre 47 alertas LexIA</div></div>
           </div>
-          <div class="foot">F1: <b>70.6%</b>. Los decretos y ordenanzas validados por el analista se contabilizan como TP o FN. Las alertas locales adicionales de LexIA se excluyen solamente del conteo de FP.</div>
+          <div class="foot">F1: <b>37.5%</b>. Los decretos y ordenanzas validados por el analista se contabilizan como TP o FN. Las alertas adicionales de esos tipos también se contabilizan como FP.</div>
         </div>
         <div class="confusion">
           <h3>Matriz de confusion</h3>
           <table class="cm">
             <tr><th></th><th>Analista SI</th><th>Analista NO</th></tr>
-            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">12</span><span class="l">TP</span></td><td class="fp"><span class="n">5</span><span class="l">FP</span></td></tr>
+            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">12</span><span class="l">TP</span></td><td class="fp"><span class="n">35</span><span class="l">FP</span></td></tr>
             <tr><td class="axis">LexIA NO</td><td class="fn"><span class="n">5</span><span class="l">FN</span></td><td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td></tr>
           </table>
         </div>
@@ -130,8 +130,52 @@
 
     <div class="band">
       <div class="band-head">
+        <div class="band-kicker">DECRETOS Y ORDENANZAS ALERTADOS POR LEXIA</div>
+        <div class="band-title">Detalle completo incluido en la matriz de metricas</div>
+      </div>
+      <table class="detail">
+        <tr><th>Fecha</th><th>Tipo</th><th>Numero</th><th>Resultado</th><th>Descripcion LexIA</th></tr>
+        <tr><td>01/09/2026</td><td>Decreto Supremo</td><td>124-2026-PCM</td><td>TP</td><td>Declara Estado de Emergencia por peligro inminente ante precipitaciones pluviales asociadas al Fenomeno El Nino.</td></tr>
+        <tr><td>05/09/2026</td><td>Decreto Supremo</td><td>125-2026-PCM</td><td>TP</td><td>Declara Estado de Emergencia en distritos de Junin, Cusco y Ayacucho.</td></tr>
+        <tr><td>05/09/2026</td><td>Decreto Supremo</td><td>126-2026-PCM</td><td>TP</td><td>Declara Estado de Emergencia en zonas de Piura.</td></tr>
+        <tr><td>05/09/2026</td><td>Decreto Supremo</td><td>128-2026-PCM</td><td>FP</td><td>Declara Estado de Emergencia en establecimientos penitenciarios de alta peligrosidad.</td></tr>
+        <tr><td>05/09/2026</td><td>Ordenanza Municipal</td><td>595</td><td>FP</td><td>Beneficios tributarios y no tributarios en San Martin de Porres.</td></tr>
+        <tr><td>05/09/2026</td><td>Ordenanza Municipal</td><td>601/MDSJM</td><td>FP</td><td>Beneficios tributarios para contribuyentes de San Juan de Miraflores.</td></tr>
+        <tr><td>05/09/2026</td><td>Ordenanza Municipal</td><td>756-MSS</td><td>FP</td><td>Beneficio por pronto pago de arbitrios municipales.</td></tr>
+        <tr><td>09/09/2026</td><td>Ordenanza Municipal</td><td>012-2026-MDM</td><td>FP</td><td>Proteccion de la Red Vial Vecinal o Rural de Marcona.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>04-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de San Miguel de Apuri.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>0476-2026/SEL-INDECOPI</td><td>FP</td><td>Barreras burocraticas vinculadas a ordenanzas de la Municipalidad de Chorrillos.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>05-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de Cachuy.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>06-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de Vilca.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>07-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de Pirhuayoc.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>08-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de Huancachi.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>09-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de Atcas.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>10-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de San Jeronimo.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>11-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de San Juan de Malleuran.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>12-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de La Florida.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>13-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de San Pedro de Cusi.</td></tr>
+        <tr><td>10/09/2026</td><td>Ordenanza Municipal</td><td>14-2026-MPY/CM</td><td>FP</td><td>Adecuacion de la Municipalidad del Centro Poblado de San Lorenzo de Tamara.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza Municipal</td><td>002-2026-MDRSQ</td><td>FP</td><td>Prorroga de amnistia tributaria en Santa Rosa de Quives.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza Municipal</td><td>278-2025-MDMM</td><td>FP</td><td>Prorroga de derechos de emision y arbitrios municipales para 2027.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza</td><td>304-2026-MDMM</td><td>FP</td><td>Prorroga de derechos de emision, impuesto predial y arbitrios municipales.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza</td><td>591-2026-MDS</td><td>FP</td><td>Modificacion del Cuadro para Asignacion de Personal de Surquillo.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza Municipal</td><td>757-MSS</td><td>FP</td><td>Fondo Educativo de Becas Universitarias de San Isidro.</td></tr>
+        <tr><td>11/09/2026</td><td>Ordenanza Municipal</td><td>NO DISPONIBLE</td><td>FP</td><td>Modificacion del Cuadro para Asignacion de Personal Provisional de Surquillo.</td></tr>
+        <tr><td>12/09/2026</td><td>Ordenanza Municipal</td><td>028-2026-MPC</td><td>FP</td><td>Modificacion de zonificacion urbana turistica en el Callao.</td></tr>
+        <tr><td>12/09/2026</td><td>Ordenanza Municipal</td><td>491-MDPH</td><td>FP</td><td>Modificacion del Cuadro Unico de Infracciones y Sanciones de Punta Hermosa.</td></tr>
+        <tr><td>12/09/2026</td><td>Ordenanza Municipal</td><td>582-MDPH</td><td>FP</td><td>Reglamento del comercio ambulatorio de Punta Hermosa.</td></tr>
+        <tr><td>12/09/2026</td><td>Ordenanza</td><td>583-MDPH</td><td>FP</td><td>Registro asociado a la Ordenanza 491-MDPH en la salida original.</td></tr>
+        <tr><td>12/09/2026</td><td>Ordenanza Municipal</td><td>NO DISPONIBLE</td><td>FP</td><td>Reglamento del comercio ambulatorio de Punta Hermosa.</td></tr>
+        <tr><td>15/09/2026</td><td>Decreto Supremo</td><td>129-2026-PCM</td><td>FP</td><td>Prorroga Estado de Emergencia por movimiento sismico en Junin.</td></tr>
+        <tr><td>15/09/2026</td><td>Decreto Supremo</td><td>130-2026-PCM</td><td>FP</td><td>Prorroga Estado de Emergencia por movimiento sismico en Junin.</td></tr>
+      </table>
+      <div class="foot">De las 33 alertas de tipo Decreto u Ordenanza, 3 cruzan con normas validadas por el analista y son TP; las 30 restantes se contabilizan como FP en la matriz completa.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
         <div class="band-kicker">NORMAS NO TOMADAS POR EL ANALISTA</div>
-        <div class="band-title">Falsos positivos: alertas LexIA sin marca de interes en el Excel</div>
+        <div class="band-title">Falsos positivos no locales: alertas LexIA sin marca de interes en el Excel</div>
       </div>
       <table class="detail">
         <tr><th>Fecha</th><th>Tipo</th><th>Numero</th><th>Nivel LexIA</th><th>Descripcion LexIA</th></tr>
@@ -141,7 +185,7 @@
         <tr><td>05/09/2026</td><td>Resolucion</td><td>02206-2026</td><td>BAJO</td><td>Resolucion SBS identificada con contenido incompleto en la salida del parser.</td></tr>
         <tr><td>11/09/2026</td><td>Resolucion</td><td>02235-2026</td><td>ALTO</td><td>Modifican el Reglamento sobre Grupo Economico, Vinculacion, aplicacion de Limites Operativos y el Reglamento para la Gestion del Riesgo de Credito.</td></tr>
       </table>
-      <div class="foot">Estas cinco normas se muestran como diferencias de criterio entre la alerta LexIA y el Excel del analista; no se interpretan como errores de parseo salvo la Resolucion SBS 02206-2026, cuyo contenido fue incompleto en la salida original.</div>
+      <div class="foot">Estas cinco normas se suman a los 30 decretos u ordenanzas no coincidentes mostrados arriba, para completar los 35 FP de la matriz. La Resolucion SBS 02206-2026 presenta contenido incompleto en la salida original.</div>
     </div>
   </div>
 </body>
