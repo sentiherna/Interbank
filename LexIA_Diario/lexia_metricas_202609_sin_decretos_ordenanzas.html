@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LexIA - Metricas septiembre 2026</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#fff;color:#173b84}
+  .page{width:1600px;max-width:100%;margin:0 auto;padding:28px 34px 36px;box-sizing:border-box}
+  .topline{width:78px;height:7px;background:#16c35b;border-radius:10px;margin-bottom:18px}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  h1{margin:0;color:#214a99;font-size:54px;line-height:1.02;font-weight:800}
+  .subtitle{margin-top:10px;font-size:18px;color:#5c6d8f}
+  .pill{background:#eef3fb;color:#214a99;border-radius:999px;padding:10px 18px;font-weight:700;font-size:18px;white-space:nowrap}
+  .pill-sub{font-size:12px;color:#97a3bb;text-align:right;margin-top:8px}
+  .band{background:#f4f6fc;border-radius:24px;padding:18px 20px;margin-top:22px}
+  .band-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+  .band-kicker{font-size:18px;letter-spacing:2px;font-weight:800}
+  .band-title{font-size:28px;font-weight:800;color:#214a99;text-align:center;flex:1}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}
+  .grid2{display:grid;grid-template-columns:1.15fr 0.85fr;gap:18px;margin-top:18px}
+  .mini{background:#fff;border-radius:20px;padding:18px 16px;box-shadow:0 0 0 1px #edf1f8 inset;text-align:center}
+  .mini .num{font-size:46px;font-weight:800;color:#214a99;line-height:1}
+  .mini .txt{font-size:14px;color:#637392;margin-top:6px}
+  .metric-card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .metric-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .metric-box{border-radius:18px;padding:18px;background:#f8fbff;text-align:center}
+  .metric-box .value{font-size:52px;font-weight:800;color:#214a99;line-height:1}
+  .metric-box .label{font-size:15px;color:#637392;margin-top:6px}
+  .metric-box .sub{font-size:13px;color:#7b89a4;margin-top:8px}
+  .confusion{background:#fff;border-radius:24px;padding:20px;box-shadow:0 0 0 1px #edf1f8 inset}
+  .confusion h3,.metric-card h3{margin:0 0 14px 0;font-size:24px;color:#214a99}
+  table{border-collapse:collapse;width:100%}
+  .cm{border-collapse:separate;border-spacing:10px}
+  .cm th,.cm td{border-radius:18px;padding:18px 16px;text-align:center}
+  .cm th{background:#eef3fb;color:#214a99;font-size:16px}
+  .cm .axis{background:#eef3fb;font-weight:700;color:#214a99}
+  .cm .tp{background:#e7f8ee}.cm .fp{background:#fff2e8}.cm .fn{background:#eef3fb}.cm .tn{background:#f7f8fc}
+  .cm .n{display:block;font-size:42px;font-weight:800;color:#214a99;line-height:1}
+  .cm .l{display:block;font-size:14px;color:#5f6f8e;margin-top:6px}
+  .detail th,.detail td{border:1px solid #dce4f1;padding:10px;text-align:left;vertical-align:top;font-size:13px;line-height:1.35}
+  .detail th{background:#eef3fb;color:#214a99;font-size:13px}
+  .foot{margin-top:16px;font-size:14px;color:#5a6d8b;line-height:1.45}
+  .note{padding:13px 15px;background:#fff;border-left:5px solid #16c35b;border-radius:8px;font-size:14px;color:#526785;line-height:1.45}
+  @media (max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}h1{font-size:40px}}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="topline"></div>
+    <div class="topbar">
+      <div>
+        <h1>Piloto 09/2026 - LexIA Normativo Diario</h1>
+        <div class="subtitle">Cruce de normas de interes, sin decretos ni ordenanzas</div>
+      </div>
+      <div>
+        <div class="pill">Corte 2026-09-01 a 2026-09-15</div>
+        <div class="pill-sub">9 fechas con validacion disponible en Excel</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">ALCANCE</div>
+        <div class="band-title">Universo utilizado para las metricas</div>
+      </div>
+      <div class="grid4">
+        <div class="mini"><div class="num">17</div><div class="txt">normas de interes registradas por el analista en septiembre</div></div>
+        <div class="mini"><div class="num">5</div><div class="txt">decretos excluidos del analisis</div></div>
+        <div class="mini"><div class="num">0</div><div class="txt">ordenanzas presentes en la validacion del periodo</div></div>
+        <div class="mini"><div class="num">12</div><div class="txt">normas de interes comparables incluidas en la matriz</div></div>
+      </div>
+      <div class="foot">Se utilizaron las fechas 01, 02, 04, 05, 09, 10, 11, 12 y 15 de septiembre de 2026. Se excluyen solamente las normas cuyo <b>tipo</b> es Decreto u Ordenanza; una resolucion que menciona un decreto en su descripcion permanece en el calculo.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">METRICAS</div>
+        <div class="band-title">Resultado observado sin decretos ni ordenanzas</div>
+      </div>
+      <div class="grid2">
+        <div class="metric-card">
+          <h3>Metricas clave</h3>
+          <div class="metric-row">
+            <div class="metric-box"><div class="value">75.0%</div><div class="label">Recall</div><div class="sub">9 de 12 normas del analista capturadas por LexIA</div></div>
+            <div class="metric-box"><div class="value">64.3%</div><div class="label">Precision</div><div class="sub">9 TP sobre 14 alertas LexIA incluidas</div></div>
+          </div>
+          <div class="foot">F1: <b>69.2%</b>. Las alertas de tipo Decreto u Ordenanza no se contabilizan, tanto del lado de LexIA como del lado del analista.</div>
+        </div>
+        <div class="confusion">
+          <h3>Matriz de confusion</h3>
+          <table class="cm">
+            <tr><th></th><th>Analista SI</th><th>Analista NO</th></tr>
+            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">9</span><span class="l">TP</span></td><td class="fp"><span class="n">5</span><span class="l">FP</span></td></tr>
+            <tr><td class="axis">LexIA NO</td><td class="fn"><span class="n">3</span><span class="l">FN</span></td><td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">NORMAS NO TOMADAS POR LEXIA</div>
+        <div class="band-title">Falsos negativos: el analista las marco como de interes</div>
+      </div>
+      <table class="detail">
+        <tr><th>Fecha</th><th>Tipo</th><th>Numero</th><th>Nivel analista</th><th>Descripcion / comentario del analista</th></tr>
+        <tr><td>10/09/2026</td><td>Resolucion</td><td>003-2026-EF/30</td><td>INFORMATIVA</td><td>Aprueban el Set Completo de las Normas Internacionales de Informacion Financiera version 2026, que incluye el Marco Conceptual para la Informacion Financiera.</td></tr>
+        <tr><td>11/09/2026</td><td>Resolucion Ministerial</td><td>D000295-2026-MINAM</td><td>INFORMATIVA</td><td>Aprueban Relacion de Servicios del Sector Ambiente susceptibles de ser ejecutados bajo el regimen excepcional del mecanismo de Obras por Impuestos y sus contenidos minimos.</td></tr>
+        <tr><td>15/09/2026</td><td>Resolucion SBS</td><td>02248-2026</td><td>INFORMATIVA</td><td>Autorizan funcionamiento de BiPay Empresa Emisora de Dinero Electronico S.A. como empresa de servicios complementarios y conexos.</td></tr>
+      </table>
+      <div class="note" style="margin-top:16px"><b>Lectura operativa:</b> las dos primeras normas corresponden a patrones que ya cuentan con reglas explicitas (NIIF/IFRS y Obras por Impuestos). La autorizacion de una empresa emisora de dinero electronico queda como caso a reforzar en la taxonomia de autorizaciones SBS.</div>
+    </div>
+
+    <div class="band">
+      <div class="band-head">
+        <div class="band-kicker">NORMAS NO TOMADAS POR EL ANALISTA</div>
+        <div class="band-title">Falsos positivos: alertas LexIA sin marca de interes en el Excel</div>
+      </div>
+      <table class="detail">
+        <tr><th>Fecha</th><th>Tipo</th><th>Numero</th><th>Nivel LexIA</th><th>Descripcion LexIA</th></tr>
+        <tr><td>01/09/2026</td><td>Resolucion</td><td>02132-2026</td><td>INFORMATIVA</td><td>Autorizan la difusion en consulta publica de un proyecto que modifica el Reglamento General de las Cooperativas de Ahorro y Credito No Autorizadas a Captar Recursos del Publico.</td></tr>
+        <tr><td>02/09/2026</td><td>Resolucion</td><td>00129-2026-SUNARP/GG</td><td>MEDIO</td><td>Aprueban modificacion del Manual de Clasificador de Cargos de la Superintendencia Nacional de los Registros Publicos.</td></tr>
+        <tr><td>02/09/2026</td><td>Resolucion</td><td>02147-2026</td><td>ALTO</td><td>Autorizan difusion en consulta publica de un proyecto normativo para cooperativas de ahorro y credito y su manual de contabilidad.</td></tr>
+        <tr><td>05/09/2026</td><td>Resolucion</td><td>02206-2026</td><td>BAJO</td><td>Resolucion SBS identificada con contenido incompleto en la salida del parser.</td></tr>
+        <tr><td>11/09/2026</td><td>Resolucion</td><td>02235-2026</td><td>ALTO</td><td>Modifican el Reglamento sobre Grupo Economico, Vinculacion, aplicacion de Limites Operativos y el Reglamento para la Gestion del Riesgo de Credito.</td></tr>
+      </table>
+      <div class="foot">Estas cinco normas se muestran como diferencias de criterio entre la alerta LexIA y el Excel del analista; no se interpretan como errores de parseo salvo la Resolucion SBS 02206-2026, cuyo contenido fue incompleto en la salida original.</div>
+    </div>
+  </div>
+</body>
+</html>
