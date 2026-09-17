@@ -1,0 +1,690 @@
+insert into d_perm_aws.t_agg_alertas_p2_plaft(
+ cod_mes
+,cod_cli
+,cnt_meses_siningresos_12m
+,cnt_meses_sinegresos_12m
+,max_trx_abonos_1m
+,max_trx_abonos_3m
+,max_trx_abonos_6m
+,max_trx_abonos_9m
+,max_trx_abonos_12m
+,max_trx_cargos_1m
+,max_trx_cargos_3m
+,max_trx_cargos_6m
+,max_trx_cargos_9m
+,max_trx_cargos_12m
+,avg_trx_cargos_3m
+,avg_trx_cargos_6m
+,avg_trx_cargos_9m
+,avg_trx_cargos_12m
+,rat_trx_cargosefe_1m
+,rat_trx_cargosefe_3m
+,rat_trx_cargosefe_6m
+,rat_trx_cargosefe_9m
+,rat_trx_cargosefe_12m
+,rat_mntcrgsefetot_1m
+,rat_mntcrgsefetot_3m
+,rat_mntcrgsefetot_6m
+,rat_mntcrgsefetot_9m
+,rat_mntcrgsefetot_12m
+,flg_cce_r1
+,fec_ultima_r1
+,flg_kyc_12m
+,flg_kyc_hist
+,ts_ultimo_kyc_hist
+,cnt_kyc_hist
+,cnt_trx_al_ext_3m
+,cnt_trx_al_ext_6m
+,cnt_trx_al_ext_9m
+,cnt_trx_al_ext_12m
+,cnt_trx_del_ext_3m
+,cnt_trx_del_ext_6m
+,cnt_trx_del_ext_9m
+,cnt_trx_del_ext_12m
+,mto_al_ext_3m
+,mto_al_ext_6m
+,mto_al_ext_9m
+,mto_al_ext_12m
+,mto_del_ext_3m
+,mto_del_ext_6m
+,mto_del_ext_9m
+,mto_del_ext_12m
+,cnt_trx_sinenv_alext_12m
+,cnt_trx_al_ext_100_12m
+,cnt_trx_al_ext_1000_12m
+,cnt_trx_al_ext_10k_12m
+,cnt_trx_al_ext_100k_12m
+,cnt_trx_al_ext_1000k_12m
+,cnt_trx_sinenv_delext_12m
+,cnt_trx_del_ext_100_12m
+,cnt_trx_del_ext_1000_12m
+,cnt_trx_del_ext_10k_12m
+,cnt_trx_del_ext_100k_12m
+,cnt_trx_delext_1mll_12m
+,flg_al_ext_12m
+,flg_del_ext_12m
+,flg_inteligo
+,ts_carga
+,p_codmes
+)
+with wrk_dim_tiempo as (
+SELECT 
+codmes, 
+DATE_FORMAT(DATE_ADD('month', -0, calendar_date), '%Y%m') AS lcodmesm00,
+DATE_FORMAT(DATE_ADD('month', -1, calendar_date), '%Y%m') AS lcodmesm01,
+DATE_FORMAT(DATE_ADD('month', -2, calendar_date), '%Y%m') AS lcodmesm02,
+DATE_FORMAT(DATE_ADD('month', -3, calendar_date), '%Y%m') AS lcodmesm03,
+DATE_FORMAT(DATE_ADD('month', -4, calendar_date), '%Y%m') AS lcodmesm04,
+DATE_FORMAT(DATE_ADD('month', -5, calendar_date), '%Y%m') AS lcodmesm05,
+DATE_FORMAT(DATE_ADD('month', -6, calendar_date), '%Y%m') AS lcodmesm06,
+DATE_FORMAT(DATE_ADD('month', -7, calendar_date), '%Y%m') AS lcodmesm07,
+DATE_FORMAT(DATE_ADD('month', -8, calendar_date), '%Y%m') AS lcodmesm08,
+DATE_FORMAT(DATE_ADD('month', -9, calendar_date), '%Y%m') AS lcodmesm09,
+DATE_FORMAT(DATE_ADD('month', -10, calendar_date), '%Y%m') AS lcodmesm10,
+DATE_FORMAT(DATE_ADD('month', -11, calendar_date), '%Y%m') AS lcodmesm11,
+DATE_FORMAT(DATE_ADD('month', -12, calendar_date), '%Y%m') AS lcodmesm12,
+DATE_FORMAT(DATE_ADD('month', -13, calendar_date), '%Y%m') AS lcodmesm13,
+DATE_FORMAT(DATE_ADD('month', -14, calendar_date), '%Y%m') AS lcodmesm14,
+DATE_ADD('month', 0, calendar_date) AS dlcodmesm00,
+DATE_ADD('month', -6, calendar_date) AS dlcodmesm06,
+DATE_ADD('month', -12, calendar_date) AS dlcodmesm12,
+DATE_ADD('month', -13, calendar_date) AS dlcodmesm13,
+DATE_TRUNC('month', calendar_date) + INTERVAL '1' month - INTERVAL '1' day AS lcoddaym0,
+DATE_TRUNC('month', calendar_date) + INTERVAL '0' month - INTERVAL '1' day AS lcoddaym1,
+date_trunc('month', calendar_date) - interval '12' month as lcoddaym12
+FROM ( 
+SELECT 
+DATE_FORMAT(DATE_PARSE(calendar_date, '%Y-%m-%d'), '%Y%m') AS codmes, 
+DATE_PARSE(calendar_date, '%Y-%m-%d') AS calendar_date 
+FROM e_perm_aws.t_calendar_summary 
+WHERE calendar_date = DATE_FORMAT(DATE_PARSE('202606','%Y%m'),'%Y-%m-%d')
+)
+),
+base_clientes as (
+select a.cod_cli
+from d_perm_aws.t_agg_alertas_p1_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+),
+wkr_tipo_cambio_rsk AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen,fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross JOIN wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') BETWEEN t.lcodmesm14 AND t.codmes
+and cod_moneda_origen in ('USD','EUR')
+and cod_tipo_cambio = '1002' --AND cambio_segun = 'SBS - diario'
+) tc
+where tc.r=1
+order by 1 desc
+),
+wrk_base as (
+select codunico as cod_cli, a.* from e_perm_aws.t_rm_cliente a
+),
+wrk_trx_captaciones as (
+select
+date_format(fechinievento,'%Y%m') as periodo,
+cuc_num cod_cli,
+sum(case when m.signomonto = '+' then 1 else 0 end) AS q_abonos,
+SUM(CASE WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio -- Euro
+ELSE 0 END) AS ABONOS_SOLARIZADO,
+SUM(CASE WHEN CodigoTransaccion IN ('1200','2200','7200') AND M.SIGNOMONTO = '+' THEN 1
+ELSE 0 END) AS Q_ABONOS_EFECTIVO_DEPOSITOS,
+SUM(CASE WHEN CodigoTransaccion IN ('1200','2200','7200') AND M.SIGNOMONTO = '+' AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN CodigoTransaccion IN ('1200','2200','7200') AND M.SIGNOMONTO = '+' AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN CodigoTransaccion IN ('1200','2200','7200') AND M.SIGNOMONTO = '+' AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS ABONOS_SOLARIZADO_EFECTIVO_DEPOSITOS,
+sum(case when m.signomonto = '-' then 1 else 0 end) AS q_cargos,
+SUM(CASE WHEN M.SIGNOMONTO = '-' AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN M.SIGNOMONTO = '-' AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN M.SIGNOMONTO = '-' AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS CARGOS_SOLARIZADO,
+SUM(CASE WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND M.SIGNOMONTO = '-' THEN 1
+ELSE 0 END) AS Q_CARGOS_EFECTIVO_RETIROS,
+SUM(CASE WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND M.SIGNOMONTO = '-' AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND M.SIGNOMONTO = '-' AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN CodigoTransaccion IN ('1100','1395','2100','7100') AND M.SIGNOMONTO = '-' AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS CARGOS_SOLARIZADO_EFECTIVO_RETIROS
+FROM e_perm_aws.t_fct_transacciones_captaciones m
+cross join wrk_dim_tiempo t
+left join wkr_tipo_cambio_rsk b on date_format(m.fechinievento,'%Y%m') = b.codmes and m.monedacd = b.cod_moneda_origen
+WHERE m.fechinievento between t.dlcodmesm13 and t.dlcodmesm00
+and m.signomonto in ('+','-') and cuc_num is not null
+and cuc_num <> coalesce(cuc_num_ord_ben, 'abc')
+group by 1,2
+),
+cantidad_monto_abonos_cargos_total AS (
+SELECT
+w.cod_cli,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.q_abonos ELSE 0 END) AS TRX_Q_ABONOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.q_cargos ELSE 0 END) AS TRX_Q_CARGOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS TRX_MONTO_ABONOS_12M_TOTAL,
+SUM(CASE WHEN w.periodo = t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_1M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_3M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_6M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_9M_TOTAL,
+SUM(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS TRX_MONTO_CARGOS_12M_TOTAL
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.cod_cli
+),
+cantidad_monto_abonos_cargos_efectivo AS (
+SELECT
+w.cod_cli,
+SUM(case when w.periodo = t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then q_abonos_efectivo_depositos end) AS trx_q_abonos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then abonos_solarizado_efectivo_depositos end) AS trx_monto_abonos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then q_cargos_efectivo_retiros end) AS trx_q_cargos_12m_efectivo,
+SUM(case when w.periodo = t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_1m_efectivo,
+SUM(case when w.periodo between t.lcodmesm03 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_3m_efectivo,
+SUM(case when w.periodo between t.lcodmesm06 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_6m_efectivo,
+SUM(case when w.periodo between t.lcodmesm09 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_9m_efectivo,
+SUM(case when w.periodo between t.lcodmesm12 and t.lcodmesm01 then cargos_solarizado_efectivo_retiros end) AS trx_monto_cargos_12m_efectivo
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.cod_cli
+),
+trx_q_abonos_ratios_efectivo_total AS (
+SELECT
+TQAT.cod_cli,
+COALESCE(CAST(TQAE.trx_q_abonos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_1m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQAE.trx_q_abonos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_abonos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_abonos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQAE
+ON TQAT.cod_cli = TQAE.cod_cli
+),
+trx_monto_abonos_ratios_efectivo_total AS (
+SELECT
+TQAT.cod_cli,
+COALESCE(CAST(TQAE.trx_monto_abonos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_1m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQAE.trx_monto_abonos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_monto_abonos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_abonos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQAE
+ON TQAE.cod_cli = TQAT.cod_cli
+),
+trx_q_cargos_ratios_efectivo_total AS (
+SELECT
+TQCE.cod_cli,
+COALESCE(CAST(TQCE.trx_q_cargos_1m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_1m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_1m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_3m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_3m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_6m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_6m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_9m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_q_cargos_ratio_9m_efectivo_total,
+COALESCE(CAST(TQCE.trx_q_cargos_12m_efectivo * 1.000000
+/ NULLIF(TQAT.trx_q_cargos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000'
+) AS trx_q_cargos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TQAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TQCE
+ON TQCE.cod_cli = TQAT.cod_cli
+),
+trx_monto_cargos_ratios_efectivo_total AS (
+SELECT
+TMCE.cod_cli,
+COALESCE(CAST(TMCE.trx_monto_cargos_1m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_1m_total, 0) AS DECIMAL(38,6)),DECIMAL '0.000000') AS trx_monto_cargos_ratio_1m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_3m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_3m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_3m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_6m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_6m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_6m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_9m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_9m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_9m_efectivo_total,
+COALESCE(CAST(TMCE.trx_monto_cargos_12m_efectivo * 1.000000
+/ NULLIF(TMAT.trx_monto_cargos_12m_total, 0) AS DECIMAL(38,6)), DECIMAL '0.000000') AS trx_monto_cargos_ratio_12m_efectivo_total
+FROM cantidad_monto_abonos_cargos_total TMAT
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo TMCE
+ON TMCE.cod_cli = TMAT.cod_cli
+),
+promedio_monto_cargo_total_efectivo AS (
+SELECT
+W.cod_cli,
+COALESCE(CAST(cmace.trx_q_cargos_3m_efectivo * 1.000000 / 3 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_3M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_6m_efectivo * 1.000000 / 6 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_6M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_9m_efectivo * 1.000000 / 9 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_9M_TOTAL,
+COALESCE(CAST(cmace.trx_q_cargos_12m_efectivo * 1.000000 / 12 AS DECIMAL(38,6)),
+DECIMAL '0.000000') AS TRX_MONTO_CARGOS_PROMEDIO_12M_TOTAL
+FROM base_clientes w
+LEFT JOIN cantidad_monto_abonos_cargos_total cmact
+ON w.cod_cli = cmact.cod_cli
+LEFT JOIN cantidad_monto_abonos_cargos_efectivo cmace
+ON w.cod_cli = cmace.cod_cli
+),
+monto_maximo_cargos_abonos AS (
+SELECT
+w.cod_cli,
+MAX(CASE WHEN w.periodo = t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS trx_monto_abonos_1m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS trx_monto_abonos_3m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS trx_monto_abonos_6m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS trx_monto_abonos_9m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.abonos_solarizado ELSE 0 END) AS trx_monto_abonos_12m_max,
+MAX(CASE WHEN w.periodo = t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS trx_monto_cargos_1m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm03 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS trx_monto_cargos_3m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm06 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS trx_monto_cargos_6m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm09 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS trx_monto_cargos_9m_max,
+MAX(CASE WHEN w.periodo between t.lcodmesm12 and t.lcodmesm01 THEN w.cargos_solarizado ELSE 0 END) AS trx_monto_cargos_12m_max
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.cod_cli
+),
+wrk_trx_flags AS (
+SELECT
+cuc_num cod_cli,
+date_format(fechinievento, '%Y%m') AS periodo,
+CASE WHEN SUM(CASE WHEN signomonto = '+' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END AS flag_ingreso,
+CASE WHEN SUM(CASE WHEN signomonto = '-' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END AS flag_egreso
+FROM e_perm_aws.t_fct_transacciones_captaciones
+cross join wrk_dim_tiempo t
+WHERE fechinievento between t.dlcodmesm13 and t.dlcodmesm00
+AND signomonto IN ('+','-')
+AND cuc_num IS NOT NULL
+AND cuc_num <> coalesce(cuc_num_ord_ben,'abc')
+GROUP BY cuc_num, date_format(fechinievento, '%Y%m')
+),
+meses AS (
+SELECT lcodmesm01 AS mes FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm02 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm03 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm04 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm05 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm06 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm07 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm08 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm09 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm10 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm11 FROM wrk_dim_tiempo UNION ALL
+SELECT lcodmesm12 FROM wrk_dim_tiempo
+),
+clientes_periodos AS (
+SELECT c.codunico cod_cli, m.mes AS periodo
+FROM (SELECT codunico FROM e_perm_aws.t_rm_cliente group by 1) c
+CROSS JOIN meses m
+),
+q_meses_sin_ingresos_egresos AS (
+SELECT
+cp.cod_cli,
+SUM(CASE WHEN COALESCE(tf.flag_ingreso,0) = 0 THEN 1 ELSE 0 END) AS q_meses_ingresos_0,
+SUM(CASE WHEN COALESCE(tf.flag_egreso,0) = 0 THEN 1 ELSE 0 END) AS q_meses_egresos_0
+FROM clientes_periodos cp
+LEFT JOIN wrk_trx_flags tf
+ON tf.cod_cli = cp.cod_cli
+AND tf.periodo = cp.periodo
+GROUP BY cp.cod_cli
+),
+wrk_var_kyc_plaft as (
+select trim(a.codunico) cod_cli,
+max(case when a.fecha_f between t.lcoddaym12 and t.lcoddaym0 then 1 end) flag_kyc_12m,
+max(case when a.fecha_f <= t.lcoddaym0 then 1 end) flag_kyc_hist,
+max(case when fecha_f <= t.lcoddaym0 then fecha_f end) fecha_ultimo_kyc_hist,
+count(case when fecha_f <= t.lcoddaym0 then 1 end) cantidad_kyc_hist
+from e_perm_aws.t_kyc_plaft a
+cross join wrk_dim_tiempo t
+where a.des_estado_f ='APROBADO'
+group by 1
+),
+wrk_list_niv_ries_motivo as (
+select
+trim(t1.codunicocli) cod_cli
+,1 flag_cce_r1
+,max(t1.fecauditoria) ultima_fecha_r1
+from e_perm_aws.t_list_niv_ries_motivo t1
+cross join wrk_dim_tiempo t
+where t1.riesgo = 'R1' and t1.fecauditoria <= t.lcoddaym0
+AND trim(t1.codunicocli) <> ''
+group by 1
+),
+wkr_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen,fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross JOIN wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') BETWEEN t.lcodmesm14 AND t.codmes
+and cod_moneda_origen in ('USD','EUR')
+and cod_tipo_cambio = '1002' --AND cambio_segun = 'SBS - diario'
+) tc
+where tc.r=1
+order by 1 desc
+),
+wrk_pre_meses_al_exterior as (
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cli,
+a.cod_trx_orig,
+count(1) q_trx,
+sum(mto_operacion) monto_trx
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+where substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) between t.lcodmesm13 and t.lcodmesm01
+and a.cod_trx_orig in ('640','9640','1640')
+and a.cod_monorigen = 'S'
+group by 1,2,3
+union all
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cli,
+a.cod_trx_orig,
+count(1) q_trx,
+sum(a.mto_operacion*tc.tipo_cambio) monto_trx
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+inner join wkr_tipo_cambio tc on substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) = tc.codmes and tc.cod_moneda_origen = 'USD'
+where substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) between t.lcodmesm13 and t.lcodmesm01
+and a.cod_trx_orig in ('640','9640','1640')
+and a.cod_monorigen = 'D'
+group by 1,2,3
+union all
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cli,
+a.cod_trx_orig,
+count(1) q_trx,
+sum(a.mto_operacion*tc.tipo_cambio) monto_trx
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+inner join wkr_tipo_cambio tc on substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) = tc.codmes and tc.cod_moneda_origen = 'EUR'
+where substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) between t.lcodmesm13 and t.lcodmesm01
+and a.cod_trx_orig in ('640','9640','1640')
+and a.cod_monorigen = 'E'
+group by 1,2,3
+),
+wrk_var_exterior as (
+SELECT 
+cod_cli,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm03 and t.lcodmesm01 then q_trx end) q_trx_al_exterior_3m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm06 and t.lcodmesm01 then q_trx end) q_trx_al_exterior_6m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm09 and t.lcodmesm01 then q_trx end) q_trx_al_exterior_9m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm12 and t.lcodmesm01 then q_trx end) q_trx_al_exterior_12m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm03 and t.lcodmesm01 then q_trx end) q_trx_del_exterior_3m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm06 and t.lcodmesm01 then q_trx end) q_trx_del_exterior_6m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm09 and t.lcodmesm01 then q_trx end) q_trx_del_exterior_9m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm12 and t.codmes then q_trx end) q_trx_del_exterior_12m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm03 and t.codmes then monto_trx end) monto_al_exterior_3m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm06 and t.codmes then monto_trx end) monto_al_exterior_6m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm09 and t.codmes then monto_trx end) monto_al_exterior_9m,
+sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm12 and t.codmes then monto_trx end) monto_al_exterior_12m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm03 and t.codmes then monto_trx end) monto_del_exterior_3m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm06 and t.codmes then monto_trx end) monto_del_exterior_6m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm09 and t.codmes then monto_trx end) monto_del_exterior_9m,
+sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm12 and t.codmes then monto_trx end) monto_del_exterior_12m,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 0 then 1 else 0 end)   q_meses_al_exterior_0,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 100 then 1 else 0 end)  q_meses_al_exterior_100,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 1000 then 1 else 0 end)  q_meses_al_exterior_1000,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 10000 then 1 else 0 end)  q_meses_al_exterior_10000,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 100000 then 1 else 0 end) q_meses_al_exterior_100000,
+sum(case when cod_trx_orig in ('640','9640') and monto_trx > 1000000 then 1 else 0 end) q_meses_al_exterior_1000000,
+sum(case when cod_trx_orig = '1640' and monto_trx > 0 then 1 else 0 end)    q_meses_del_exterior_0,
+sum(case when cod_trx_orig = '1640' and monto_trx > 100 then 1 else 0 end)    q_meses_del_exterior_100,
+sum(case when cod_trx_orig = '1640' and monto_trx > 1000 then 1 else 0 end)   q_meses_del_exterior_1000,
+sum(case when cod_trx_orig = '1640' and monto_trx > 10000 then 1 else 0 end)   q_meses_del_exterior_10000,
+sum(case when cod_trx_orig = '1640' and monto_trx > 100000 then 1 else 0 end)   q_meses_del_exterior_100000,
+sum(case when cod_trx_orig = '1640' and monto_trx > 1000000 then 1 else 0 end)   q_meses_del_exterior_1000000,
+case when (sum(case when cod_trx_orig in ('640','9640') and periodo between t.lcodmesm12 and t.lcodmesm01 then q_trx end) > 0) then 1 else 0 end flag_al_exterior,
+case when (sum(case when cod_trx_orig = '1640' and periodo between t.lcodmesm12 and t.lcodmesm01 then q_trx end) > 0) then 1 else 0 end flag_del_exterior
+from wrk_pre_meses_al_exterior a
+cross join wrk_dim_tiempo t
+group by 1
+),
+flag_inteligo AS (
+SELECT
+CASE 
+WHEN o.cod_trx_orig IN (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) THEN o.codunico_ord
+WHEN o.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) THEN o.codunico_ben
+WHEN o.codunico_ben IS NULL THEN o.codunico_ord
+ELSE o.codunico_ben
+END AS cod_cli,
+substr(o.fec_inicio_trx, 1, 4) || substr(o.fec_inicio_trx, 6, 2) AS periodo,
+MAX(
+CASE 
+WHEN o.cod_tienda1 IN ('0316','0647') THEN 1 
+ELSE 0 
+END
+) AS flag_inteligo
+FROM e_perm_aws.t_aml_operaciones o
+JOIN wrk_dim_tiempo t
+ON (substr(o.fec_inicio_trx, 1, 4) || substr(o.fec_inicio_trx, 6, 2)) = t.lcodmesm01
+GROUP BY 1,2
+)
+SELECT
+CAST(t.codmes AS VARCHAR) AS COD_MES,
+CAST(bc.cod_cli AS VARCHAR) AS COD_CLI,
+CAST(QMSIE.q_meses_ingresos_0 AS INT) AS CNT_MESES_SININGRESOS_12M,
+CAST(QMSIE.q_meses_egresos_0 AS INT) AS CNT_MESES_SINEGRESOS_12M,
+COALESCE(CAST(MMCA.trx_monto_abonos_1m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_ABONOS_1M,
+COALESCE(CAST(MMCA.trx_monto_abonos_3m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_ABONOS_3M,
+COALESCE(CAST(MMCA.trx_monto_abonos_6m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_ABONOS_6M,
+COALESCE(CAST(MMCA.trx_monto_abonos_9m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_ABONOS_9M,
+COALESCE(CAST(MMCA.trx_monto_abonos_12m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_ABONOS_12M,
+COALESCE(CAST(MMCA.trx_monto_cargos_1m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_CARGOS_1M,
+COALESCE(CAST(MMCA.trx_monto_cargos_3m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_CARGOS_3M,
+COALESCE(CAST(MMCA.trx_monto_cargos_6m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_CARGOS_6M,
+COALESCE(CAST(MMCA.trx_monto_cargos_9m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_CARGOS_9M,
+COALESCE(CAST(MMCA.trx_monto_cargos_12m_max AS DECIMAL(38,6)), 0) AS MAX_TRX_CARGOS_12M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_3M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOS_3M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_6M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOS_6M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_9M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOS_9M,
+COALESCE(CAST(pmcte.TRX_MONTO_CARGOS_PROMEDIO_12M_TOTAL AS DECIMAL(38,6)), 0) AS AVG_TRX_CARGOS_12M,
+COALESCE(CAST(TQCRET.trx_q_cargos_ratio_1m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_CARGOSEFE_1M,
+COALESCE(CAST(TQCRET.trx_q_cargos_ratio_3m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_CARGOSEFE_3M,
+COALESCE(CAST(TQCRET.trx_q_cargos_ratio_6m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_CARGOSEFE_6M,
+COALESCE(CAST(TQCRET.trx_q_cargos_ratio_9m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_CARGOSEFE_9M,
+COALESCE(CAST(TQCRET.trx_q_cargos_ratio_12m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_TRX_CARGOSEFE_12M,
+COALESCE(CAST(TMCRET.trx_monto_cargos_ratio_1m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_MNTCRGSEFETOT_1M,
+COALESCE(CAST(TMCRET.trx_monto_cargos_ratio_3m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_MNTCRGSEFETOT_3M,
+COALESCE(CAST(TMCRET.trx_monto_cargos_ratio_6m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_MNTCRGSEFETOT_6M,
+COALESCE(CAST(TMCRET.trx_monto_cargos_ratio_9m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_MNTCRGSEFETOT_9M,
+COALESCE(CAST(TMCRET.trx_monto_cargos_ratio_12m_efectivo_total AS DECIMAL(38,6)), 0) AS RAT_MNTCRGSEFETOT_12M,
+CASE WHEN b.flag_cce_r1 = 1 THEN 1 ELSE 0 END AS FLG_CCE_R1,
+CAST(b.ultima_fecha_r1 AS DATE) AS FEC_ULTIMA_R1,
+CASE WHEN c.flag_kyc_12m = 1 THEN 1 ELSE 0 END AS FLG_KYC_12M,
+CASE WHEN c.flag_kyc_hist = 1 THEN 1 ELSE 0 END AS FLG_KYC_HIST,
+CAST(c.fecha_ultimo_kyc_hist AS TIMESTAMP) AS TS_ULTIMO_KYC_HIST,
+COALESCE(CAST(c.cantidad_kyc_hist AS INTEGER), 0) AS CNT_KYC_HIST,
+COALESCE(CAST(e.q_trx_al_exterior_3m AS INTEGER), 0) AS CNT_TRX_AL_EXT_3M,
+COALESCE(CAST(e.q_trx_al_exterior_6m AS INTEGER), 0) AS CNT_TRX_AL_EXT_6M,
+COALESCE(CAST(e.q_trx_al_exterior_9m AS INTEGER), 0) AS CNT_TRX_AL_EXT_9M,
+COALESCE(CAST(e.q_trx_al_exterior_12m AS INTEGER), 0) AS CNT_TRX_AL_EXT_12M,
+COALESCE(CAST(e.q_trx_del_exterior_3m AS INTEGER), 0) AS CNT_TRX_DEL_EXT_3M,
+COALESCE(CAST(e.q_trx_del_exterior_6m AS INTEGER), 0) AS CNT_TRX_DEL_EXT_6M,
+COALESCE(CAST(e.q_trx_del_exterior_9m AS INTEGER), 0) AS CNT_TRX_DEL_EXT_9M,
+COALESCE(CAST(e.q_trx_del_exterior_12m AS INTEGER), 0) AS CNT_TRX_DEL_EXT_12M,
+COALESCE(CAST(e.monto_al_exterior_3m AS DECIMAL(38,6)), 0) AS MTO_AL_EXT_3M,
+COALESCE(CAST(e.monto_al_exterior_6m AS DECIMAL(38,6)), 0) AS MTO_AL_EXT_6M,
+COALESCE(CAST(e.monto_al_exterior_9m AS DECIMAL(38,6)), 0) AS MTO_AL_EXT_9M,    
+COALESCE(CAST(e.monto_al_exterior_12m AS DECIMAL(38,6)), 0) AS MTO_AL_EXT_12M,
+COALESCE(CAST(e.monto_del_exterior_3m AS DECIMAL(38,6)), 0) AS MTO_DEL_EXT_3M,
+COALESCE(CAST(e.monto_del_exterior_6m AS DECIMAL(38,6)), 0) AS MTO_DEL_EXT_6M,
+COALESCE(CAST(e.monto_del_exterior_9m AS DECIMAL(38,6)), 0) AS MTO_DEL_EXT_9M,
+COALESCE(CAST(e.monto_del_exterior_12m AS DECIMAL(38,6)), 0) AS MTO_DEL_EXT_12M,
+COALESCE(CAST(e.q_meses_al_exterior_0 AS INTEGER), 0) AS CNT_TRX_SINENV_ALEXT_12M,
+COALESCE(CAST(e.q_meses_al_exterior_100 AS INTEGER), 0) AS CNT_TRX_AL_EXT_100_12M,
+COALESCE(CAST(e.q_meses_al_exterior_1000 AS INTEGER), 0) AS CNT_TRX_AL_EXT_1000_12M,
+COALESCE(CAST(e.q_meses_al_exterior_10000 AS INTEGER), 0) AS CNT_TRX_AL_EXT_10K_12M,
+COALESCE(CAST(e.q_meses_al_exterior_100000 AS INTEGER), 0) AS CNT_TRX_AL_EXT_100K_12M,
+COALESCE(CAST(e.q_meses_al_exterior_1000000 AS INTEGER), 0) AS CNT_TRX_AL_EXT_1000K_12M,
+COALESCE(CAST(e.q_meses_del_exterior_0 AS INTEGER), 0) AS CNT_TRX_SINENV_DELEXT_12M,
+COALESCE(CAST(e.q_meses_del_exterior_100 AS INTEGER), 0) AS CNT_TRX_DEL_EXT_100_12M,
+COALESCE(CAST(e.q_meses_del_exterior_1000 AS INTEGER), 0) AS CNT_TRX_DEL_EXT_1000_12M,
+COALESCE(CAST(e.q_meses_del_exterior_10000 AS INTEGER), 0) AS CNT_TRX_DEL_EXT_10K_12M,
+COALESCE(CAST(e.q_meses_del_exterior_100000 AS INTEGER), 0) AS CNT_TRX_DEL_EXT_100K_12M,
+COALESCE(CAST(e.q_meses_del_exterior_1000000 AS INTEGER), 0) AS CNT_TRX_DELEXT_1MLL_12M,
+CASE WHEN e.flag_al_exterior = 1 THEN 1 ELSE 0 END AS FLG_AL_EXT_12M,
+CASE WHEN e.flag_del_exterior = 1 THEN 1 ELSE 0 END AS FLG_DEL_EXT_12M,
+CASE WHEN f.flag_inteligo = 1 THEN 1 ELSE 0 END AS FLG_INTELIGO,
+(localtimestamp - interval '5' hour) AS ts_carga,
+t.codmes AS p_codmes
+from base_clientes bc
+cross join wrk_dim_tiempo t
+left join cantidad_monto_abonos_cargos_total cmact
+on bc.cod_cli = cmact.cod_cli
+left join cantidad_monto_abonos_cargos_efectivo cmace
+on bc.cod_cli = cmace.cod_cli
+left join promedio_monto_cargo_total_efectivo pmcte
+on bc.cod_cli = pmcte.cod_cli
+left join trx_q_abonos_ratios_efectivo_total tqaret
+on bc.cod_cli = tqaret.cod_cli
+left join trx_monto_abonos_ratios_efectivo_total tmar
+on bc.cod_cli = tmar.cod_cli
+left join trx_monto_cargos_ratios_efectivo_total tmcret
+on bc.cod_cli = tmcret.cod_cli
+left join trx_q_cargos_ratios_efectivo_total tqcret
+on bc.cod_cli = tqcret.cod_cli
+left join monto_maximo_cargos_abonos mmca
+on bc.cod_cli = mmca.cod_cli
+left join q_meses_sin_ingresos_egresos qmsie
+on bc.cod_cli = qmsie.cod_cli
+left join wrk_var_exterior e
+on bc.cod_cli = e.cod_cli
+left join wrk_list_niv_ries_motivo b
+on bc.cod_cli = b.cod_cli
+left join wrk_var_kyc_plaft c
+on bc.cod_cli = c.cod_cli
+left join flag_inteligo f
+on bc.cod_cli = f.cod_cli
+;

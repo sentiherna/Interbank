@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280, height=720, initial-scale=1.0">
+<title>Perfiles — Priorización del Modelo</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --green: #00be50;
+  --green-dark: #005f1e;
+  --blue: #1f4592;
+  --orange: #e67e22;
+  --purple: #8e44ad;
+  --red: #c0392b;
+  --bg: #f9fafb;
+  --card-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {font-family: 'Poppins', sans-serif;background: var(--bg);color: var(--green-dark);overflow: hidden;}
+.slide {width: 1280px; height: 720px; margin: auto;display: flex; flex-direction: column;}
+.header {background: var(--green);color: #fff;padding: 16px 28px;display: flex;align-items: center;border-radius: 14px 14px 0 0;font-weight: 600;font-size: 22px;gap: 12px;box-shadow: var(--shadow);}
+.header img { height: 46px; }
+.main-title {text-align: center;font-size: 26px;color: var(--blue);font-weight: 700;margin: 14px 0;}
+.profiles-grid {display: grid;grid-template-columns: repeat(4, 1fr);grid-gap: 16px;padding: 0 28px;flex: 1;}
+.card {background: var(--card-bg);border-radius: 14px;box-shadow: var(--shadow);padding: 18px 16px;display: flex;flex-direction: column;transition: all 0.3s;}
+.card:hover {transform: translateY(-6px);box-shadow: 0 10px 24px rgba(0,0,0,0.15);}
+.card-header {display: flex;align-items: center;gap: 10px;margin-bottom: 10px;}
+.card-icon {font-size: 23px;color: var(--green);}
+.card-title {font-size: 19px;font-weight: 700;color: var(--green);}
+.card-subtitle {font-size: 11.5px;color: var(--green-dark);opacity: 0.9;line-height: 1.3;margin-bottom: 6px;}
+.feature-list {
+  list-style: none;
+  width: 100%;
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+.feature-item {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 8px;
+  font-size: 12.3px;
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+  align-items: center;
+}
+.feature-item:last-child { border-bottom: none; }
+.pill {font-size: 11px;font-weight: 700;border-radius: 999px;padding: 3px 9px;text-transform: uppercase;}
+.pill.clientes { background:#e8f5e8; color:#005f1e; border:1px solid var(--green); }
+.pill.pasivos { background:#e3f2fd; color:var(--blue); border:1px solid var(--blue); }
+.pill.antiguedad { background:#fff3e0; color:var(--orange); border:1px solid var(--orange); }
+.pill.ingresos { background:#e8f5e8; color:#005f1e; border:1px solid var(--green); }
+.pill.egresos { background:#fef5e7; color:#d35400; border:1px solid #e67e22; }
+.pill.meses-sin { background:#ffebee; color:var(--red); border:1px solid var(--red); }
+.pill.edad { background:#f3e5f5; color:var(--purple); border:1px solid var(--purple); }
+.pill.linea { background:#e8eaf6; color:#3949ab; border:1px solid #3949ab; }
+.pill.trx { background:#fffde7; color:#f57f17; border:1px solid #f57f17; }
+.pill.precision { background:rgba(0,190,80,0.15); color:var(--green-dark); border:1px solid var(--green); font-weight:800; }
+.alert-section {background:#f8f9fa;border-radius:8px;padding:9px;margin-top:auto;border:1px solid #eee;}
+.alert-title {font-size:10px;font-weight:700;color:#777;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.alert-row {display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:2px;}
+.summary {text-align:center;font-weight:600;color:var(--green-dark);margin:14px 0 10px;font-size:14.5px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="header">
+    <img src="https://play-lh.googleusercontent.com/vjYx0jloYA0BSr6fHPhvhhIbgieH0jmOV3fv_evGkj9bxxjITNO3Yhfux77bq2_HvBIF" alt="Logo">
+    <span>Estrategia de Priorización</span>
+  </div>
+  <div class="main-title">Resultados del Modelo y Carga Operativa</div>
+  <div class="profiles-grid">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-exclamation-triangle card-icon" style="color:var(--red);"></i>
+        <div>
+          <div class="card-title" style="color:var(--green);">P1 — Máxima</div>
+          <div class="card-subtitle">Alta concentración de riesgo</div>
+        </div>
+      </div>
+      <ul class="feature-list">
+        <li class="feature-item">Clientes<span class="pill clientes">123</span></li><li class="feature-item">num_antiguedad<span class="pill ingresos">1.65</span></li><li class="feature-item">rat_pastot_x_ingtot_6m<span class="pill egresos">0.03</span></li><li class="feature-item">mto_pas_soles<span class="pill linea">527,327</span></li><li class="feature-item">imp_trx_abonosefect_6m<span class="pill trx">1,667,813</span></li><li class="feature-item">imp_trx_cargosefe_6m<span class="pill antiguedad">1,351,896</span></li><li class="feature-item">mto_del_ext_12m<span class="pill meses-sin">17,697,694</span></li><li class="feature-item">cnt_meses_sinegresos_12m<span class="pill edad">3.33</span></li><li class="feature-item">Precisión<span class="pill precision">23.6%</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-line card-icon" style="color:var(--green);"></i>
+        <div>
+          <div class="card-title" style="color:var(--green);">P2 — Segunda</div>
+          <div class="card-subtitle">Riesgo moderado con alta actividad</div>
+        </div>
+      </div>
+      <ul class="feature-list">
+        <li class="feature-item">Clientes<span class="pill clientes">110</span></li><li class="feature-item">num_antiguedad<span class="pill ingresos">5.52</span></li><li class="feature-item">rat_pastot_x_ingtot_6m<span class="pill egresos">0.07</span></li><li class="feature-item">mto_pas_soles<span class="pill linea">484,893</span></li><li class="feature-item">imp_trx_abonosefect_6m<span class="pill trx">388,667</span></li><li class="feature-item">imp_trx_cargosefe_6m<span class="pill antiguedad">131,553</span></li><li class="feature-item">mto_del_ext_12m<span class="pill meses-sin">2,545,452</span></li><li class="feature-item">cnt_meses_sinegresos_12m<span class="pill edad">0.97</span></li><li class="feature-item">Precisión<span class="pill precision">6.4%</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-briefcase card-icon" style="color:var(--green);"></i>
+        <div>
+          <div class="card-title" style="color:var(--green);">P3 — Estándar</div>
+          <div class="card-subtitle">Riesgo bajo, clientes estables</div>
+        </div>
+      </div>
+      <ul class="feature-list">
+        <li class="feature-item">Clientes<span class="pill clientes">103</span></li><li class="feature-item">num_antiguedad<span class="pill ingresos">9.36</span></li><li class="feature-item">rat_pastot_x_ingtot_6m<span class="pill egresos">0.13</span></li><li class="feature-item">mto_pas_soles<span class="pill linea">1,091,274</span></li><li class="feature-item">imp_trx_abonosefect_6m<span class="pill trx">270,857</span></li><li class="feature-item">imp_trx_cargosefe_6m<span class="pill antiguedad">56,624</span></li><li class="feature-item">mto_del_ext_12m<span class="pill meses-sin">4,959,965</span></li><li class="feature-item">cnt_meses_sinegresos_12m<span class="pill edad">1.15</span></li><li class="feature-item">Precisión<span class="pill precision">5.8%</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-layer-group card-icon" style="color:#777;"></i>
+        <div>
+          <div class="card-title" style="color:#555;">P4 + P5 — Baja</div>
+          <div class="card-subtitle">Riesgo mínimo</div>
+        </div>
+      </div>
+      <ul class="feature-list">
+        <li class="feature-item">Clientes<span class="pill clientes">198</span></li><li class="feature-item">num_antiguedad<span class="pill ingresos">9.84</span></li><li class="feature-item">rat_pastot_x_ingtot_6m<span class="pill egresos">23.33</span></li><li class="feature-item">mto_pas_soles<span class="pill linea">5,926,130</span></li><li class="feature-item">imp_trx_abonosefect_6m<span class="pill trx">421,282</span></li><li class="feature-item">imp_trx_cargosefe_6m<span class="pill antiguedad">96,990</span></li><li class="feature-item">mto_del_ext_12m<span class="pill meses-sin">943,475</span></li><li class="feature-item">cnt_meses_sinegresos_12m<span class="pill edad">1.46</span></li><li class="feature-item">Precisión<span class="pill precision">2.8%</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="summary">
+    Conclusión: El modelo concentra el <b>15.0% de precisión en P1 + P2 (233 clientes)</b>.<br>
+    <span style="color:#666;">P3 y P4+P5 tienen menor concentración de riesgo → ideal para automatización y optimización operativa.</span>
+  </div>
+</div>
+</body>
+</html>

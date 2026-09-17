@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Perfil por Quintil de Score - Interbank</title>
+<style>
+    body { font-family: 'Poppins', sans-serif; background-color: white; color: rgb(0,95,30); margin: 40px; }
+    h1 { color: rgb(0,95,30); font-weight: 600; }
+    h2 { color: rgb(0,95,30); font-weight: 500; margin-top: 40px; }
+    .kpi { background-color: rgb(198,255,192); padding: 10px 20px; margin: 20px 0 10px 0; border-left: 6px solid rgb(0,95,30); }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+    th { background-color: rgb(198,255,192); }
+</style>
+</head>
+<body>
+<h1>Perfil por Quintil de Score</h1>
+<p>Variables más distintivas (top 5 por z-score entre quintiles) de las 20 variables más importantes según SHAP.</p>
+<h2>Quintiles de riesgo</h2>
+
+<div class="kpi"><strong>Q1 (bajo)</strong><br/>Registros: 32,283</div>
+<table>
+<tr><th>Variable</th><th>Media en el quintil</th><th>Distancia (z-score)</th></tr>
+<tr><td>num_antiguedad</td><td>9.2736</td><td>+1.68</td></tr><tr><td>cnt_meses_sinegresos_12m</td><td>5.1648</td><td>+1.16</td></tr><tr><td>rat_mntcrgsefetot_1m</td><td>0.1117</td><td>+0.56</td></tr><tr><td>share_cp_egresos</td><td>0.7821</td><td>+0.01</td></tr><tr><td>rat_pastot_x_ingtot_6m</td><td>30.1252</td><td>-0.26</td></tr>
+</table>
+
+<div class="kpi"><strong>Q2</strong><br/>Registros: 32,283</div>
+<table>
+<tr><th>Variable</th><th>Media en el quintil</th><th>Distancia (z-score)</th></tr>
+<tr><td>rat_mntcrgsefetot_1m</td><td>0.1322</td><td>+1.25</td></tr><tr><td>mto_fact_declarado_sunat</td><td>2.8625</td><td>+0.24</td></tr><tr><td>cnt_meses_sinegresos_12m</td><td>4.5679</td><td>+0.17</td></tr><tr><td>num_antiguedad</td><td>5.3244</td><td>+0.15</td></tr><tr><td>cod_sectorista_id</td><td>2.9330</td><td>+0.08</td></tr>
+</table>
+
+<div class="kpi"><strong>Q3</strong><br/>Registros: 32,283</div>
+<table>
+<tr><th>Variable</th><th>Media en el quintil</th><th>Distancia (z-score)</th></tr>
+<tr><td>rat_pastot_x_ingtot_6m</td><td>121.1213</td><td>+1.73</td></tr><tr><td>cnt_meses_sinegresos_12m</td><td>4.9035</td><td>+0.72</td></tr><tr><td>cod_ubigeo_cd</td><td>2.9798</td><td>+0.63</td></tr><tr><td>mto_fact_declarado_sunat</td><td>2.9888</td><td>+0.50</td></tr><tr><td>cod_sectorista_id</td><td>2.9729</td><td>+0.48</td></tr>
+</table>
+
+<div class="kpi"><strong>Q4</strong><br/>Registros: 32,290</div>
+<table>
+<tr><th>Variable</th><th>Media en el quintil</th><th>Distancia (z-score)</th></tr>
+<tr><td>cod_ubigeo_cd</td><td>2.9893</td><td>+0.72</td></tr><tr><td>cod_sectorista_id</td><td>2.9782</td><td>+0.53</td></tr><tr><td>mto_fact_declarado_sunat</td><td>2.9952</td><td>+0.51</td></tr><tr><td>rat_ing_ext_x_ing_tot_12m</td><td>0.3008</td><td>-0.21</td></tr><tr><td>cnt_trx_cargostot_3m</td><td>37.1037</td><td>-0.22</td></tr>
+</table>
+
+<div class="kpi"><strong>Q5 (alto)</strong><br/>Registros: 32,276</div>
+<table>
+<tr><th>Variable</th><th>Media en el quintil</th><th>Distancia (z-score)</th></tr>
+<tr><td>cnt_ros_hist</td><td>0.0853</td><td>+1.79</td></tr><tr><td>imp_trx_abonosefect_6m</td><td>108,370.7298</td><td>+1.79</td></tr><tr><td>rat_cntros_x_cnttrxegr_3m</td><td>0.0067</td><td>+1.79</td></tr><tr><td>mto_del_ext_12m</td><td>446,269.7460</td><td>+1.79</td></tr><tr><td>imp_trx_cargosefe_6m</td><td>86,399.1142</td><td>+1.79</td></tr>
+</table>
+
+</body>
+</html>

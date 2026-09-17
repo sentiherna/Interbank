@@ -1,0 +1,1217 @@
+INSERT INTO d_perm_aws.t_agg_alertas_p3_plaft(
+cod_mes
+,cod_cli
+,tip_cliente_snsb_value
+,num_score_con_excepcion
+,desc_tipobanca
+,flg_casos_12m
+,desc_estado_ultimo_caso
+,ts_ultimo_caso
+,cnt_casos_hist
+,flg_desv_hist
+,desc_estado_ultima_desv
+,cod_mesmax_inicio_desv
+,cod_mesmax_cierre_desv
+,num_meses_en_prcs_dsv
+,flg_alerta_12m
+,flg_alerta_hist
+,cod_calificacion_ltm_lrt
+,ts_ultima_alerta
+,cnt_alerta_hist
+,flg_ros_12m
+,ts_ultimo_ros
+,cnt_ros_hist
+,imp_trx_debajo10k_ing_12m
+,imp_trx_debajo10k_egr_12m
+,cod_mesmax_notc
+,cnt_noticias
+,desc_nivel_rsg_not_neg
+,cod_rsg_pep
+,flg_pep
+,cod_v01_lista_rsg
+,desc_cargo_pep
+,cod_fecha_inicio_pep
+,cod_fecha_fin_pep
+,flg_activo_pep
+,flg_activo
+,flg_pasivo
+,flg_hecar_v_12m
+,flg_hecar_h_v
+,ts_ultimo_hecar_v
+,cnt_hecar_v
+,flg_hecar_a_12m
+,flg_hecar_h_a
+,ts_ultimo_hecar_a
+,cnt_hecar_a
+,cnt_hecar_12m
+,mto_cp_pep_ing
+,mto_cp_pep_egr
+,mto_cp_tot_ing_12m
+,mto_cptotegreso_12m
+,avg_cp_men_ing_12m
+,max_mto_cpmening_12m
+,cnt_trx_totcping_12m
+,cod_mesmax_cp_ing_12m
+,avg_cpmenegr_12m
+,max_mto_cpegrmen_12m
+,cnt_trx_cpegr_12m
+,cod_mesmax_trx_cp_egr_12m
+,cod_cli_cp_ing_12m
+,key_value_top1cp_ing_12m
+,mto_tot_acumuladoing_12m
+,flg_t1cp_notneging_12m
+,flg_t1cp_rosing_12m
+,ts_top1cpultimoros
+,flg_t1cp_desving_12m
+,cod_fecmax_cpincdsv_ing
+,fec_top1cplsbant_ing
+,fec_cp_ms_rcnt_lsb_ing
+,cnt_cp_trx_egr_ros
+,mto_cp_tot_egr_ros
+,cnt_cp_trx_ing_ros
+,mto_cp_tot_ing_ros
+,cnt_cp_lsb_ing
+,cod_cli_cp_egr_12m
+,key_value_cp_egr_12m
+,mto_t1cp_acum_egr_12m
+,cnt_cp_egr
+,flg_cp_noticia_egr_12m
+,flg_cp_ros_egr_12m
+,ts_cp_ultimo_ros_egr
+,flg_cp_desv_egr_12m
+,cod_fecmax_cp_inc_dsv_egr
+,fec_cp_ms_ntg_lsb_egr
+,fec_cp_ms_rcnt_lsb_egr
+,cnt_cp_lsb_egr
+,mto_ro_debajo_umbral
+,cnt_ro_debajo_umbral
+,cnt_cp_trx_egr_desv
+,mto_cp_tot_egr_desv
+,cnt_trx_debajo10k_ing_12m
+,cnt_trx_debajo10k_egr_12m
+,cnt_trx_top1cping_12m
+,mto_cp_tot_ing_desv
+,cnt_cp_trx_ing_desv
+,rat_cpingreso_12m
+,rat_cp_egr_12m
+,ts_carga
+,p_codmes
+)
+with wrk_dim_tiempo as (
+SELECT 
+codmes, 
+DATE_FORMAT(DATE_ADD('month', -0, calendar_date), '%Y%m') AS lcodmesm00,
+DATE_FORMAT(DATE_ADD('month', -1, calendar_date), '%Y%m') AS lcodmesm01,
+DATE_FORMAT(DATE_ADD('month', -2, calendar_date), '%Y%m') AS lcodmesm02,
+DATE_FORMAT(DATE_ADD('month', -3, calendar_date), '%Y%m') AS lcodmesm03,
+DATE_FORMAT(DATE_ADD('month', -4, calendar_date), '%Y%m') AS lcodmesm04,
+DATE_FORMAT(DATE_ADD('month', -5, calendar_date), '%Y%m') AS lcodmesm05,
+DATE_FORMAT(DATE_ADD('month', -6, calendar_date), '%Y%m') AS lcodmesm06,
+DATE_FORMAT(DATE_ADD('month', -7, calendar_date), '%Y%m') AS lcodmesm07,
+DATE_FORMAT(DATE_ADD('month', -8, calendar_date), '%Y%m') AS lcodmesm08,
+DATE_FORMAT(DATE_ADD('month', -9, calendar_date), '%Y%m') AS lcodmesm09,
+DATE_FORMAT(DATE_ADD('month', -10, calendar_date), '%Y%m') AS lcodmesm10,
+DATE_FORMAT(DATE_ADD('month', -11, calendar_date), '%Y%m') AS lcodmesm11,
+DATE_FORMAT(DATE_ADD('month', -12, calendar_date), '%Y%m') AS lcodmesm12,
+DATE_FORMAT(DATE_ADD('month', -13, calendar_date), '%Y%m') AS lcodmesm13,
+DATE_FORMAT(DATE_ADD('month', -14, calendar_date), '%Y%m') AS lcodmesm14,
+DATE_FORMAT(DATE_ADD('month', -36, calendar_date), '%Y%m%d') AS lcoddiam36,
+DATE_FORMAT(DATE_ADD('month', 1, calendar_date), '%Y%m%d') AS ncoddiam01,
+DATE_FORMAT(DATE_ADD('month', 0, calendar_date), '%Y%m%d') AS ncoddiam00,
+DATE_ADD('month', 0, calendar_date) AS dlcodmesm00,
+DATE_TRUNC('month', calendar_date) + INTERVAL '0' month - INTERVAL '1' day AS lcoddaym1
+FROM ( 
+SELECT 
+DATE_FORMAT(DATE_PARSE(calendar_date, '%Y-%m-%d'), '%Y%m') AS codmes, 
+DATE_PARSE(calendar_date, '%Y-%m-%d') AS calendar_date 
+FROM e_perm_aws.t_calendar_summary 
+WHERE calendar_date = DATE_FORMAT(DATE_PARSE('"+calcmes(date_time_obj, 0)+"','%Y%m'),'%Y-%m-%d')
+)
+),
+mst_plaft_monedas AS (
+select
+cod_argcatalogo as cod_moneda,
+desc_argcatalogo as desc_moneda,
+desc_valor01 as cod_moneda_valor
+from e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and desc_catalogo = 'MONEDAS'
+),
+wkr_pre_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen,cod_tipo_cambio, cod_moneda_destino
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio, cod_moneda_destino,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen, fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen, cod_tipo_cambio order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross join wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') between t.lcodmesm14 and t.codmes
+and cod_tipo_cambio in ('1000','1004') -- 1000 -> Compra | 1004 -> Venta
+) tc
+where tc.r=1
+order by 1 desc
+),
+wkr_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from wkr_pre_tipo_cambio
+where cod_tipo_cambio = '1004'
+), 
+mst_plaft_trx_operaciones AS (
+SELECT
+a.cod_argcatalogo AS cod_trx,
+a.desc_argcatalogo AS des_trx,
+a.desc_valor01 AS cod_riesgo,
+a.desc_valor02 AS tipo_transaccion,
+a.desc_valor03 AS actor,
+a.desc_valor04 AS tipo_transaccion_2,
+a.desc_valor05 AS actor_2,
+a.p_codmes AS p_codmes
+FROM e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+WHERE a.p_codmes = t.codmes
+and a.desc_catalogo = 'TIPO OPERACION'
+),
+wrk_base_aml_operaciones as (
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cuc,
+a.codunico_ord,
+a.codunico_ben,
+a.cod_trx_orig,
+a.fec_inicio_trx,
+a.mto_operacion,
+a.cod_mediocobpag1,
+a.cod_efectivo1,
+case when a.cod_monorigen = 'S' then 'PEN'
+when a.cod_monorigen = 'D' then 'USD'
+when a.cod_monorigen = 'E' then 'EUR'
+end as moneda_origen,
+case when a.cod_monorigen = 'D' then a.mto_operacion end as mto_dolares,
+case when a.cod_monorigen = 'S' then a.mto_operacion end as mto_soles
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+where a.p_fec_proceso between t.lcoddiam36 and t.ncoddiam00
+and a.cod_monorigen in ('S','D','E')
+union all
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cuc,
+a.codunico_ord,
+a.codunico_ben,
+a.cod_trx_orig,
+a.fec_inicio_trx,
+a.mto_operacion,
+a.cod_mediocobpag1,
+a.cod_efectivo1,
+pp.cod_moneda as moneda_origen,
+cast(null as decimal(16,2)) as mto_dolares,
+cast(null as decimal(16,2)) as mto_soles
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+left join mst_plaft_monedas pp on a.desc_monorigen = pp.desc_moneda
+where p_fec_proceso between t.lcoddiam36 and t.ncoddiam00
+and a.cod_monorigen not in ('S','D','E') and a.desc_monorigen is not null
+),
+wrk_solarizacion as (
+select a.periodo
+,a.cod_cuc
+,a.codunico_ord
+,a.codunico_ben
+,a.cod_trx_orig
+,a.fec_inicio_trx
+,a.mto_operacion
+,a.cod_mediocobpag1
+,a.cod_efectivo1
+,a.moneda_origen
+,a.mto_dolares
+,case when a.moneda_origen = 'PEN' then a.mto_operacion else a.mto_operacion*tc.tipo_cambio end as mto_soles
+from wrk_base_aml_operaciones a
+inner join wkr_pre_tipo_cambio tc on a.periodo = tc.codmes and tc.cod_moneda_destino = 'PEN' and tc.cod_tipo_cambio = '1004' and a.moneda_origen = tc.cod_moneda_origen
+),
+wrk_aml_operaciones as (
+select a.periodo
+,a.cod_cuc
+,a.codunico_ord
+,a.codunico_ben
+,a.cod_trx_orig
+,a.fec_inicio_trx
+,a.mto_operacion
+,a.cod_mediocobpag1
+,a.cod_efectivo1
+,a.moneda_origen
+,case when a.moneda_origen = 'USD' then a.mto_operacion else (a.mto_soles*1.0)/tc.tipo_cambio end as mto_dolares
+,a.mto_soles
+from wrk_solarizacion a
+inner join wkr_pre_tipo_cambio tc on a.periodo = tc.codmes and tc.cod_moneda_destino = 'PEN' and tc.cod_tipo_cambio = '1000' and tc.cod_moneda_origen = 'USD'
+),
+base_clientes as (
+select a.cod_cli as codunico
+from d_perm_aws.t_agg_alertas_p1_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+),
+RO_DEBAJO_UMBRAL AS (
+select
+periodo,
+cod_cuc AS codunico,
+SUM(CASE 
+WHEN T2.cod_trx_orig IN ('410','420','430','SPOT22','SPOT23') AND T2.mto_dolares >= 4950 AND T2.mto_dolares < 5000
+THEN T2.mto_soles
+WHEN T2.cod_trx_orig IN ('620','630','400151','401151','400056','400101','400111','400162','401111','401162',
+'401211','401262','403101','403111','403162','401101','TR25','TR26')
+AND T2.mto_dolares >= 2475 AND T2.mto_dolares < 2500
+THEN T2.mto_soles
+WHEN T2.cod_trx_orig NOT IN ('410','420','430','SPOT22','SPOT23',
+'620','630','400151','401151','400056','400101','400111','400162','401111','401162',
+'401211','401262','403101','403111','403162','401101','TR25','TR26')
+AND T2.mto_dolares >= 9900 AND T2.mto_dolares < 10000
+THEN T2.mto_soles
+END) MONTO_RO_DEBAJO_UMBRAL,
+COUNT(CASE
+WHEN T2.cod_trx_orig IN ('410','420','430','SPOT22','SPOT23') AND T2.mto_dolares >= 4950 AND T2.mto_dolares < 5000
+THEN 1 
+WHEN T2.cod_trx_orig IN ('620','630','400151','401151','400056','400101','400111','400162','401111','401162',
+'401211','401262','403101','403111','403162','401101','TR25','TR26')
+AND T2.mto_dolares >= 2475 AND T2.mto_dolares < 2500
+THEN 1
+WHEN T2.cod_trx_orig NOT IN ('410','420','430','SPOT22','SPOT23',
+'620','630','400151','401151','400056','400101','400111','400162','401111','401162',
+'401211','401262','403101','403111','403162','401101','TR25','TR26')
+AND T2.mto_dolares >= 9900 AND T2.mto_dolares < 10000
+THEN 1
+END) Q_RO_DEBAJO_UMBRAL
+FROM wrk_aml_operaciones T2
+CROSS JOIN wrk_dim_tiempo t
+where periodo = t.lcodmesm01
+AND T2.cod_trx_orig <> '907'
+AND T2.codunico_ord <> T2.codunico_ben
+GROUP BY 1,2
+),
+wrk_ingreso_egreso_debajo_10k as (
+select 
+cod_cuc as codunico,
+sum(case when pp.tipo_transaccion = 'INGRESO' then 1 end) cant_trx_debajo_10k_ing,
+sum(case when pp.tipo_transaccion = 'INGRESO' then a.mto_soles end) monto_trx_debajo_10k_ing,
+sum(case when pp.tipo_transaccion = 'EGRESO' then 1 end) cant_trx_debajo_10k_egr,
+sum(case when pp.tipo_transaccion = 'EGRESO' then a.mto_soles end) monto_trx_debajo_10k_egr
+FROM wrk_aml_operaciones a
+cross join wrk_dim_tiempo t
+left join mst_plaft_trx_operaciones pp 
+on a.cod_trx_orig = pp.cod_trx
+where a.periodo between t.lcodmesm12 and t.codmes and a.mto_dolares >= 9900 AND a.mto_dolares < 10000
+and a.cod_trx_orig <> '907' and a.codunico_ord <> a.codunico_ben and (cod_mediocobpag1 = '1' or cod_efectivo1 = '1')
+group by 1
+),
+wrk_cliente_plaft as (
+select
+codunico,
+nivel_riesgo_not_neg,
+tipo_cliente_sensible_vinc,
+score_con_excepcion_a,
+ultimo_periodo_noticia,
+cantidad_noticias,
+nivel_riesgo_pep,
+fecha_mas_antiguo_lsb,
+fecha_mas_reciente_lsb,
+cantidad_lsb,
+cantidad_not_asociado_laft,
+cantidad_not_5a_alto,
+cantidad_not_1a_alto,
+cantidad_oficios,
+cantidad_oficios_1a
+from e_perm_aws.t_cliente_plaft
+),
+wrk_alertas_plaft as (
+select 
+ap.codunico,
+max_by(ap.tipo_banca, ap.tipo_banca IS NOT NULL) AS tipobancadesc,
+max(case when date_format(ap.fecha_inicio_investigacion, '%Y%m') between t.lcodmesm12 and t.lcodmesm01 then 1 end) FLAG_CASOS_12M,
+max(case 
+when ap.fecha_inicio_investigacion<= t.dlcodmesm00 and ap.fecha_fin_decision_occ >= t.dlcodmesm00 then 'PENDIENTE'
+when ap.fecha_inicio_investigacion <= t.dlcodmesm00 and ap.fecha_fin_decision_occ <= t.dlcodmesm00 then 'ATENDIDO' END) ESTADO_ULTIMO_CASO,
+max(case when ap.fecha_inicio_investigacion <= t.dlcodmesm00 then ap.fecha_inicio_investigacion end) FECHA_ULTIMO_CASO,
+sum(case when ap.fecha_inicio_investigacion <= t.dlcodmesm00 then 1 end) Q_CASOS_HIST,
+max(case when ap.fecha_inicio_desvinculacion <= t.dlcodmesm00 then 1 end) FLAG_DESV_HIST,
+max(
+CASE
+WHEN ap.fecha_inicio_desvinculacion <= t.dlcodmesm00
+AND coalesce(ap.fecha_fin_desvinculacion, t.dlcodmesm00) >= t.dlcodmesm00
+THEN 'PENDIENTE'
+WHEN ap.fecha_inicio_desvinculacion <= t.dlcodmesm00
+AND ap.fecha_fin_desvinculacion <= t.dlcodmesm00
+THEN 'ATENDIDO'
+END
+) AS estado_ultima_desv,
+max(
+CASE 
+WHEN ap.fecha_inicio_desvinculacion <= t.dlcodmesm00 
+THEN date_format(ap.fecha_inicio_desvinculacion, '%Y%m')
+END
+) AS periodo_inicio_desv_max,
+max(
+CASE 
+WHEN ap.fecha_fin_desvinculacion <= t.dlcodmesm00 
+THEN date_format(ap.fecha_fin_desvinculacion, '%Y%m')
+END
+) AS periodo_cierre_desv_max,
+min(
+CASE 
+WHEN ap.fecha_inicio_desvinculacion <= t.dlcodmesm00 THEN 
+date_diff(
+'month', ap.fecha_inicio_desvinculacion,coalesce(ap.fecha_fin_desvinculacion, t.dlcodmesm00))END
+) AS meses_en_proceso_desvinculacion,
+max(case when ap.PERIODO_ALERTA between t.lcodmesm12 and t.lcodmesm01 then 1 end) FLAG_ALERTA_12M,
+max(case when ap.PERIODO_ALERTA <= t.lcodmesm01 then 1 end) FLAG_ALERTA_HIST,
+max(ap.CALIFICACION_MONITOREO) AS calificacion_ultima_alerta,
+max(CASE WHEN ap.PERIODO_ALERTA <= lcodmesm01 THEN coalesce(ap.WF_FECHA_HORA_CIERRE, ap.VISOR_FECHA_HORA_CIERRE) END) AS fecha_ultima_alerta,
+sum(case when ap.PERIODO_ALERTA <= t.lcodmesm01 then 1 end) Q_ALERTA_HIST,
+max(case when date_format(ap.fecha_inicio_ros, '%Y%m') between t.lcodmesm12 and t.lcodmesm01 then 1 end) FLAG_ROS_12M,
+max(case when ap.fecha_inicio_ros <= t.dlcodmesm00 then fecha_inicio_ros end) FECHA_ULTIMO_ROS,
+count( case when ap.fecha_inicio_ros < t.dlcodmesm00 then 1 end) Q_ROS_HIST
+from e_perm_aws.t_alertas_plaft ap
+cross join wrk_dim_tiempo t
+group by 1
+),
+base_cucibk AS (
+SELECT cod_cuc, key_value
+FROM (
+SELECT
+cod_cuc,
+key_value,
+ROW_NUMBER() OVER (PARTITION BY cod_cuc ORDER BY fch_priprd DESC) AS rn
+FROM e_perm_aws.t_mst_ctaibk_rsk
+)
+WHERE rn = 1
+),
+flag_producto AS (
+SELECT
+CAST(t.lcodmesm01 AS VARCHAR) AS mes_base,
+a.cod_cuc AS codunico,
+MAX(CASE WHEN CAST(b.nivel8_fnte_cd AS VARCHAR) = '1' THEN 1 ELSE 0 END) AS flag_activo,
+MAX(CASE WHEN CAST(b.nivel8_fnte_cd AS VARCHAR) = '2' THEN 1 ELSE 0 END) AS flag_pasivo
+FROM e_perm_aws.t_fem_all_instr_rsk a
+CROSS JOIN wrk_dim_tiempo T
+LEFT JOIN e_perm_aws.t_dim_jerarquia_productos b 
+ON CAST(a.common_coa_id AS VARCHAR(50)) = b.producto_fnte_cd
+WHERE a.p_codmes = t.lcodmesm02
+GROUP BY 1,2
+),
+cliente_pep AS (
+SELECT
+b.cod_cuc AS codunico,
+1 AS flag_pep,
+100 AS v01_lista_riesgo,
+MAX(r3.cargo)        AS cargo_pep,
+MAX(r3.sbs_fecha_inicio)   AS fecha_inicio_pep,
+MAX(r3.sbs_fecha_cese)    AS fecha_fin_pep,
+MAX(ni.estado)        AS flag_activo_pep,
+MAX(ni.cargo)        AS cargo
+FROM base_cucibk b
+INNER JOIN e_perm_aws.t_listas_nivel_de_riesgos_motivo_r3 r3
+ON b.key_value = r3.key_value
+LEFT JOIN e_perm_aws.t_list_neg_internac ni
+ON b.key_value = ni.numdocnacionalidad2
+GROUP BY b.cod_cuc
+),
+cliente_hecar AS(
+SELECT
+codunico,
+max(case when hp.inicio_fechahora between hp.sectorista_fechahora and hp.sectorista_fin_fechahora and hp.tipo_hecar = 'V' then 1 end) FLAG_HECAR_12M_V,
+max(case when hp.inicio_fechahora <=hp.sectorista_fin_fechahora and hp.tipo_hecar = 'V' then 1 end) FLAG_HECAR_H_V,
+max(case when hp.inicio_fechahora <= hp.sectorista_fin_fechahora and hp.tipo_hecar = 'V' then hp.inicio_fechahora end) FECHA_ULTIMO_HECAR_V,
+count(case when hp.inicio_fechahora <= hp.sectorista_fin_fechahora and hp.tipo_hecar = 'V' then 1 end) Q_HECAR_V,
+max(case when hp.inicio_fechahora between hp.sectorista_fechahora and hp.sectorista_fin_fechahora and hp.tipo_hecar= 'A' then 1 end) FLAG_HECAR_12M_A,
+max(case when hp.inicio_fechahora <= hp.sectorista_fin_fechahora and hp.tipo_hecar = 'A' then 1 end) FLAG_HECAR_H_A,
+max(case when hp.inicio_fechahora <= hp.sectorista_fin_fechahora and hp.tipo_hecar = 'A' then hp.inicio_fechahora end) FECHA_ULTIMO_HECAR_A,
+count(case when hp.inicio_fechahora <= hp.sectorista_fin_fechahora and hp.tipo_hecar = 'A' then 1 end) Q_HECAR_A,
+count(case when hp.inicio_fechahora between hp.sectorista_fechahora and hp.sectorista_fin_fechahora then 1 end) Q_HECAR_12M
+from e_perm_aws.t_hecar_plaft hp
+group by 1
+),
+CONTRAPARTE AS (
+SELECT 
+T1.periodo,
+T1.cod_trx_orig,
+T2.des_trx AS TOP_DESCRIPCION,
+T2.tipo_transaccion,  
+1 AS Q_TRX,
+T1.mto_soles AS MONTO_SOLARIZADO,
+T2.actor AS ROL_CLIENTE,
+CASE 
+WHEN T2.actor = 'ORD' THEN T1.codunico_ord
+WHEN T2.actor = 'BEN' THEN T1.codunico_ben
+END AS CU_CLIENTE,
+CASE 
+WHEN T2.actor = 'ORD' THEN 'BEN'
+WHEN T2.actor = 'BEN' THEN 'ORD'
+END AS ROL_CONTRAPARTE,
+CASE 
+WHEN T2.actor = 'ORD' THEN T1.codunico_ben
+WHEN T2.actor = 'BEN' THEN T1.codunico_ord
+END AS CU_CONTRAPARTE,
+CASE 
+WHEN T2.actor = 'ORD' THEN bc_ben.key_value
+WHEN T2.actor = 'BEN' THEN bc_ord.key_value
+END AS DNI_CONTRAPARTE
+FROM wrk_aml_operaciones T1 
+CROSS JOIN wrk_dim_tiempo tm
+LEFT JOIN mst_plaft_trx_operaciones T2
+ON T1.cod_trx_orig = T2.cod_trx
+LEFT JOIN base_cucibk bc_ord
+ON T1.codunico_ord = bc_ord.cod_cuc
+LEFT JOIN base_cucibk bc_ben
+ON T1.codunico_ben = bc_ben.cod_cuc
+WHERE T1.periodo = tm.lcodmesm01
+AND (
+T1.codunico_ord <> T1.codunico_ben
+OR COALESCE(bc_ord.key_value,'0') <> COALESCE(bc_ben.key_value,'0')
+)
+AND (TRY_CAST(
+CASE 
+WHEN T2.actor = 'ORD' THEN T1.codunico_ben
+WHEN T2.actor = 'BEN' THEN T1.codunico_ord
+END AS BIGINT
+) > 0
+OR TRY_CAST(
+CASE 
+WHEN T2.actor = 'ORD' THEN bc_ben.key_value
+WHEN T2.actor = 'BEN' THEN bc_ord.key_value
+END AS BIGINT
+) > 0)
+),
+CONTRAPARTE_1 AS (
+SELECT
+c.periodo,
+c.TOP_DESCRIPCION,
+c.tipo_transaccion,
+SUM(c.Q_TRX) AS Q_TRX,
+SUM(c.MONTO_SOLARIZADO) AS MONTO_SOLARIZADO,
+c.ROL_CLIENTE,
+c.CU_CLIENTE,
+c.ROL_CONTRAPARTE,
+c.CU_CONTRAPARTE,
+COALESCE(
+NULLIF(TRIM(cli.key_value), ''),
+c.DNI_CONTRAPARTE
+) AS DNI_CONTRAPARTE
+from contraparte c
+left join e_perm_aws.t_rm_cliente cli
+on c.cu_contraparte = cli.codunico
+GROUP BY 1,2,3,6,7,8,9,10
+),
+cte_flags AS (
+SELECT
+cp.codunico,
+CASE
+WHEN cantidad_noticias > 0
+OR cantidad_not_asociado_laft > 0
+OR cantidad_not_5a_alto > 0
+OR cantidad_not_1a_alto > 0
+OR COALESCE(nivel_riesgo_not_neg, '') <> ''
+THEN 1 ELSE 0
+END AS flag_noticia,
+CASE
+WHEN cantidad_oficios > 0
+OR cantidad_oficios_1a > 0
+THEN 1 ELSE 0
+END AS flag_oficio,
+MAX(
+CASE 
+WHEN date_format(ap.fecha_inicio_ros, '%Y%m') <= t.lcodmesm01 
+THEN 1 ELSE 0 
+END) AS FLAG_ROS,
+MAX(
+CASE 
+WHEN ap.fecha_inicio_desvinculacion <= t.dlcodmesm00 
+THEN 1 ELSE 0 
+END
+) AS FLAG_DESV
+FROM wrk_cliente_plaft cp
+cross join wrk_dim_tiempo t
+LEFT JOIN e_perm_aws.t_alertas_plaft ap
+ON cp.codunico = ap.codunico
+GROUP BY 1,2,3
+),
+info_negativa as (
+select codunico
+from cte_flags
+where flag_noticia = 1
+group by 1
+),
+contraparte_2 as (
+select
+c1.periodo,
+c1.tipo_transaccion,
+c1.cu_cliente,
+c1.cu_contraparte,
+c1.dni_contraparte,
+c1.q_trx,
+c1.monto_solarizado
+from contraparte_1 c1
+inner join info_negativa inf
+on c1.cu_contraparte = inf.codunico
+where try_cast(c1.cu_cliente as bigint) > 0
+),
+contraparte_consolidado as (
+select
+cu_cliente,
+tipo_transaccion as tipo_operacion,
+sum(monto_solarizado) as monto_total,
+avg(monto_solarizado) as promedio_mensual,
+max(monto_solarizado) as maximo_mensual,
+sum(q_trx) as cantidad_operaciones,
+max(periodo) as ultimo_mes_operacion
+from contraparte_2
+group by cu_cliente, tipo_transaccion
+),
+contraparte_pep as (
+select 
+c1.periodo,
+c1.tipo_transaccion,
+c1.cu_cliente,
+c1.q_trx,
+c1.monto_solarizado
+from contraparte_1 c1
+left join cliente_pep cp
+on c1.cu_contraparte = cp.codunico
+where cast(c1.cu_cliente as integer) > 0
+and coalesce(cp.flag_pep, 0) = 1
+),
+consolidado_pep as (
+select
+x.periodo,
+x.tipo_operacion,
+x.cu_cliente, 
+sum(x.acumulado_mensual) as monto_total,
+avg(x.acumulado_mensual) as promedio_mensual,
+max(x.acumulado_mensual) as maximo_mensual,
+sum(x.cantidad_mensual) as cantidad_operaciones,
+max(x.periodo) as ultimo_mes_operacion
+from (
+select 
+periodo,
+tipo_transaccion as tipo_operacion,
+cu_cliente, 
+sum(monto_solarizado) as acumulado_mensual,
+sum(q_trx) as cantidad_mensual
+from contraparte_pep
+group by tipo_transaccion, cu_cliente, periodo
+) x
+group by x.periodo, x.tipo_operacion, x.cu_cliente
+),
+cp_ing_egr_consolidado AS (
+SELECT
+cc.cu_cliente AS codunico,
+MAX(CASE WHEN tipo_operacion = 'EGRESO' THEN cc.ultimo_mes_operacion END) AS cp_ultimo_mes_egr,
+MAX(CASE WHEN tipo_operacion = 'INGRESO' THEN cc.ultimo_mes_operacion END) AS cp_ultimo_mes_ing,
+SUM(CASE WHEN tipo_operacion = 'INGRESO' THEN cc.monto_total ELSE 0 END) AS cp_monto_total_ing,
+SUM(CASE WHEN tipo_operacion = 'EGRESO' THEN cc.monto_total ELSE 0 END) AS cp_monto_total_egr,
+SUM(CASE WHEN tipo_operacion = 'INGRESO' THEN cc.promedio_mensual ELSE 0 END) cp_promedio_mensual_ing,
+SUM(CASE WHEN tipo_operacion = 'INGRESO' THEN cc.maximo_mensual ELSE 0 END) cp_maximo_mensual_ing,
+SUM(CASE WHEN tipo_operacion = 'INGRESO' THEN cc.cantidad_operaciones ELSE 0 END) AS cp_cant_trx_ing,
+SUM(CASE WHEN tipo_operacion = 'EGRESO' THEN cc.promedio_mensual ELSE 0 END) cp_promedio_mensual_egr,
+SUM(CASE WHEN tipo_operacion = 'EGRESO' THEN cc.maximo_mensual ELSE 0 END) cp_maximo_mensual_egr,
+SUM(CASE WHEN tipo_operacion = 'EGRESO' THEN cc.cantidad_operaciones ELSE 0 END) AS cp_cant_trx_egr
+FROM contraparte_consolidado cc
+group by 1
+),
+monto_ing_egr_pep AS (
+SELECT
+cp.periodo,
+cp.cu_cliente AS codunico,
+SUM(CASE WHEN tipo_operacion = 'INGRESO' THEN cp.monto_total ELSE 0 END) AS cp_monto_pep_ing,
+SUM(CASE WHEN tipo_operacion = 'EGRESO' THEN cp.monto_total ELSE 0 END) AS cp_monto_pep_egr
+from consolidado_pep cp
+group by 1,2
+),
+contraparte_top1 as (
+select
+x2.tipo_transaccion as tipo_transaccion,
+x2.cu_cliente,
+x2.cu_contraparte,
+x2.dni_contraparte,
+x2.acumulado,
+x2.cantidad
+from (
+select
+tipo_transaccion, cu_cliente, cu_contraparte,
+dni_contraparte, acumulado, cantidad,
+row_number() over (
+partition by x1.tipo_transaccion, x1.cu_cliente
+order by x1.acumulado desc
+) as rn
+from (
+select
+t1.tipo_transaccion,
+t1.cu_cliente,
+t1.cu_contraparte,
+t1.dni_contraparte,
+sum(t1.monto_solarizado) as acumulado,
+count(1) as cantidad
+from contraparte_2 t1
+group by 
+t1.tipo_transaccion,
+t1.cu_cliente,
+t1.cu_contraparte,
+t1.dni_contraparte
+) x1
+) x2
+where x2.rn = 1
+),
+contraparte_top1_f as (
+select 
+t1.tipo_transaccion,
+t1.cu_cliente,
+t1.cu_contraparte,
+t1.dni_contraparte,
+t1.acumulado,
+t1.cantidad,
+coalesce(t2.flag_noticia, 0) as flag_noticia,
+coalesce(t2.flag_ros, 0)   as flag_ros,
+ap.fecha_ultimo_ros     as fecha_ultimo_ros,
+coalesce(t2.flag_desv, 0)  as flag_desv,
+ap.periodo_inicio_desv_max  as fecha_inicio_desv_max,
+cp.fecha_mas_antiguo_lsb,
+cp.fecha_mas_reciente_lsb,
+cp.cantidad_lsb
+from contraparte_top1 t1
+left join cte_flags t2 
+on t1.cu_contraparte = t2.codunico
+left join wrk_cliente_plaft cp
+on t1.cu_contraparte = cp.codunico
+left join wrk_alertas_plaft ap
+on t1.cu_contraparte = ap.codunico
+),
+contraparte_top_ing as (
+select
+t1f.cu_cliente
+,t1f.cu_contraparte as cu_contraparte_ing
+,t1f.dni_contraparte as dni_contraparte_ing
+,t1f.acumulado as cp_acumulado_ing
+,t1f.cantidad as cp_cantidad_ing
+,t1f.cantidad_lsb as cp_cantidad_lsb_ing
+,t1f.flag_noticia as cp_flag_noticia_ing
+,t1f.flag_ros as cp_flag_ros_ing
+,t1f.fecha_ultimo_ros as cp_fecha_ultimo_ros_ing
+,t1f.flag_desv as cp_flag_desv_ing
+,t1f.fecha_inicio_desv_max as cp_fecha_inicio_desv_max_ing
+,t1f.fecha_mas_antiguo_lsb as cp_fecha_mas_antiguo_lsb_ing
+,t1f.fecha_mas_reciente_lsb as cp_fecha_mas_reciente_lsb_ing
+from contraparte_top1_f t1f
+where t1f.tipo_transaccion = 'INGRESO'
+),
+contraparte_top_egr as (
+select
+t1f.cu_cliente
+,t1f.cu_contraparte as cu_contraparte_egr
+,t1f.dni_contraparte as dni_contraparte_egr
+,t1f.acumulado as cp_acumulado_egr
+,t1f.cantidad as cp_cantidad_egr
+,t1f.cantidad_lsb as cp_cantidad_lsb_egr
+,t1f.flag_noticia as cp_flag_noticia_egr
+,t1f.flag_ros as cp_flag_ros_egr
+,t1f.fecha_ultimo_ros as cp_fecha_ultimo_ros_egr
+,t1f.flag_desv as cp_flag_desv_egr
+,t1f.fecha_inicio_desv_max as cp_fecha_inicio_desv_max_egr
+,t1f.fecha_mas_antiguo_lsb as cp_fecha_mas_antiguo_lsb_egr
+,t1f.fecha_mas_reciente_lsb as cp_fecha_mas_reciente_lsb_egr
+from contraparte_top1_f t1f
+where t1f.tipo_transaccion = 'EGRESO'
+),
+acumulado_total as (
+select
+c1.cu_cliente as codunico,
+c1.tipo_transaccion as tipo_operacion,
+sum(c1.monto_solarizado) as monto_total
+from contraparte_1 c1
+group by cu_cliente, tipo_transaccion
+),
+cp_ratio_ing AS (
+SELECT
+CC.CU_CLIENTE AS codunico,
+SUM(CC.MONTO_TOTAL) AS monto_ingreso_negativo,
+MAX(AT.MONTO_TOTAL) AS monto_ingreso_total,
+SUM(CC.MONTO_TOTAL) / NULLIF(MAX(AT.MONTO_TOTAL), 0) AS cp_ratio_ing
+FROM CONTRAPARTE_CONSOLIDADO CC
+JOIN ACUMULADO_TOTAL AT
+ON CC.CU_CLIENTE = AT.codunico
+AND AT.TIPO_OPERACION = 'INGRESO'
+WHERE CC.TIPO_OPERACION = 'INGRESO'
+GROUP BY CC.CU_CLIENTE
+),
+cp_ratio_egr AS (
+SELECT
+CC.CU_CLIENTE AS codunico,
+SUM(CC.MONTO_TOTAL) AS monto_ingreso_negativo,
+MAX(AT.MONTO_TOTAL) AS monto_ingreso_total,
+SUM(CC.MONTO_TOTAL) / NULLIF(MAX(AT.MONTO_TOTAL), 0) AS cp_ratio_egr
+FROM CONTRAPARTE_CONSOLIDADO CC
+JOIN ACUMULADO_TOTAL AT
+ON CC.CU_CLIENTE = AT.codunico
+AND AT.TIPO_OPERACION = 'EGRESO'
+WHERE CC.TIPO_OPERACION = 'EGRESO'
+GROUP BY CC.CU_CLIENTE
+),
+INFO_DESVINCULACIONES AS (
+SELECT
+ap.CODUNICO
+FROM t_alertas_plaft ap
+CROSS JOIN wrk_dim_tiempo t
+WHERE
+(
+(
+(ap.periodo_inusual >= '201601' OR ap.periodo_ros >= '201601')
+AND ap.FLAG_FORMULARIO = 1
+)
+OR
+(
+ap.FLAG_FORMULARIO = 1
+AND ap.ALCA_CODIGO_ALERTA > 0
+AND ap.CALIFICACION_INVESTIGACION = 'PENDIENTE'
+)
+)
+AND ap.fecha_inicio_desvinculacion
+<= CAST(
+DATE_PARSE(CONCAT(t.lcodmesm13, '01'), '%Y%m%d')
+AS TIMESTAMP
+)
+),
+contraparte_desv as (
+select 
+t1.periodo,
+t1.tipo_transaccion,
+t1.cu_cliente,
+t1.q_trx,
+t1.monto_solarizado 
+from contraparte_1 t1
+inner join info_desvinculaciones t2
+on t1.cu_contraparte = t2.codunico
+where cast(t1.cu_cliente as integer) > 1
+),
+contraparte_consolidado_desv as (
+select
+x1.tipo_operacion,
+x1.cu_cliente, 
+sum(x1.acumulado_mensual) as monto_total,
+avg(x1.acumulado_mensual) as promedio_mensual,
+max(x1.acumulado_mensual) as maximo_mensual,
+sum(x1.cantidad_mensual) as cantidad_operaciones,
+max(x1.periodo) as ultimo_mes_operacion,
+null
+from
+(select 
+periodo,
+tipo_transaccion as tipo_operacion,
+cu_cliente, 
+sum(monto_solarizado) as acumulado_mensual,
+sum(q_trx) as cantidad_mensual
+from contraparte_desv
+group by
+tipo_transaccion, cu_cliente, periodo) x1
+group by
+x1.tipo_operacion,
+x1.cu_cliente
+order by 
+x1.tipo_operacion,
+x1.cu_cliente
+),
+cp_desv_ingreso as (
+select
+cu_cliente
+,cantidad_operaciones as cp_cant_trx_ing_desv
+,monto_total as cp_monto_total_ing_desv
+from contraparte_consolidado_desv
+where tipo_operacion = 'INGRESO'
+),
+cp_desv_egreso as (
+select
+cu_cliente
+,cantidad_operaciones as cp_cant_trx_egr_desv
+,monto_total as cp_monto_total_egr_desv
+from contraparte_consolidado_desv
+where tipo_operacion = 'EGRESO'
+),
+INFO_ROS AS (
+select
+CODUNICO
+FROM t_alertas_plaft ap
+CROSS JOIN wrk_dim_tiempo t
+WHERE
+(
+(
+(ap.periodo_inusual >= '201601' OR ap.periodo_ros >= '201601')
+AND ap.FLAG_FORMULARIO = 1
+)
+OR
+(
+ap.FLAG_FORMULARIO = 1
+AND ap.ALCA_CODIGO_ALERTA > 0
+AND ap.CALIFICACION_INVESTIGACION = 'PENDIENTE'
+)
+)
+AND ap.fecha_inicio_ros
+<= CAST(
+DATE_PARSE(CONCAT(t.lcodmesm13, '01'), '%Y%m%d')
+AS TIMESTAMP
+)
+),
+contraparte_ros as (
+select 
+c.periodo,
+c.tipo_transaccion,
+c.cu_cliente,
+c.monto_solarizado,
+c.q_trx
+from 
+contraparte_1 c
+inner join 
+info_ros t2
+on c.cu_contraparte = t2.codunico
+where
+cast(c.cu_cliente as integer) > 1
+),
+contraparte_consolidado_ros as (
+select
+x1.tipo_operacion,
+x1.cu_cliente, 
+sum(x1.acumulado_mensual) as monto_total,
+avg(x1.acumulado_mensual) as promedio_mensual,
+max(x1.acumulado_mensual) as maximo_mensual,
+sum(x1.cantidad_mensual) as cantidad_operaciones,
+max(x1.periodo) as ultimo_mes_operacion,
+null
+from
+(select 
+periodo,
+tipo_transaccion as tipo_operacion,
+cu_cliente, 
+sum(monto_solarizado) as acumulado_mensual,
+sum(q_trx) as cantidad_mensual
+from contraparte_ros
+group by
+tipo_transaccion,
+cu_cliente, 
+periodo) x1
+group by
+x1.tipo_operacion,
+x1.cu_cliente
+order by 
+x1.tipo_operacion,
+x1.cu_cliente
+),
+cp_ros_ingreso as (
+select
+cu_cliente
+,cantidad_operaciones as cp_cant_trx_ing_ros
+,monto_total as cp_monto_total_ing_ros
+from contraparte_consolidado_ros
+where tipo_operacion = 'INGRESO'
+),
+cp_ros_egreso AS (
+SELECT
+CU_CLIENTE
+,CANTIDAD_OPERACIONES AS cp_cant_trx_egr_ros
+,MONTO_TOTAL AS cp_monto_total_egr_ros
+FROM CONTRAPARTE_CONSOLIDADO_ROS
+WHERE TIPO_OPERACION = 'EGRESO'
+),
+consolidado_bloque_7 AS (
+select
+bc.codunico,
+cp.nivel_riesgo_not_neg,
+cp.tipo_cliente_sensible_vinc as tipo_cliente_sensible,
+cp.score_con_excepcion_a as score_con_excepcion,
+ied10k.monto_trx_debajo_10k_ing,
+ied10k.cant_trx_debajo_10k_ing,
+ied10k.monto_trx_debajo_10k_egr,
+ied10k.cant_trx_debajo_10k_egr,
+ap.tipobancadesc,
+ap.flag_casos_12m,
+ap.estado_ultimo_caso,
+ap.fecha_ultimo_caso,
+ap.q_casos_hist,
+ap.flag_desv_hist,
+ap.estado_ultima_desv,
+ap.periodo_inicio_desv_max,
+ap.periodo_cierre_desv_max,
+ap.meses_en_proceso_desvinculacion,
+ap.flag_alerta_12m,
+ap.flag_alerta_hist,
+ap.calificacion_ultima_alerta,
+ap.fecha_ultima_alerta,
+ap.q_alerta_hist,
+ap.flag_ros_12m,
+ap.fecha_ultimo_ros,
+ap.q_ros_hist,
+cp.ultimo_periodo_noticia,
+cp.cantidad_noticias,
+cpri.cp_ratio_ing,
+cpre.cp_ratio_egr
+from base_clientes bc
+cross join wrk_dim_tiempo t
+left join e_perm_aws.t_dim_cliente dc
+on bc.codunico = dc.cuc_num
+left join wrk_alertas_plaft ap
+on bc.codunico = ap.codunico
+left join wrk_cliente_plaft cp
+on bc.codunico = cp.codunico
+left join wrk_ingreso_egreso_debajo_10k ied10k
+on bc.codunico = ied10k.codunico
+left join cp_ratio_ing cpri
+on bc.codunico = cpri.codunico
+left join cp_ratio_egr cpre
+on bc.codunico = cpre.codunico
+),
+consolidado_bloque_8_9 as (
+select
+bc.codunico
+,cp.nivel_riesgo_pep as riesgo_pep
+,pep.flag_pep
+,pep.v01_lista_riesgo
+,pep.cargo_pep
+,pep.fecha_inicio_pep
+,pep.fecha_fin_pep
+,pep.flag_activo_pep
+,fp.flag_activo
+,fp.flag_pasivo
+,hp.flag_hecar_12m_v
+,hp.flag_hecar_h_v
+,hp.fecha_ultimo_hecar_v
+,hp.q_hecar_v
+,hp.flag_hecar_12m_a
+,hp.flag_hecar_h_a
+,hp.fecha_ultimo_hecar_a
+,hp.q_hecar_a
+,hp.q_hecar_12m
+,miep.cp_monto_pep_ing
+,miep.cp_monto_pep_egr
+,ciec.cp_monto_total_ing
+,ciec.cp_monto_total_egr
+,ciec.cp_promedio_mensual_ing
+,ciec.cp_maximo_mensual_ing
+,ciec.cp_cant_trx_ing
+,ciec.cp_cant_trx_egr
+,ciec.cp_ultimo_mes_ing
+,ciec.cp_promedio_mensual_egr
+,ciec.cp_maximo_mensual_egr
+,ciec.cp_ultimo_mes_egr
+,cti.cu_contraparte_ing
+,cti.dni_contraparte_ing
+,cti.cp_acumulado_ing
+,cti.cp_flag_noticia_ing
+,cti.cp_flag_ros_ing
+,cti.cp_cantidad_ing
+,cti.cp_fecha_ultimo_ros_ing
+,cti.cp_flag_desv_ing
+,cti.cp_fecha_inicio_desv_max_ing
+,cti.cp_fecha_mas_antiguo_lsb_ing
+,cti.cp_fecha_mas_reciente_lsb_ing
+,cre.cp_cant_trx_egr_ros
+,cre.cp_monto_total_egr_ros
+,cri.cp_cant_trx_ing_ros
+,cri.cp_monto_total_ing_ros
+,cp_cantidad_lsb_ing
+,cte.cu_contraparte_egr
+,cte.dni_contraparte_egr
+,cte.cp_acumulado_egr
+,cte.cp_cantidad_egr
+,cte.cp_flag_noticia_egr
+,cte.cp_flag_ros_egr
+,cte.cp_fecha_ultimo_ros_egr
+,cte.cp_flag_desv_egr
+,cte.cp_fecha_inicio_desv_max_egr
+,cte.cp_fecha_mas_antiguo_lsb_egr
+,cte.cp_fecha_mas_reciente_lsb_egr
+,cte.cp_cantidad_lsb_egr
+,cpdi.cp_cant_trx_ing_desv
+,cpdi.cp_monto_total_ing_desv
+,cpde.cp_cant_trx_egr_desv
+,cpde.cp_monto_total_egr_desv
+,rdu.monto_ro_debajo_umbral
+,rdu.q_ro_debajo_umbral
+,t.codmes as p_codmes
+from base_clientes bc
+cross join wrk_dim_tiempo t
+left join wrk_cliente_plaft cp
+on bc.codunico = cp.codunico
+left join cliente_hecar hp
+on bc.codunico = hp.codunico
+left join flag_producto fp
+on cp.codunico = fp.codunico
+left join cliente_pep pep
+on bc.codunico = pep.codunico
+left join cp_ing_egr_consolidado ciec
+on bc.codunico = ciec.codunico
+left join monto_ing_egr_pep miep
+on bc.codunico = miep.codunico
+left join contraparte_top_ing cti
+on bc.codunico = cti.cu_cliente
+left join contraparte_top_egr cte
+on bc.codunico = cte.cu_cliente
+left join cp_ros_egreso cre
+on bc.codunico = cre.cu_cliente
+left join cp_ros_ingreso cri
+on bc.codunico = cri.cu_cliente
+left join ro_debajo_umbral rdu
+on bc.codunico = rdu.codunico
+left join cp_desv_ingreso cpdi
+on bc.codunico = cpdi.cu_cliente
+left join cp_desv_egreso cpde 
+on bc.codunico = cpde.cu_cliente
+)
+select
+t.codmes as cod_mes
+,bc.codunico as cod_cli
+,cb7.tipo_cliente_sensible as tip_cliente_snsb_value
+,cast(cb7.score_con_excepcion as decimal(38,6)) as num_score_con_excepcion
+,cb7.tipobancadesc as desc_tipobanca
+,cb7.flag_casos_12m as flg_casos_12m
+,cb7.estado_ultimo_caso as desc_estado_ultimo_caso
+,cb7.fecha_ultimo_caso as ts_ultimo_caso
+,cb7.q_casos_hist as cnt_casos_hist
+,cb7.flag_desv_hist as flg_desv_hist
+,cb7.estado_ultima_desv as desc_estado_ultima_desv
+,cb7.periodo_inicio_desv_max as cod_mesmax_inicio_desv
+,cb7.periodo_cierre_desv_max as cod_mesmax_cierre_desv
+,cb7.meses_en_proceso_desvinculacion as num_meses_en_prcs_dsv
+,cb7.flag_alerta_12m as flg_alerta_12m
+,cb7.flag_alerta_hist as flg_alerta_hist
+,cb7.calificacion_ultima_alerta as cod_calificacion_ltm_lrt
+,cb7.fecha_ultima_alerta as ts_ultima_alerta
+,cb7.q_alerta_hist as cnt_alerta_hist
+,cb7.flag_ros_12m as flg_ros_12m
+,cb7.fecha_ultimo_ros as ts_ultimo_ros
+,cb7.q_ros_hist as cnt_ros_hist
+,cast(cb7.monto_trx_debajo_10k_ing as decimal(38,6)) as imp_trx_debajo10k_ing_12m
+,cast(cb7.monto_trx_debajo_10k_egr as decimal(38,6)) as imp_trx_debajo10k_egr_12m
+,cb7.ultimo_periodo_noticia as cod_mesmax_notc
+,cb7.cantidad_noticias as cnt_noticias
+,cb7.nivel_riesgo_not_neg as desc_nivel_rsg_not_neg
+,cb89.riesgo_pep as cod_rsg_pep
+,cb89.flag_pep as flg_pep
+,cb89.v01_lista_riesgo as cod_v01_lista_rsg
+,cb89.cargo_pep as desc_cargo_pep
+,cb89.fecha_inicio_pep as cod_fecha_inicio_pep
+,cb89.fecha_fin_pep as cod_fecha_fin_pep
+,cb89.flag_activo_pep as flg_activo_pep
+,cb89.flag_activo as flg_activo
+,cb89.flag_pasivo as flg_pasivo
+,cb89.flag_hecar_12m_v as flg_hecar_v_12m
+,cb89.flag_hecar_h_v as flg_hecar_h_v
+,cb89.fecha_ultimo_hecar_v as ts_ultimo_hecar_v
+,cb89.q_hecar_v as cnt_hecar_v
+,cb89.flag_hecar_12m_a as flg_hecar_a_12m
+,cb89.flag_hecar_h_a as flg_hecar_h_a
+,cb89.fecha_ultimo_hecar_a as ts_ultimo_hecar_a
+,cb89.q_hecar_a as cnt_hecar_a
+,cb89.q_hecar_12m as cnt_hecar_12m
+,cast(cb89.cp_monto_pep_ing as decimal(38,6)) as mto_cp_pep_ing
+,cast(cb89.cp_monto_pep_egr as decimal(38,6)) as mto_cp_pep_egr
+,cast(cb89.cp_monto_total_ing as decimal(38,6)) as mto_cp_tot_ing_12m
+,cast(cb89.cp_monto_total_egr as decimal(38,6)) as mto_cptotegreso_12m
+,cast(cb89.cp_promedio_mensual_ing as decimal(38,6)) as avg_cp_men_ing_12m
+,cast(cb89.cp_maximo_mensual_ing as decimal(38,6)) as max_mto_cpmening_12m
+,cb89.cp_cant_trx_ing as cnt_trx_totcping_12m
+,cb89.cp_ultimo_mes_ing as cod_mesmax_cp_ing_12m
+,cast(cb89.cp_promedio_mensual_egr as decimal(38,6)) as avg_cpmenegr_12m
+,cast(cb89.cp_maximo_mensual_egr as decimal(38,6)) as max_mto_cpegrmen_12m
+,cb89.cp_cant_trx_egr as cnt_trx_cpegr_12m
+,cb89.cp_ultimo_mes_egr as cod_mesmax_trx_cp_egr_12m
+,cb89.cu_contraparte_ing as cod_cli_cp_ing_12m
+,cb89.dni_contraparte_ing as key_value_top1cp_ing_12m
+,cast(cb89.cp_acumulado_ing as decimal(38,6)) as mto_tot_acumuladoing_12m
+,cb89.cp_flag_noticia_ing as flg_t1cp_notneging_12m
+,cb89.cp_flag_ros_ing as flg_t1cp_rosing_12m
+,cb89.cp_fecha_ultimo_ros_ing as ts_top1cpultimoros
+,cb89.cp_flag_desv_ing as flg_t1cp_desving_12m
+,cb89.cp_fecha_inicio_desv_max_ing as cod_fecmax_cpincdsv_ing
+,cb89.cp_fecha_mas_antiguo_lsb_ing as fec_top1cplsbant_ing
+,cb89.cp_fecha_mas_reciente_lsb_ing as fec_cp_ms_rcnt_lsb_ing
+,cb89.cp_cant_trx_egr_ros as cnt_cp_trx_egr_ros
+,cast(cb89.cp_monto_total_egr_ros as decimal(38,6)) as mto_cp_tot_egr_ros
+,cb89.cp_cant_trx_ing_ros as cnt_cp_trx_ing_ros
+,cast(cb89.cp_monto_total_ing_ros as decimal(38,6)) as mto_cp_tot_ing_ros
+,cb89.cp_cantidad_lsb_ing as cnt_cp_lsb_ing
+,cb89.cu_contraparte_egr as cod_cli_cp_egr_12m
+,cb89.dni_contraparte_egr as key_value_cp_egr_12m
+,cast(cb89.cp_acumulado_egr as decimal(38,6)) as mto_t1cp_acum_egr_12m
+,cb89.cp_cantidad_egr as cnt_cp_egr
+,cb89.cp_flag_noticia_egr as flg_cp_noticia_egr_12m
+,cb89.cp_flag_ros_egr as flg_cp_ros_egr_12m
+,cb89.cp_fecha_ultimo_ros_egr as ts_cp_ultimo_ros_egr
+,cb89.cp_flag_desv_egr as flg_cp_desv_egr_12m
+,cb89.cp_fecha_inicio_desv_max_egr as cod_fecmax_cp_inc_dsv_egr
+,cb89.cp_fecha_mas_antiguo_lsb_egr as fec_cp_ms_ntg_lsb_egr
+,cb89.cp_fecha_mas_reciente_lsb_egr as fec_cp_ms_rcnt_lsb_egr
+,cb89.cp_cantidad_lsb_egr as cnt_cp_lsb_egr
+,cast(cb89.monto_ro_debajo_umbral as decimal(38,6)) as mto_ro_debajo_umbral
+,cb89.q_ro_debajo_umbral as cnt_ro_debajo_umbral
+,cb89.cp_cant_trx_egr_desv as cnt_cp_trx_egr_desv
+,cast(cb89.cp_monto_total_egr_desv as decimal(38,6)) as mto_cp_tot_egr_desv
+,cb7.cant_trx_debajo_10k_ing as cnt_trx_debajo10k_ing_12m
+,cb7.cant_trx_debajo_10k_egr as cnt_trx_debajo10k_egr_12m
+,cb89.cp_cantidad_ing as cnt_trx_top1cping_12m
+,cast(cb89.cp_monto_total_ing_desv as decimal(38,6)) as mto_cp_tot_ing_desv
+,cb89.cp_cant_trx_ing_desv as cnt_cp_trx_ing_desv
+,cast(cb7.cp_ratio_ing as decimal(38,6)) as rat_cpingreso_12m
+,cast(cb7.cp_ratio_egr as decimal(38,6)) as rat_cp_egr_12m
+,(localtimestamp - interval '5' hour) as ts_carga
+,t.codmes as p_codmes
+from base_clientes bc
+cross join wrk_dim_tiempo t
+left join consolidado_bloque_7 cb7
+on bc.codunico = cb7.codunico    
+left join consolidado_bloque_8_9 cb89
+on bc.codunico = cb89.codunico
+;

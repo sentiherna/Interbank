@@ -1,0 +1,712 @@
+insert into d_perm_aws.t_agg_alertas_p4_plaft(
+ cod_mes
+,cod_cli
+,mto_ing_tnda_rsg_bajo_12m
+,mto_ing_tnda_rsgmedio_12m
+,mto_ing_tnda_rsg_alto_12m
+,cnt_tienda_rsg_bajo_12m
+,cnt_tienda_rsg_medio_12m
+,cnt_tienda_rsg_alto_12m
+,mto_ing_cnl_rsg_bajo_12m
+,mto_ing_cnl_rsg_medio_12m
+,mto_ing_cnl_rsg_alto_12m
+,cnt_canal_rsg_bajo_12m
+,cnt_canal_rsg_medio_12m
+,cnt_canal_rsg_alto_12m
+,mto_ing_delextrsgalto_12m
+,mto_ing_delexttot_12m
+,cnt_trx_delextrsgalto_12m
+,cnt_trx_delexttot_12m
+,mto_al_extrsgaltot_12m
+,mto_al_ext_tot_12m
+,cnt_trx_alextrsgalto
+,cnt_al_ext_tot_12m
+,rat_ing_dl_xt_lt_tot_12m
+,rat_trx_ingextrsgalto_12m
+,rat_mto_al_xt_lt_12m
+,rat_cnt_ing_al_xt_lt_tot
+,cod_v13_lugar_op_rsg_12m
+,cod_v16_canal_op_rsg_12m
+,desc_ciiu_v4
+,rat_trx_mntabontot_13_46
+,rat_trx_mntabontot_13_49
+,rat_trx_mntabontot_16_712
+,cod_v12_lugar_rsdn_rsg
+,cod_v11_pais_op_rsg
+,ts_carga
+,p_codmes
+)
+with wrk_dim_tiempo as (
+SELECT 
+codmes, 
+DATE_FORMAT(DATE_ADD('month', -0, calendar_date), '%Y%m') AS lcodmesm00,
+DATE_FORMAT(DATE_ADD('month', -1, calendar_date), '%Y%m') AS lcodmesm01,
+DATE_FORMAT(DATE_ADD('month', -2, calendar_date), '%Y%m') AS lcodmesm02,
+DATE_FORMAT(DATE_ADD('month', -3, calendar_date), '%Y%m') AS lcodmesm03,
+DATE_FORMAT(DATE_ADD('month', -4, calendar_date), '%Y%m') AS lcodmesm04,
+DATE_FORMAT(DATE_ADD('month', -5, calendar_date), '%Y%m') AS lcodmesm05,
+DATE_FORMAT(DATE_ADD('month', -6, calendar_date), '%Y%m') AS lcodmesm06,
+DATE_FORMAT(DATE_ADD('month', -7, calendar_date), '%Y%m') AS lcodmesm07,
+DATE_FORMAT(DATE_ADD('month', -8, calendar_date), '%Y%m') AS lcodmesm08,
+DATE_FORMAT(DATE_ADD('month', -9, calendar_date), '%Y%m') AS lcodmesm09,
+DATE_FORMAT(DATE_ADD('month', -10, calendar_date), '%Y%m') AS lcodmesm10,
+DATE_FORMAT(DATE_ADD('month', -11, calendar_date), '%Y%m') AS lcodmesm11,
+DATE_FORMAT(DATE_ADD('month', -12, calendar_date), '%Y%m') AS lcodmesm12,
+DATE_FORMAT(DATE_ADD('month', -13, calendar_date), '%Y%m') AS lcodmesm13,
+DATE_FORMAT(DATE_ADD('month', -14, calendar_date), '%Y%m') AS lcodmesm14,
+DATE_FORMAT(DATE_ADD('month', -36, calendar_date), '%Y%m%d') AS lcoddiam36,
+DATE_ADD('month', 0, calendar_date) AS dlcodmesm00,
+DATE_FORMAT(DATE_ADD('month', 1, calendar_date), '%Y%m%d') AS ncoddiam01,
+DATE_FORMAT(DATE_ADD('month', 0, calendar_date), '%Y%m%d') AS ncoddiam00,
+DATE_ADD('month', -13, calendar_date) AS dlcodmesm13,
+DATE_TRUNC('month', calendar_date) + INTERVAL '0' month - INTERVAL '1' day AS lcoddaym1
+FROM ( 
+SELECT 
+DATE_FORMAT(DATE_PARSE(calendar_date, '%Y-%m-%d'), '%Y%m') AS codmes, 
+DATE_PARSE(calendar_date, '%Y-%m-%d') AS calendar_date 
+FROM e_perm_aws.t_calendar_summary 
+WHERE calendar_date = DATE_FORMAT(DATE_PARSE('202606','%Y%m'),'%Y-%m-%d')
+)
+),
+mst_plaft_trx_operaciones AS (
+SELECT
+a.cod_argcatalogo AS cod_trx,
+a.desc_argcatalogo AS des_trx,
+a.desc_valor01 AS cod_riesgo,
+a.desc_valor02 AS tipo_transaccion,
+a.desc_valor03 AS actor,
+a.desc_valor04 AS tipo_transaccion_2,
+a.desc_valor05 AS actor_2
+FROM e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+WHERE a.p_codmes = t.codmes
+and a.desc_catalogo = 'TIPO OPERACION'
+),
+mst_plaft_dim_tienda AS (
+select
+a.cod_argcatalogo AS cod_tienda,
+a.desc_argcatalogo AS desc_tienda,
+a.desc_valor01 AS tda_codriesgo,
+a.scr_equivalente AS scr_equivalente
+FROM e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and a.desc_catalogo = 'TIENDA'
+),
+mst_plaft_monedas AS (
+select
+cod_argcatalogo as cod_moneda,
+desc_argcatalogo as desc_moneda,
+desc_valor01 as cod_moneda_valor
+from e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and desc_catalogo = 'MONEDAS'
+),
+mst_plaft_dim_canal AS (
+select
+cod_argcatalogo as cod_canal,
+desc_argcatalogo as desc_canal,
+desc_valor01 as can_codriesgo,
+scr_equivalente as scr_equivalente
+from e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and desc_catalogo = 'CANAL'
+),
+mst_plaft_dim_pais AS (
+select
+cod_argcatalogo as cod_pais,
+desc_argcatalogo as desc_pais,
+desc_valor01 as pai_codriesgo,
+desc_valor03 as cod_pais_2,
+scr_equivalente as scr_equivalente
+from e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and desc_catalogo = 'PAIS'
+),
+mst_plaft_dim_ubigeo AS (
+select
+cod_argcatalogo as cod_ubg_departamento,
+desc_argcatalogo as desc_ubg_departamento,
+desc_valor01 as ubg_codriesgo,
+desc_valor02 as ubg_distrito,
+scr_equivalente as scr_equivalente
+from e_perm_aws.t_mst_parametros_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+and desc_catalogo = 'UBIGEO'
+),
+wkr_pre_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen,cod_tipo_cambio, cod_moneda_destino
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio, cod_moneda_destino,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen, fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen, cod_tipo_cambio order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross join wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') between t.lcodmesm14 and t.codmes
+and cod_tipo_cambio in ('1000','1004')
+) tc
+where tc.r=1
+order by 1 desc
+),
+base_cucibk AS (
+SELECT cod_cuc, key_value
+FROM (
+SELECT
+cod_cuc,
+key_value,
+ROW_NUMBER() OVER (PARTITION BY cod_cuc ORDER BY fch_priprd DESC) AS rn
+FROM e_perm_aws.t_mst_ctaibk_rsk
+)
+WHERE rn = 1
+),
+wkr_tipo_cambio AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from wkr_pre_tipo_cambio
+where cod_tipo_cambio  = '1004'
+),
+wrk_base_aml_operaciones as (
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cuc,
+a.codunico_ord,
+a.codunico_ben,
+a.cod_trx_orig,
+a.fec_inicio_trx,
+a.cod_tienda1,
+a.cod_canal_trx,
+a.cod_pais_ben,
+a.cod_pais_efec_trx,
+a.cod_ubigeo_opera,
+a.mto_operacion,
+case when a.cod_monorigen = 'S' then 'PEN'
+when a.cod_monorigen = 'D' then 'USD'
+when a.cod_monorigen = 'E' then 'EUR'
+end as moneda_origen,
+case when a.cod_monorigen = 'D' then a.mto_operacion end as mto_dolares,
+case when a.cod_monorigen = 'S' then a.mto_operacion end as mto_soles
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+where a.p_fec_proceso between t.lcoddiam36 and t.ncoddiam00
+and a.cod_monorigen in ('S','D','E')
+union all
+select substr(a.fec_inicio_trx, 1, 4) || substr(a.fec_inicio_trx, 6, 2) periodo,
+case 
+when a.cod_trx_orig in (
+'010','011','012','040','100','100100','100101','101100','101101','101200','103401',
+'120100','121100','123100','211','220','222','300','400151','400162','401151','401152',
+'401162','403162','500001','500002','500004','500005','500006','500007','500008',
+'500009','500010','500017','500020','500021','500022','500023','500024','500025',
+'500026','500027','500028','500031','500056','500102','500104','500105','500106',
+'500108','500109','500110','500116','500117','500120','500121','500122','500123',
+'500124','500125','500126','500127','500128','500131','500152','501101','501102',
+'501104','501105','501106','501108','501109','501110','501117','501120','501121',
+'501122','501123','501124','501125','501126','501127','501128','501131','501152',
+'503101','503102','503103','503104','503105','503106','503108','503109','503110',
+'503117','503121','503122','503123','503124','503125','503126','503127','510',
+'510002','510003','510004','510006','510009','510022','510027','520','540','600',
+'630','640','700','710','9630','221','220-25','221-25','222-25','223-25','225-25',
+'226-25','630-25','00-05','00-12','00-13','00-14','510-12','510-13','510-14','TR25'
+) then a.codunico_ord
+when a.cod_trx_orig IN (
+'221-26','222-26','226-26','620-24','620-APLI','620-TPLI','630-26','223-26','01-53',
+'225-26','0233','020','110','115','140','1640','200','221','240001','240011','240031',
+'240052','260001','260011','260031','260051','260052','360','400056','400101','400111',
+'400131','401101','401111','401131','401171','401211','401262','403101','403111','407100',
+'407103','407111','620','650','700','TR26','9650','220-26','00-99','650-ATM','0223'
+) then a.codunico_ben
+when a.codunico_ben is null then a.codunico_ord
+else a.codunico_ben
+end as cod_cuc,
+a.codunico_ord,
+a.codunico_ben,
+a.cod_trx_orig,
+a.fec_inicio_trx,
+a.cod_tienda1,
+a.cod_canal_trx,
+a.cod_pais_ben,
+a.cod_pais_efec_trx,
+a.cod_ubigeo_opera,
+a.mto_operacion,
+pp.cod_moneda as moneda_origen,
+cast(null as decimal(16,2)) as mto_dolares,
+cast(null as decimal(16,2)) as mto_soles
+from e_perm_aws.t_aml_operaciones a
+cross join wrk_dim_tiempo t
+left join mst_plaft_monedas pp on a.desc_monorigen = pp.desc_moneda
+where a.p_fec_proceso between t.lcoddiam36 and t.ncoddiam00
+and a.cod_monorigen not in ('S','D','E') and a.desc_monorigen is not null
+),
+wrk_solarizacion as (
+select  a.periodo
+,a.cod_cuc
+,a.codunico_ord
+,a.codunico_ben
+,a.cod_trx_orig
+,a.fec_inicio_trx
+,a.cod_tienda1
+,a.cod_canal_trx
+,a.cod_pais_ben
+,a.cod_pais_efec_trx
+,a.cod_ubigeo_opera
+,a.mto_operacion
+,a.moneda_origen
+,a.mto_dolares
+,case when a.moneda_origen = 'PEN' then a.mto_operacion else a.mto_operacion*tc.tipo_cambio end as mto_soles
+from wrk_base_aml_operaciones a
+inner join wkr_pre_tipo_cambio tc on a.periodo = tc.codmes and tc.cod_moneda_destino = 'PEN' and tc.cod_tipo_cambio = '1004' and a.moneda_origen = tc.cod_moneda_origen
+),
+wrk_aml_operaciones as (
+select  a.periodo
+,a.cod_cuc
+,a.codunico_ord
+,a.codunico_ben
+,a.cod_trx_orig
+,a.fec_inicio_trx
+,a.cod_tienda1 AS cod_tienda
+,a.cod_canal_trx
+,a.cod_pais_ben
+,a.cod_pais_efec_trx
+,a.cod_ubigeo_opera
+,a.mto_operacion
+,a.moneda_origen
+,case when a.moneda_origen = 'USD' then a.mto_operacion else (a.mto_soles*1.0)/tc.tipo_cambio end as mto_dolares
+,a.mto_soles
+from wrk_solarizacion a
+inner join wkr_pre_tipo_cambio tc on a.periodo = tc.codmes and tc.cod_moneda_destino = 'PEN' and tc.cod_tipo_cambio = '1000' and tc.cod_moneda_origen = 'USD'
+),
+base_clientes as (
+select a.cod_cli as codunico
+from d_perm_aws.t_agg_alertas_p1_plaft a
+cross join wrk_dim_tiempo t
+where a.p_codmes = t.codmes
+),
+trx_egreso_ingreso_actor_1 AS (
+SELECT
+o.periodo,
+o.cod_trx_orig,
+mp.des_trx,
+o.cod_tienda,
+o.cod_canal_trx,
+o.cod_pais_ben,
+o.cod_pais_efec_trx,
+O.cod_ubigeo_opera,
+CASE 
+WHEN mp.actor = 'ORD' THEN o.codunico_ord
+WHEN mp.actor = 'BEN' THEN o.codunico_ben
+ELSE o.codunico_ord
+END AS cod_cli,
+sum(case when mp.tipo_transaccion = 'INGRESO' then 1 else 0 end) AS q_trx_ingreso,
+sum(case when mp.tipo_transaccion = 'EGRESO' then 1 else 0 end) AS q_trx_egreso,
+SUM(CASE WHEN mp.tipo_transaccion = 'INGRESO' THEN o.mto_soles ELSE 0 END) AS mnt_ingreso,
+SUM(CASE WHEN mp.tipo_transaccion = 'EGRESO' THEN o.mto_soles ELSE 0 END) AS mnt_egreso,
+SUM(mto_dolares) AS mto_dolares,
+count(1) AS cantidad_trx
+FROM wrk_aml_operaciones o
+LEFT JOIN mst_plaft_trx_operaciones mp ON o.cod_trx_orig = mp.cod_trx
+CROSS JOIN wrk_dim_tiempo t
+WHERE mp.tipo_transaccion IS NOT NULL
+AND o.periodo = t.lcodmesm01
+AND o.codunico_ord <> o.codunico_ben
+GROUP BY 1,2,3,4,5,6,7,8,9
+),
+trx_egreso_ingreso_actor_2 AS (
+SELECT
+o.periodo,
+o.cod_trx_orig,
+mp.des_trx,
+o.cod_tienda,
+o.cod_canal_trx,
+o.cod_pais_ben,
+o.cod_pais_efec_trx,
+o.cod_ubigeo_opera,
+CASE 
+WHEN mp.actor_2 = 'ORD' THEN o.codunico_ord
+WHEN mp.actor_2 = 'BEN' THEN o.codunico_ben
+ELSE o.codunico_ord
+END AS cod_cli,
+sum(case when mp.tipo_transaccion_2 = 'INGRESO' then 1 else 0 end) AS q_trx_ingreso,
+sum(case when mp.tipo_transaccion_2 = 'EGRESO' then 1 else 0 end) AS q_trx_egreso,
+SUM(CASE WHEN mp.tipo_transaccion_2 = 'INGRESO' THEN o.mto_soles ELSE 0 END) AS mnt_ingreso,
+SUM(CASE WHEN mp.tipo_transaccion_2 = 'EGRESO' THEN o.mto_soles ELSE 0 END) AS mnt_egreso,
+SUM(mto_dolares) AS mto_dolares,
+count(1) AS cantidad_trx
+FROM wrk_aml_operaciones o
+LEFT JOIN mst_plaft_trx_operaciones mp ON o.cod_trx_orig = mp.cod_trx
+CROSS JOIN wrk_dim_tiempo t
+WHERE mp.tipo_transaccion_2 IS NOT NULL
+AND o.periodo = t.lcodmesm01
+AND o.codunico_ord <> o.codunico_ben
+GROUP BY 1,2,3,4,5,6,7,8,9
+),
+trx_egreso_ingreso AS (
+SELECT a.* FROM trx_egreso_ingreso_actor_1 a
+inner join base_clientes b on a.cod_cli = b.codunico
+UNION ALL
+SELECT a.* FROM trx_egreso_ingreso_actor_2 a
+inner join base_clientes b on a.cod_cli = b.codunico
+),
+mtz_trx_tienda_riesgo_ingreso AS (
+SELECT
+te.cod_cli AS codunico,
+SUM(CASE WHEN t.tda_codriesgo = '0.00'   THEN te.mnt_ingreso ELSE 0 END) AS ing_tienda_riesgo_bajo,
+SUM(CASE WHEN t.tda_codriesgo = '50.00'  THEN te.mnt_ingreso ELSE 0 END) AS ing_tienda_riesgo_medio,
+SUM(CASE WHEN t.tda_codriesgo = '100.00' THEN te.mnt_ingreso ELSE 0 END) AS ing_tienda_riesgo_alto,
+SUM(CASE WHEN t.tda_codriesgo = '0.00'   THEN te.q_trx_ingreso ELSE 0 END) AS q_tienda_riesgo_bajo,
+SUM(CASE WHEN t.tda_codriesgo = '50.00'  THEN te.q_trx_ingreso ELSE 0 END) AS q_tienda_riesgo_medio,
+SUM(CASE WHEN t.tda_codriesgo = '100.00' THEN te.q_trx_ingreso ELSE 0 END) AS q_tienda_riesgo_alto
+FROM trx_egreso_ingreso te
+JOIN mst_plaft_dim_tienda t
+ON te.cod_tienda = t.cod_tienda
+WHERE te.cod_trx_orig <> '907'
+GROUP BY 1
+),
+mtz_trx_canal_riesgo_ingreso AS (
+SELECT
+te.cod_cli AS codunico,
+SUM(CASE WHEN c.can_codriesgo = '0.00'   THEN te.mnt_ingreso ELSE 0 END) AS ing_canal_riesgo_bajo,
+SUM(CASE WHEN c.can_codriesgo = '50.00'  THEN te.mnt_ingreso ELSE 0 END) AS ing_canal_riesgo_medio,
+SUM(CASE WHEN c.can_codriesgo = '100.00' THEN te.mnt_ingreso ELSE 0 END) AS ing_canal_riesgo_alto,
+SUM(CASE WHEN c.can_codriesgo = '0.00'   THEN te.q_trx_ingreso ELSE 0 END) AS q_canal_riesgo_bajo,
+SUM(CASE WHEN c.can_codriesgo = '50.00'  THEN te.q_trx_ingreso ELSE 0 END) AS q_canal_riesgo_medio,
+SUM(CASE WHEN c.can_codriesgo = '100.00' THEN te.q_trx_ingreso ELSE 0 END) AS q_canal_riesgo_alto
+FROM trx_egreso_ingreso te
+JOIN mst_plaft_dim_canal c
+ON te.cod_canal_trx = c.cod_canal
+WHERE te.cod_trx_orig <> '907'
+GROUP BY 1
+),
+MTZ_TRX_DEL_EXT_RIESGO AS (
+SELECT 
+bc.codunico,
+SUM(CASE 
+WHEN T2.cod_trx_orig = '1640'
+AND T3.pai_codriesgo = 100
+THEN T2.mnt_ingreso 
+END) AS ING_DEL_EXT_RIESGO_ALTO,
+SUM(CASE 
+WHEN T2.cod_trx_orig = '1640'
+THEN T2.mnt_ingreso 
+END) AS ING_DEL_EXT_TOTAL,
+COUNT(CASE 
+WHEN T2.cod_trx_orig = '1640'
+AND T3.pai_codriesgo = 100
+THEN 1 
+END) AS Q_DEL_EXT_RIESGO_ALTO,
+COUNT(CASE 
+WHEN T2.cod_trx_orig = '1640'
+THEN 1 
+END) AS Q_DEL_EXT_TOTAL,
+SUM(CASE 
+WHEN T2.cod_trx_orig IN ('640','9640')
+AND T3.pai_codriesgo = 100
+THEN T2.mnt_egreso 
+END) AS ING_AL_EXT_RIESGO_ALTO,
+SUM(CASE 
+WHEN T2.cod_trx_orig IN ('640','9640')
+THEN T2.mnt_egreso 
+END) AS ING_AL_EXT_TOTAL,
+COUNT(CASE 
+WHEN T2.cod_trx_orig IN ('640','9640')
+AND T3.pai_codriesgo = 100
+THEN 1 
+END) AS Q_AL_EXT_RIESGO_ALTO,
+COUNT(CASE 
+WHEN T2.cod_trx_orig IN ('640','9640')
+THEN 1 
+END) AS Q_AL_EXT_TOTAL,
+max(pai_codriesgo) as v11_pais_operativa_riesgo
+from base_clientes bc
+left join trx_egreso_ingreso t2
+on bc.codunico = t2.cod_cli
+left join (select cod_pais_2, max(cast(pai_codriesgo as int)) as pai_codriesgo from mst_plaft_dim_pais group by 1 ) t3
+ON (
+CASE
+WHEN T2.cod_trx_orig = '1640'
+THEN T2.cod_pais_efec_trx
+WHEN T2.cod_trx_orig IN ('640','9640')
+THEN T2.cod_pais_ben
+END
+) = T3.cod_pais_2
+WHERE T2.cod_trx_orig IN ('640','9640','1640')
+GROUP BY bc.codunico
+),
+wrk_pre_rfm_regulares as (
+select a.cod_cuc,
+sum(mto_dolares) as monto_usd_trx, count(1) as cantidad_trx
+from wrk_aml_operaciones a
+cross join wrk_dim_tiempo t
+where a.periodo between t.lcodmesm12 and t.lcodmesm01
+group by 1
+),
+wrk_mga_rfm_regulares as (
+select a.cod_cuc,
+monto_usd_trx,
+coalesce(a.cantidad_trx/a.cantidad_trx,0) as p_lugar_operativa_a
+from wrk_pre_rfm_regulares a
+),
+wrk_trx_tipo_operacion as (
+select
+a.cod_cli,
+count(1) as cantidad_trx_tipo,
+SUM(mto_dolares) AS monto_usd_trx
+from trx_egreso_ingreso a
+inner join mst_plaft_trx_operaciones b
+on a.cod_trx_orig = b.cod_trx
+group by a.cod_cli
+),
+wrk_trx_tipo_operacion_r100 as (
+select
+a.cod_cli,
+count(1) as cantidad_trx_riesgo,
+SUM(mto_dolares) AS monto_usd_trx
+from trx_egreso_ingreso a
+inner join mst_plaft_trx_operaciones b
+on a.cod_trx_orig = b.cod_trx
+where b.cod_riesgo = '100'
+group by a.cod_cli
+),
+wrk_p_tipo_operacion_a as (
+select
+t.cod_cli,
+coalesce(
+r.cantidad_trx_riesgo * 1.0 / t.cantidad_trx_tipo,
+0
+) as p_tipo_operacion_a,
+t.monto_usd_trx
+from wrk_trx_tipo_operacion t
+left join wrk_trx_tipo_operacion_r100 r
+on t.cod_cli = r.cod_cli
+),
+wrk_mga_umbrales_rfm as (
+select max(case when rn <= 0.5 * cnt then monto_usd_trx else 0 end) as valor1_m,
+max(case when rn <= 0.8 * cnt then monto_usd_trx else 0 end) as valor1_a,
+0.5 as valor2_m,
+0.8 as valor2_a
+from (
+select
+monto_usd_trx,
+row_number() over (order by monto_usd_trx asc) as rn,
+count(*)     over () as cnt
+from wrk_mga_rfm_regulares
+) t
+),
+wrk_riesgo_lugar_operativa as (
+select t1.cod_cuc as codunico,
+case 
+ when t1.p_lugar_operativa_a>=t2.valor2_a and t1.monto_usd_trx>=t2.valor1_a  then 100
+ when t1.p_lugar_operativa_a>=t2.valor2_m and t1.monto_usd_trx>=t2.valor1_m  then 50
+ else 0
+end as v13_lugar_operativa_riesgo
+from wrk_mga_rfm_regulares t1
+cross join wrk_mga_umbrales_rfm t2
+),
+wrk_riesgo_tipo_operacion as (
+select t1.cod_cli as codunico,
+CASE 
+WHEN P_TIPO_OPERACION_A>=VALOR2_A AND MONTO_USD_TRX>=VALOR1_A  THEN 100
+WHEN P_TIPO_OPERACION_A>=VALOR2_M AND MONTO_USD_TRX>=VALOR1_M  THEN 50
+ELSE 0
+END AS V16_CANAL_OPERACION_RIESGO
+from wrk_p_tipo_operacion_a t1
+cross join wrk_mga_umbrales_rfm t2
+),
+wrk_trx_tipo_ubigeo as (
+select
+a.cod_cli,
+count(1) as cantidad_trx_riesgo,
+SUM(mto_dolares) AS monto_usd_trx
+from trx_egreso_ingreso a
+inner join mst_plaft_trx_operaciones b
+on a.cod_trx_orig = b.cod_trx
+where b.cod_riesgo = '100'
+group by a.cod_cli
+),
+V12_LUGAR_RESIDENCIA AS (  
+SELECT
+t1.cod_cli,
+COALESCE(t2.ubg_codriesgo, '100') AS v12_lugar_residencia_riesgo          
+FROM trx_egreso_ingreso t1              
+LEFT JOIN mst_plaft_dim_ubigeo t2              
+ON t1.cod_ubigeo_opera = t2.cod_ubg_departamento              
+AND CASE WHEN t1.cod_ubigeo_opera <> '15' THEN '' END = COALESCE(t2.ubg_distrito, '')
+),
+consolidado_sunat AS (
+SELECT
+b.cod_cuc AS codunico,
+ccr.des_actividad AS descripcion_ciiu_v4,
+ROW_NUMBER() OVER (
+PARTITION BY t.numruc 
+ORDER BY t.fecvigenciarele DESC
+) AS rn
+FROM base_cucibk b
+INNER JOIN e_perm_aws.t_consolidado_sunat t
+ON b.key_value = t.numruc
+CROSS JOIN wrk_dim_tiempo d
+LEFT JOIN e_perm_aws.t_mst_catalogo_ciiu_rsk CCR
+ON T.ciiuv4 = CCR.cod_ciiu
+),
+wkr_tipo_cambio_captaciones AS (
+select codmes, tipo_cambio, cod_moneda_origen
+from (
+select to_char(fecha_cambio,'yyyymm') codmes, cod_tipo_cambio,
+round(tipo_cambio,3) tipo_cambio, cod_moneda_origen,fecha_cambio,
+row_number() over(partition by date_trunc('month', fecha_cambio), cod_moneda_origen order by fecha_cambio desc) r
+from e_perm_aws.t_dim_tipo_cambio_rsk a
+cross JOIN wrk_dim_tiempo t
+where to_char(fecha_cambio,'yyyymm') BETWEEN t.lcodmesm14 AND t.codmes
+and cod_moneda_origen in ('USD','EUR')
+and cod_tipo_cambio = '1002'
+) tc
+where tc.r=1
+order by 1 desc
+),
+wrk_trx_captaciones as (
+select
+date_format(fechinievento,'%Y%m') as periodo,
+cuc_num,
+SUM(CASE WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'PSS' THEN M.MONTOTRANSACCION
+WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'USD' THEN M.MONTOTRANSACCION*b.tipo_cambio
+WHEN M.SIGNOMONTO = '+' AND M.MONEDACD = 'EUR' THEN M.MONTOTRANSACCION*b.tipo_cambio
+ELSE 0 END) AS ABONOS_SOLARIZADO
+FROM e_perm_aws.t_fct_transacciones_captaciones m
+cross join wrk_dim_tiempo t
+left join wkr_tipo_cambio_captaciones b on date_format(m.fechinievento,'%Y%m') = b.codmes and m.monedacd = b.cod_moneda_origen
+WHERE m.fechinievento between t.dlcodmesm13 and t.dlcodmesm00
+and m.signomonto in ('+','-') and cuc_num is not null
+and cuc_num <> coalesce(cuc_num_ord_ben, 'abc')
+group by 1,2
+),
+cantidad_monto_abonos_total AS (
+SELECT
+w.CUC_NUM AS codunico,
+SUM(CASE WHEN w.periodo BETWEEN t.lcodmesm03 AND t.lcodmesm01 
+THEN w.abonos_solarizado 
+ELSE 0 
+END) AS TRX_MONTO_ABONOS_1A3M_TOTAL,
+SUM(CASE WHEN w.periodo BETWEEN t.lcodmesm06 AND t.lcodmesm04 
+THEN w.abonos_solarizado 
+ELSE 0 
+END) AS TRX_MONTO_ABONOS_4A6M_TOTAL,
+SUM(CASE WHEN w.periodo BETWEEN t.lcodmesm09 AND t.lcodmesm04 
+THEN w.abonos_solarizado 
+ELSE 0 
+END) AS TRX_MONTO_ABONOS_4A9M_TOTAL,
+SUM(CASE WHEN w.periodo BETWEEN t.lcodmesm06 AND t.lcodmesm01 
+THEN w.abonos_solarizado 
+ELSE 0 
+END) AS TRX_MONTO_ABONOS_1A6M_TOTAL,
+SUM(CASE WHEN w.periodo BETWEEN t.lcodmesm12 AND t.lcodmesm07 
+THEN w.abonos_solarizado 
+ELSE 0 
+END) AS TRX_MONTO_ABONOS_7A12M_TOTAL
+FROM wrk_trx_captaciones w
+CROSS JOIN wrk_dim_tiempo t
+GROUP BY w.CUC_NUM
+),
+ratio_monto_abonos AS (
+SELECT
+codunico,
+COALESCE(CAST(TRX_MONTO_ABONOS_1A3M_TOTAL * 1.000000
+/ NULLIF(TRX_MONTO_ABONOS_4A6M_TOTAL, 0)
+AS DECIMAL(38,6)),DECIMAL '0.000000' ) AS TRX_MONTO_ABONOS_RATIO_1A3M_4A6M_TOTAL,
+COALESCE(CAST(TRX_MONTO_ABONOS_1A3M_TOTAL * 1.000000
+/ NULLIF(TRX_MONTO_ABONOS_4A9M_TOTAL, 0)
+AS DECIMAL(38,6)), DECIMAL '0.000000') AS TRX_MONTO_ABONOS_RATIO_1A3M_4A9M_TOTAL,
+COALESCE(CAST(TRX_MONTO_ABONOS_1A6M_TOTAL * 1.000000
+/ NULLIF(TRX_MONTO_ABONOS_7A12M_TOTAL, 0)
+AS DECIMAL(38,6)), DECIMAL '0.000000') AS TRX_MONTO_ABONOS_RATIO_1A6M_7A12M_TOTAL
+FROM cantidad_monto_abonos_total
+)
+SELECT distinct
+t.codmes AS COD_MES,
+CAST(bc.codunico AS VARCHAR) AS COD_CLI,
+COALESCE(CAST(mtri.ING_TIENDA_RIESGO_BAJO AS DECIMAL(38,6)), 0) AS MTO_ING_TNDA_RSG_BAJO_12M,
+COALESCE(CAST(mtri.ING_TIENDA_RIESGO_MEDIO AS DECIMAL(38,6)), 0) AS MTO_ING_TNDA_RSGMEDIO_12M,
+COALESCE(CAST(mtri.ING_TIENDA_RIESGO_ALTO AS DECIMAL(38,6)), 0) AS MTO_ING_TNDA_RSG_ALTO_12M,
+COALESCE(CAST(mtri.Q_TIENDA_RIESGO_BAJO AS INTEGER), 0) AS CNT_TIENDA_RSG_BAJO_12M,
+COALESCE(CAST(mtri.Q_TIENDA_RIESGO_MEDIO AS INTEGER), 0) AS CNT_TIENDA_RSG_MEDIO_12M,
+COALESCE(CAST(mtri.Q_TIENDA_RIESGO_ALTO AS INTEGER), 0) AS CNT_TIENDA_RSG_ALTO_12M,
+COALESCE(CAST(mcri.ING_CANAL_RIESGO_BAJO AS DECIMAL(38,6)), 0) AS MTO_ING_CNL_RSG_BAJO_12M,
+COALESCE(CAST(mcri.ING_CANAL_RIESGO_MEDIO AS DECIMAL(38,6)), 0) AS MTO_ING_CNL_RSG_MEDIO_12M,
+COALESCE(CAST(mcri.ING_CANAL_RIESGO_ALTO AS DECIMAL(38,6)), 0)  AS MTO_ING_CNL_RSG_ALTO_12M,
+COALESCE(CAST(mcri.Q_CANAL_RIESGO_BAJO AS INTEGER), 0) AS CNT_CANAL_RSG_BAJO_12M,
+COALESCE(CAST(mcri.Q_CANAL_RIESGO_MEDIO AS INTEGER), 0) AS CNT_CANAL_RSG_MEDIO_12M,
+COALESCE(CAST(mcri.Q_CANAL_RIESGO_ALTO AS INTEGER), 0) AS CNT_CANAL_RSG_ALTO_12M,
+COALESCE(CAST(mtder.ING_DEL_EXT_RIESGO_ALTO AS DECIMAL(38,6)), 0) AS MTO_ING_DELEXTRSGALTO_12M,
+COALESCE(CAST(mtder.ING_DEL_EXT_TOTAL AS DECIMAL(38,6)), 0) AS MTO_ING_DELEXTTOT_12M,
+COALESCE(CAST(mtder.Q_DEL_EXT_RIESGO_ALTO AS INTEGER), 0) AS CNT_TRX_DELEXTRSGALTO_12M,
+COALESCE(CAST(mtder.Q_DEL_EXT_TOTAL AS INTEGER), 0) AS CNT_TRX_DELEXTTOT_12M,
+COALESCE(CAST(mtder.ING_AL_EXT_RIESGO_ALTO AS DECIMAL(38,6)), 0) AS MTO_AL_EXTRSGALTOT_12M,
+COALESCE(CAST(mtder.ING_AL_EXT_TOTAL AS DECIMAL(38,6)), 0) AS MTO_AL_EXT_TOT_12M,
+COALESCE(CAST(mtder.Q_AL_EXT_RIESGO_ALTO AS INTEGER), 0) AS CNT_TRX_ALEXTRSGALTO,
+COALESCE(CAST(mtder.Q_AL_EXT_TOTAL AS INTEGER), 0) AS CNT_AL_EXT_TOT_12M,
+CAST(COALESCE(
+CAST(mtder.ing_del_ext_riesgo_alto AS DECIMAL(38,6))/ NULLIF(CAST(mtder.ing_del_ext_total AS DECIMAL(38,6)), 0),0)
+AS DECIMAL(38,6)) AS RAT_ING_DL_XT_LT_TOT_12M,
+CAST(COALESCE(
+CAST(mtder.q_del_ext_riesgo_alto AS DECIMAL(38,6))/ NULLIF(CAST(mtder.q_del_ext_total AS DECIMAL(38,6)), 0),0)
+AS DECIMAL(38,6)) AS RAT_TRX_INGEXTRSGALTO_12M,
+CAST(COALESCE(
+CAST(mtder.ing_al_ext_riesgo_alto AS DECIMAL(38,6))/ NULLIF(CAST(mtder.ing_al_ext_total AS DECIMAL(38,6)), 0),0)
+AS DECIMAL(38,6)) AS RAT_MTO_AL_XT_LT_12M,
+CAST(COALESCE(
+CAST(mtder.q_al_ext_riesgo_alto AS DECIMAL(38,6))/ NULLIF(CAST(mtder.q_al_ext_total AS DECIMAL(38,6)), 0),0)
+AS DECIMAL(38,6)) AS RAT_CNT_ING_AL_XT_LT_TOT,
+COALESCE(CAST(rlo.v13_lugar_operativa_riesgo AS INTEGER), 0) AS COD_V13_LUGAR_OP_RSG_12M,
+COALESCE(CAST(rto.V16_CANAL_OPERACION_RIESGO AS INTEGER), 0) AS COD_V16_CANAL_OP_RSG_12M,
+CAST(cs.descripcion_ciiu_v4 AS VARCHAR) AS DESC_CIIU_V4,
+COALESCE(CAST(rma.TRX_MONTO_ABONOS_RATIO_1A3M_4A6M_TOTAL AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABONTOT_13_46,
+COALESCE(CAST(rma.TRX_MONTO_ABONOS_RATIO_1A3M_4A9M_TOTAL AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABONTOT_13_49,
+COALESCE(CAST(rma.TRX_MONTO_ABONOS_RATIO_1A6M_7A12M_TOTAL AS DECIMAL(38,6)), 0) AS RAT_TRX_MNTABONTOT_16_712,
+COALESCE(TRY_CAST(lr.v12_lugar_residencia_riesgo AS INTEGER), 0) AS COD_V12_LUGAR_RSDN_RSG,
+COALESCE(TRY_CAST(mtder.v11_pais_operativa_riesgo AS INTEGER), 0) AS COD_V11_PAIS_OP_RSG,
+(localtimestamp - interval '5' hour) as ts_carga,
+t.codmes AS p_codmes
+FROM base_clientes bc
+cross join wrk_dim_tiempo t
+LEFT JOIN mtz_trx_canal_riesgo_ingreso mcri
+ON bc.codunico = mcri.codunico
+LEFT JOIN v12_lugar_residencia lr
+ON bc.codunico = lr.cod_cli
+LEFT JOIN mtz_trx_tienda_riesgo_ingreso mtri
+ON bc.codunico = mtri.codunico
+LEFT JOIN MTZ_TRX_DEL_EXT_RIESGO mtder
+ON bc.codunico = mtder.codunico
+left join wrk_riesgo_lugar_operativa rlo
+on bc.codunico = rlo.codunico
+LEFT JOIN wrk_riesgo_tipo_operacion rto
+on bc.codunico = rto.codunico
+LEFT JOIN ratio_monto_abonos rma
+ON bc.codunico = rma.codunico
+LEFT JOIN consolidado_sunat cs
+ON bc.codunico = cs.codunico AND cs.rn = 1
+;

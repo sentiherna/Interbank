@@ -152,7 +152,7 @@ WITH pd AS (
             - TRY_CAST(a.desc_nivel_rsg_lsb_tot AS DOUBLE)
             AS gap_riesgo_pep_lsb
 
-    FROM d_perm_aws.t_agg_alertas_plaft a
+    FROM e_perm_aws.t_agg_alertas_plaft a
         WHERE a.cod_mes BETWEEN '202501' AND '202604'
             AND a.desc_subsegmento = 'BPE'
 ),

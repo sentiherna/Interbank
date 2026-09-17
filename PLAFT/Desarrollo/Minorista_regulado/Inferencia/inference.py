@@ -35,9 +35,18 @@ ENCODING_MAPS_FILE = "encoding_maps.json"
 DIR_RESULTS = "/opt/ml/processing/output/results"
 
 # ======================== LISTA DE VARIABLES ============================
-COLS_IDS = ["cod_mes", "key_value","cod_cli","tipo_alerta_n2"]
+COLS_IDS = ["cod_mes", "key_value","cod_cli","tipo_alerta_n2","cod_tip_doc"]
 COLS_CONTROL = ["trx_riesgo_cliente"]
 COLS_POST = ["key_value", "tipo_alerta_n2", "cod_mes"]
+
+# Desde 202605, ausencia de operaciones al exterior llega codificada como 0.
+# Se restaura la semantica historica (NULL) antes de aplicar la imputacion del TRAIN.
+ZERO_AS_MISSING_FEATURES = [
+    "mto_del_ext_12m",
+    "rat_ing_ext_x_ing_tot_12m",
+    "mto_al_ext_12m",
+    "ratio_egresos_exterior",
+]
 
 COLS_VARS = [  # VARIABLES FINALES del TRAIN (selected_columns.csv sin target)
     "cnt_trx_cargostot_3m",
@@ -95,6 +104,23 @@ def _safe_fill_median(series: pd.Series, default_value: float = 0.0) -> pd.Serie
     else:
         median_value = non_null.median()
     return series.fillna(median_value)
+
+
+def restore_historical_missingness(df: pd.DataFrame) -> pd.DataFrame:
+    """Restore the pre-202605 missing-value representation for exterior features."""
+    restored_counts = {}
+    for column in ZERO_AS_MISSING_FEATURES:
+        if column not in df.columns:
+            continue
+        values = pd.to_numeric(df[column], errors="coerce")
+        zero_mask = values.eq(0)
+        restored_counts[column] = int(zero_mask.sum())
+        df[column] = values.mask(zero_mask, np.nan)
+
+    if restored_counts:
+        detail = ", ".join(f"{column}={count:,}" for column, count in restored_counts.items())
+        print(f"Valores 0 restaurados a NA para mantener semantica 202508: {detail}")
+    return df
 
 
 def apply_feature_mappings(df: pd.DataFrame) -> pd.DataFrame:
@@ -209,6 +235,7 @@ def preprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
     if "cnt_alerta_hist" in df.columns:
         df["cnt_alerta_hist"] = df["cnt_alerta_hist"].astype("float64")
 
+    df = restore_historical_missingness(df)
     df = apply_feature_mappings(df)
 
     if "mto_fact_declarado_sunat" in df.columns:
@@ -342,21 +369,23 @@ def postprocessing_fn(df: pd.DataFrame) -> pd.DataFrame:
 
 def output_fn(df: pd.DataFrame, cols_control: list = None) -> pd.DataFrame:
     datetime_now = datetime.datetime.now(pytz.timezone("America/Lima")).strftime("%Y%m%d")
-
     df_output = pd.DataFrame()
-    df_output["codmes"] = df["cod_mes"]
-    df_output["num_documento"] = df["key_value"]
-    df_output["codunico"] = df["cod_cli"]
+    df_output["cod_mes"] = df["cod_mes"]
+    df_output["cod_tip_doc"] = df["cod_tip_doc"]
+    df_output["key_value"] = df["key_value"]
+    df_output["cod_cli"] = df["cod_cli"]
+    df_output["prob_model"] = ""
+    df_output["puntuacion"] = df["puntuacion"]
     df_output["modelo"] = "plaft_pj_minorista"
-    df_output["fec_replica"] = datetime_now
-    df_output["grupo_alerta"] = df["grupo_alerta_desc"]
-    df_output["grupo_corte_nueva_alerta"] = (df["grupo_corte_nueva_alerta"])
-    df_output["score"] = df["puntuacion"]
+    df_output["ts_carga"] = datetime_now
+    df_output["grupo_ejec"] = df["grupo_alerta_desc"]
+    df_output["segmento"] = ""
     df_output["orden"] = df["orden"]
-    df_output["variable1"] = df["tipo_alerta_n2"]
-    df_output["variable2"] = df["trx_riesgo_cliente"]
-    df_output["variable3"] = ""
-
+    df_output["extra_01"] = df["tipo_alerta_n2"]
+    df_output["extra_02"] = df["trx_riesgo_cliente"]
+    df_output["extra_03"] = df["grupo_corte_nueva_alerta"]
+    df_output["extra_04"] = ""
+    df_output["extra_05"] = ""
     return df_output, None
 
 

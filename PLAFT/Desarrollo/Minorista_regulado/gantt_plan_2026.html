@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan 2026 | Gantt</title>
+<style>
+:root {
+  --ink: #17212b;
+  --muted: #65727d;
+  --line: #d8e0e5;
+  --paper: #f4f6f3;
+  --panel: #ffffff;
+  --accent: #006d77;
+  --accent-soft: #d9f0ee;
+  --orange: #e07a5f;
+  --yellow: #f2cc8f;
+  --blue: #4d7ea8;
+  --green: #4f8a62;
+  --purple: #7b61a8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: Georgia, "Times New Roman", serif;
+}
+button, input, select { font: inherit; }
+.top {
+  padding: 28px clamp(18px, 4vw, 56px) 22px;
+  background: linear-gradient(135deg, #173f4a, #006d77 58%, #83c5be);
+  color: white;
+}
+.eyebrow { margin: 0 0 8px; font: 700 12px/1.2 Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; opacity: .8; }
+h1 { margin: 0; font-size: clamp(30px, 4vw, 52px); font-weight: 500; }
+.subtitle { max-width: 760px; margin: 9px 0 0; font: 15px/1.5 Arial, sans-serif; opacity: .9; }
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: end;
+  padding: 18px clamp(18px, 4vw, 56px);
+  background: white; border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 5;
+}
+.control { display: grid; gap: 5px; min-width: 190px; }
+.control label { font: 700 11px Arial, sans-serif; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+select, input[type="search"], input[type="file"] { border: 1px solid #bbc9cf; border-radius: 5px; padding: 9px 10px; background: #fff; color: var(--ink); }
+button { border: 0; border-radius: 5px; padding: 10px 14px; background: var(--ink); color: #fff; cursor: pointer; }
+button:hover { background: var(--accent); }
+main { padding: 22px clamp(18px, 4vw, 56px) 48px; }
+.notice { margin-bottom: 16px; padding: 11px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); font: 13px/1.45 Arial, sans-serif; }
+.summary { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.metric { min-width: 150px; padding: 13px 15px; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; }
+.metric strong { display: block; font: 700 23px Arial, sans-serif; }
+.metric span { color: var(--muted); font: 12px Arial, sans-serif; }
+.gantt-wrap { overflow: auto; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; box-shadow: 0 8px 24px rgba(23,33,43,.06); }
+.gantt { min-width: 1120px; }
+.months { display: grid; grid-template-columns: 340px 1fr; background: #eef3f1; border-bottom: 1px solid var(--line); }
+.month-label { padding: 12px 14px; font: 700 12px Arial, sans-serif; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.timeline { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(74px, 1fr); }
+.timeline span { padding: 12px 7px; border-left: 1px solid var(--line); text-align: center; font: 700 11px Arial, sans-serif; color: var(--muted); }
+.row { display: grid; grid-template-columns: 340px 1fr; min-height: 48px; border-bottom: 1px solid #e7ecee; }
+.row:last-child { border-bottom: 0; }
+.row-info { padding: 8px 14px; background: #fff; border-right: 1px solid var(--line); }
+.row-info strong { display: block; font-size: 14px; line-height: 1.2; }
+.row-info small { display: block; margin-top: 4px; color: var(--muted); font: 11px Arial, sans-serif; }
+.track { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(74px, 1fr); background-image: repeating-linear-gradient(to right, transparent 0, transparent calc((100% / var(--months)) - 1px), #e7ecee calc((100% / var(--months)) - 1px), #e7ecee calc(100% / var(--months))); }
+.track::before { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.22); pointer-events: none; }
+.bar { position: absolute; top: 10px; height: 28px; min-width: 5px; padding: 6px 9px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-radius: 4px; color: white; background: var(--accent); font: 700 11px Arial, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,.14); z-index: 1; }
+.bar:hover { z-index: 2; filter: brightness(1.08); }
+.legend { display: flex; flex-wrap: wrap; gap: 13px; padding: 14px 0 4px; font: 12px Arial, sans-serif; color: var(--muted); }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 5px; border-radius: 2px; vertical-align: -1px; }
+.pending { margin-top: 22px; }
+.pending h2 { margin: 0 0 9px; font-size: 23px; font-weight: 500; }
+table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--line); font: 13px Arial, sans-serif; }
+th, td { padding: 9px 10px; border-bottom: 1px solid #e7ecee; text-align: left; }
+th { background: #eef3f1; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.empty { color: var(--muted); font: 14px Arial, sans-serif; }
+@media (max-width: 700px) {
+  .toolbar { position: static; }
+  .control { min-width: 100%; }
+  main { padding-left: 12px; padding-right: 12px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <p class="eyebrow">Planificacion 2026-2028</p>
+  <h1>Mapa de trabajo</h1>
+  <p class="subtitle">Cronograma Gantt generado desde el plan actual. Las tareas sin fechas se muestran aparte para no inventar duraciones.</p>
+</header>
+<section class="toolbar">
+  <div class="control"><label for="area">Area</label><select id="area"><option value="">Todas</option></select></div>
+  <div class="control"><label for="project">Proyecto</label><select id="project"><option value="">Todos</option></select></div>
+  <div class="control"><label for="owner">Responsable</label><select id="owner"><option value="">Todos</option></select></div>
+  <div class="control"><label for="search">Buscar tarea</label><input id="search" type="search" placeholder="Ej. piloto, validacion"></div>
+  <div class="control"><label for="file">Actualizar fuente</label><input id="file" type="file" accept=".md,.csv,.tsv,text/plain,text/csv"></div>
+  <button id="reset" type="button">Restablecer filtros</button>
+</section>
+<main>
+  <div id="notice" class="notice">Cargando plan_2026.md...</div>
+  <section id="summary" class="summary"></section>
+  <section class="gantt-wrap"><div id="gantt" class="gantt"></div></section>
+  <div class="legend" id="legend"></div>
+  <section class="pending"><h2>Tareas sin fecha completa</h2><div id="pending"></div></section>
+</main>
+<script>
+const state = { rows: [], filtered: [] };
+const colors = ['#006d77', '#e07a5f', '#4d7ea8', '#4f8a62', '#7b61a8', '#b07d3c', '#3c6e71'];
+const $ = id => document.getElementById(id);
+function parseLine(line) {
+  const delimiter = line.includes('\t') ? '\t' : ',';
+  const cells = [];
+  let value = '', quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { quoted = !quoted; continue; }
+    if (ch === delimiter && !quoted) { cells.push(value.trim()); value = ''; }
+    else value += ch;
+  }
+  cells.push(value.trim());
+  return cells;
+}
+function parseSource(text) {
+  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(Boolean);
+  if (!lines.length) return [];
+  return lines.slice(1).map((line, index) => {
+    const c = parseLine(line);
+    return { id: index + 1, area: c[0] || '', project: c[1] || '', task: c[2] || '', owner: c[3] || '', start: c[4] || '', end: c[5] || '', deliverable: c[7] || '' };
+  });
+}
+function dateValue(value) {
+  const parts = value.split('/').map(Number);
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return null;
+  const [month, day, year] = parts;
+  return new Date(year, month - 1, day);
+}
+function formatDate(date) { return date.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function uniqueValues(key) { return [...new Set(state.rows.map(row => row[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')); }
+function fillSelect(id, values) {
+  const select = $(id); const current = select.value;
+  select.innerHTML = '<option value="">Todos</option>' + values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+  if (values.includes(current)) select.value = current;
+}
+function escapeHtml(value) { return String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
+function applyFilters() {
+  const area = $('area').value, project = $('project').value, owner = $('owner').value, search = $('search').value.toLowerCase();
+  state.filtered = state.rows.filter(row => (!area || row.area === area) && (!project || row.project === project) && (!owner || row.owner === owner) && (!search || `${row.task} ${row.project} ${row.owner}`.toLowerCase().includes(search)));
+  render();
+}
+function buildFilters() {
+  fillSelect('area', uniqueValues('area'));
+  fillSelect('project', uniqueValues('project'));
+  fillSelect('owner', uniqueValues('owner'));
+}
+function render() {
+  const dated = state.filtered.filter(row => dateValue(row.start) && dateValue(row.end));
+  const pending = state.filtered.filter(row => !(dateValue(row.start) && dateValue(row.end)));
+  const dates = dated.flatMap(row => [dateValue(row.start), dateValue(row.end)]);
+  const min = dates.length ? new Date(Math.min(...dates)) : new Date();
+  const max = dates.length ? new Date(Math.max(...dates)) : new Date();
+  min.setDate(1); max.setDate(1); max.setMonth(max.getMonth() + 1);
+  const months = Math.max(1, (max.getFullYear() - min.getFullYear()) * 12 + max.getMonth() - min.getMonth());
+  const projects = uniqueFrom(dated, 'project');
+  $('summary').innerHTML = `<div class="metric"><strong>${state.filtered.length}</strong><span>Tareas filtradas</span></div><div class="metric"><strong>${dated.length}</strong><span>Con fechas</span></div><div class="metric"><strong>${pending.length}</strong><span>Sin fecha completa</span></div><div class="metric"><strong>${projects.length}</strong><span>Proyectos</span></div>`;
+  $('notice').textContent = `Fuente actual: ${state.rows.length} tareas. El gráfico muestra ${dated.length} tareas con fecha completa.`;
+  const monthLabels = [];
+  for (let i = 0; i < months; i++) { const d = new Date(min); d.setMonth(min.getMonth() + i); monthLabels.push(d.toLocaleDateString('es-PE', { month: 'short', year: 'numeric' })); }
+  let html = `<div class="months"><div class="month-label">Proyecto / tarea</div><div class="timeline">${monthLabels.map(m => `<span>${escapeHtml(m)}</span>`).join('')}</div></div>`;
+  dated.forEach((row, index) => {
+    const start = dateValue(row.start), end = dateValue(row.end);
+    const leftDays = (start - min) / 86400000, widthDays = Math.max(1, (end - start) / 86400000 + 1), totalDays = (max - min) / 86400000;
+    const color = colors[projects.indexOf(row.project) % colors.length];
+    const title = `${row.project} | ${row.task} | ${row.owner} | ${row.start} - ${row.end}`;
+    html += `<div class="row"><div class="row-info"><strong>${escapeHtml(row.task)}</strong><small>${escapeHtml(row.project)} · ${escapeHtml(row.owner)}</small></div><div class="track" style="--months:${months}"><div class="bar" title="${escapeHtml(title)}" style="left:${leftDays / totalDays * 100}%;width:${widthDays / totalDays * 100}%;background:${color}">${escapeHtml(row.owner)}</div></div></div>`;
+  });
+  $('gantt').innerHTML = dated.length ? html : '<p class="empty" style="padding:20px">No hay tareas fechadas para este filtro.</p>';
+  $('legend').innerHTML = projects.map((project, index) => `<span><i style="background:${colors[index % colors.length]}"></i>${escapeHtml(project)}</span>`).join('');
+  $('pending').innerHTML = pending.length ? `<table><thead><tr><th>Area</th><th>Proyecto</th><th>Tarea</th><th>Responsable</th><th>Inicio</th><th>Fin</th></tr></thead><tbody>${pending.map(row => `<tr><td>${escapeHtml(row.area)}</td><td>${escapeHtml(row.project)}</td><td>${escapeHtml(row.task)}</td><td>${escapeHtml(row.owner)}</td><td>${escapeHtml(row.start || 'Pendiente')}</td><td>${escapeHtml(row.end || 'Pendiente')}</td></tr>`).join('')}</tbody></table>` : '<p class="empty">No hay tareas pendientes de fecha con este filtro.</p>';
+}
+function uniqueFrom(rows, key) { return [...new Set(rows.map(row => row[key]))]; }
+function loadText(text) { state.rows = parseSource(text); buildFilters(); applyFilters(); }
+$('area').addEventListener('change', applyFilters); $('project').addEventListener('change', applyFilters); $('owner').addEventListener('change', applyFilters); $('search').addEventListener('input', applyFilters);
+$('reset').addEventListener('click', () => { $('area').value = ''; $('project').value = ''; $('owner').value = ''; $('search').value = ''; applyFilters(); });
+$('file').addEventListener('change', event => { const file = event.target.files[0]; if (file) file.text().then(loadText); });
+fetch('plan_2026.md').then(response => { if (!response.ok) throw new Error('No disponible'); return response.text(); }).then(loadText).catch(() => { $('notice').textContent = 'Selecciona plan_2026.md en "Actualizar fuente" para cargar el Gantt desde el archivo actual.'; loadText('Tipo de Proyecto\tProyecto\tTareas\tResponsable\tFecha Inicial\tFecha fin tentativa\n'); });
+</script>
+</body>
+</html>
