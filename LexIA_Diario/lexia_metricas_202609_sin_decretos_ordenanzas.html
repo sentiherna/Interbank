@@ -64,11 +64,11 @@
       </div>
       <div class="grid4">
         <div class="mini"><div class="num">17</div><div class="txt">normas de interes registradas por el analista en septiembre</div></div>
-        <div class="mini"><div class="num">5</div><div class="txt">decretos excluidos del analisis</div></div>
-        <div class="mini"><div class="num">0</div><div class="txt">ordenanzas presentes en la validacion del periodo</div></div>
-        <div class="mini"><div class="num">12</div><div class="txt">normas de interes comparables incluidas en la matriz</div></div>
+        <div class="mini"><div class="num">12</div><div class="txt">TP, incluidos 3 decretos detectados por LexIA</div></div>
+        <div class="mini"><div class="num">5</div><div class="txt">FN, incluidos 2 decretos no detectados por LexIA</div></div>
+        <div class="mini"><div class="num">5</div><div class="txt">FP no locales: alertas LexIA no marcadas por el analista</div></div>
       </div>
-      <div class="foot">Se utilizaron las fechas 01, 02, 04, 05, 09, 10, 11, 12 y 15 de septiembre de 2026. Se excluyen solamente las normas cuyo <b>tipo</b> es Decreto u Ordenanza; una resolucion que menciona un decreto en su descripcion permanece en el calculo.</div>
+      <div class="foot">Se utilizaron las fechas 01, 02, 04, 05, 09, 10, 11, 12 y 15 de septiembre de 2026. Todas las normas del analista, incluidos decretos y ordenanzas, permanecen en el universo: si LexIA las detecta son TP y, si no, FN. Del lado de LexIA solo se excluyen de FP las alertas adicionales cuyo tipo es Decreto u Ordenanza.</div>
     </div>
 
     <div class="band">
@@ -80,17 +80,17 @@
         <div class="metric-card">
           <h3>Metricas clave</h3>
           <div class="metric-row">
-            <div class="metric-box"><div class="value">75.0%</div><div class="label">Recall</div><div class="sub">9 de 12 normas del analista capturadas por LexIA</div></div>
-            <div class="metric-box"><div class="value">64.3%</div><div class="label">Precision</div><div class="sub">9 TP sobre 14 alertas LexIA incluidas</div></div>
+            <div class="metric-box"><div class="value">70.6%</div><div class="label">Recall</div><div class="sub">12 de 17 normas del analista capturadas por LexIA</div></div>
+            <div class="metric-box"><div class="value">70.6%</div><div class="label">Precision</div><div class="sub">12 TP sobre 17 alertas LexIA incluidas</div></div>
           </div>
-          <div class="foot">F1: <b>69.2%</b>. Las alertas de tipo Decreto u Ordenanza no se contabilizan, tanto del lado de LexIA como del lado del analista.</div>
+          <div class="foot">F1: <b>70.6%</b>. Los decretos y ordenanzas validados por el analista se contabilizan como TP o FN. Las alertas locales adicionales de LexIA se excluyen solamente del conteo de FP.</div>
         </div>
         <div class="confusion">
           <h3>Matriz de confusion</h3>
           <table class="cm">
             <tr><th></th><th>Analista SI</th><th>Analista NO</th></tr>
-            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">9</span><span class="l">TP</span></td><td class="fp"><span class="n">5</span><span class="l">FP</span></td></tr>
-            <tr><td class="axis">LexIA NO</td><td class="fn"><span class="n">3</span><span class="l">FN</span></td><td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td></tr>
+            <tr><td class="axis">LexIA SI</td><td class="tp"><span class="n">12</span><span class="l">TP</span></td><td class="fp"><span class="n">5</span><span class="l">FP</span></td></tr>
+            <tr><td class="axis">LexIA NO</td><td class="fn"><span class="n">5</span><span class="l">FN</span></td><td class="tn"><span class="n">N/D</span><span class="l">TN no medido</span></td></tr>
           </table>
         </div>
       </div>
@@ -106,8 +106,10 @@
         <tr><td>10/09/2026</td><td>Resolucion</td><td>003-2026-EF/30</td><td>INFORMATIVA</td><td>Aprueban el Set Completo de las Normas Internacionales de Informacion Financiera version 2026, que incluye el Marco Conceptual para la Informacion Financiera.</td></tr>
         <tr><td>11/09/2026</td><td>Resolucion Ministerial</td><td>D000295-2026-MINAM</td><td>INFORMATIVA</td><td>Aprueban Relacion de Servicios del Sector Ambiente susceptibles de ser ejecutados bajo el regimen excepcional del mecanismo de Obras por Impuestos y sus contenidos minimos.</td></tr>
         <tr><td>15/09/2026</td><td>Resolucion SBS</td><td>02248-2026</td><td>INFORMATIVA</td><td>Autorizan funcionamiento de BiPay Empresa Emisora de Dinero Electronico S.A. como empresa de servicios complementarios y conexos.</td></tr>
+        <tr><td>12/09/2026</td><td>Decreto Supremo</td><td>186-2026-EF</td><td>INFORMATIVA</td><td>Aprueba el Reglamento del Titulo II del Decreto de Urgencia N° 013-2020.</td></tr>
+        <tr><td>15/09/2026</td><td>Decreto Supremo</td><td>018-2026-MTC</td><td>IMPACTO</td><td>Aprueba la norma sobre la numeracion para la identificacion de llamadas y mensajes de texto realizados con fines publicitarios.</td></tr>
       </table>
-      <div class="note" style="margin-top:16px"><b>Lectura operativa:</b> las dos primeras normas corresponden a patrones que ya cuentan con reglas explicitas (NIIF/IFRS y Obras por Impuestos). La autorizacion de una empresa emisora de dinero electronico queda como caso a reforzar en la taxonomia de autorizaciones SBS.</div>
+      <div class="note" style="margin-top:16px"><b>Lectura operativa:</b> las dos primeras normas corresponden a patrones que ya cuentan con reglas explicitas (NIIF/IFRS y Obras por Impuestos). La autorizacion de una empresa emisora de dinero electronico queda como caso a reforzar en la taxonomia de autorizaciones SBS. Los dos decretos permanecen como FN porque el criterio solicitado conserva toda norma validada por el analista.</div>
     </div>
 
     <div class="band">
